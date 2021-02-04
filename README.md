@@ -44,3 +44,33 @@ When using the database from IDEA, you can use these credentials to login.
 ### How to use JDBC
 Resources:<br/>
 https://www.vogella.com/tutorials/MySQLJava/article.html
+
+# Checklist
+Login, Session Management, User management and Security
+
+Each user must login to the system before he/she can perform actions/tasks. Management of the users and groups must be done on the server application or a separate client solely for administration purposes which should be accessed by admin users only. The application must be capable of managing sessions so that a user can only communicate with the server using one transaction session and within the limits of that session only. For example, a user cannot send a message or file unless the user has properly logged in.
+
+
+- [ ] Broadcast (to all users) - Users must be allowed to send a broadcast message to all other users that are logged in.
+
+
+- [ ] Private Message - Any user must be allowed to send private messages to anyone. Offline users will be notified of such message/s once they login.
+
+
+- [ ] Bookmarking of contacts (“favorite” contacts/groups) - Any user must be able to mark/bookmark frequently contacted users or groups for easy access.
+
+
+- [ ] Conference (creation and invitation – similar to groups in messenger) - Any user must be capable of creating a conference and invite different users or groups to join the conference. Other invited users may also invite other users but only the creator of the conference is allowed to remove/kick users out of the conference.
+
+
+- [ ] Searching Contacts/Groups
+
+Auxiliary feature for broadcasting messages, sending private messages, bookmarking of
+users or groups and invitation to conferences.
+
+Other features<br />
+- [ ] Sending of files<br />
+- [ ] Status updates (online, idle, away from keyboard, busy, etc.)<br />
+- [ ] Help module<br />
+
+You may look into existing chat applications for features that you may want to include in your project.

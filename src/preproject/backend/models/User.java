@@ -1,33 +1,38 @@
 package preproject.backend.models;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-// TODO: fit to database
-// placeholder data for now
+/**
+ * This class will be used to create an object of user which holds all of the information of the account and also the
+ * history of their messages.
+ *
+ * Each message will be stored in a {@link List} of the {@link Message} class. Then, this information will be used to
+ * store all of the unique group chat that the user is in. Each {@link List} of {@link Message} will be identified by
+ * a unique ID.
+ */
 public class User {
     private String userId;
     private String email;
     private String firstName;
     private String lastName;
-    private String userName;
-    private List<Message> messageList;
+    private Map<String, List<Message>> messageList; // where String = id, Message = messages for that group chat's id
 
-    public User(String id, String email, String fN, String lN, String uN) {
+    public User(String id, String email, String fN, String lN) {
         this.userId = id;
         this.email = email;
         this.firstName = fN;
         this.lastName = lN;
-        this.userName = uN;
-        this.messageList = new ArrayList<>();
+        this.messageList = new HashMap<>();
     }
 
-    public User(String id, String email, String fN, String lN, String uN, List<Message> mL) {
+    public User(String id, String email, String fN, String lN, Map<String, List<Message>> mL) {
         this.userId = id;
         this.email = email;
         this.firstName = fN;
         this.lastName = lN;
-        this.userName = uN;
         this.messageList = mL;
     }
 
@@ -63,19 +68,11 @@ public class User {
         this.lastName = lastName;
     }
 
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public List<Message> getMessageList() {
+    public Map<String, List<Message>> getMessageList() {
         return messageList;
     }
 
-    public void setMessageList(List<Message> messageList) {
+    public void setMessageList(Map<String, List<Message>> messageList) {
         this.messageList = messageList;
     }
 }

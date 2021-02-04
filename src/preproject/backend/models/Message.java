@@ -2,30 +2,27 @@ package preproject.backend.models;
 
 import java.sql.Timestamp;
 
-// TODO: fit to database
-// placeholder data for now
+/**
+ * The goal for this class is to create an object of Message where it contains the information of the messages sent,
+ * if the message is sent or received/seen or not seen, timestamp, and the id for the message for validation.
+ */
 public class Message {
-    private String status;
+    private String convoId; // validation key for which group chat it was sent to
     private String message;
     private java.sql.Timestamp timeSent;
 
-    public Message(String message, java.sql.Timestamp timeSent) {
+    public Message(String convoId, String message, java.sql.Timestamp timeSent) {
+        this.convoId = convoId;
         this.message = message;
         this.timeSent = timeSent;
     }
 
-    public Message(String message, String status, java.sql.Timestamp timeSent) {
-        this.message = message;
-        this.timeSent = timeSent;
-        this.status = status;
+    public String getConvoId() {
+        return convoId;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getStatus() {
-        return status;
+    public void setConvoId(String convoId) {
+        this.convoId = convoId;
     }
 
     public void setMessage(String message) {

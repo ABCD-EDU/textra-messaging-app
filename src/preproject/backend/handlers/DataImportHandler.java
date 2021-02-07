@@ -15,7 +15,7 @@ import java.util.*;
  * import all of the information in the database. Which can save a lot of data.
  */
 public final class DataImportHandler {
-    public static Map<String, Set<String>> parseGroupChatTable(ResultSet table) throws SQLException {
+    public static Map<String, Set<String>> parseGroupChatTable(ResultSet table) {
         Map<String, Set<String>> groupMap = null;
         try {
             groupMap = new HashMap<>();
@@ -37,7 +37,7 @@ public final class DataImportHandler {
         return groupMap;
     }
 
-    public static List<User> parseUserTable(ResultSet table) throws SQLException {
+    public static List<User> parseUserTable(ResultSet table) {
         List<User> userList = null;
         try {
             userList = new ArrayList<>();
@@ -56,7 +56,7 @@ public final class DataImportHandler {
         return userList;
     }
 
-    public static Map<String, List<Message>> parseMessageTable(ResultSet table) throws SQLException {
+    public static Map<String, List<Message>> parseMessageTable(ResultSet table) {
         Map<String, List<Message>> messageMap = null;
         try {
             messageMap = new HashMap<>();

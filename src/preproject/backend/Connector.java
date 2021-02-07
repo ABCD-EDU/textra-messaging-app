@@ -38,13 +38,9 @@ public class Connector {
         ResultSet userTable = readDatabase (USER_ACCOUNTS_TABLE);
         ResultSet msgTable = readDatabase(MESSAGES_TABLE);
 
-        try {
-            Map<String, Set<String>> groupData = DataImportHandler.parseGroupChatTable(gcTable);
-            List<User> userData = DataImportHandler.parseUserTable(userTable);
-            Map<String, List<Message>> messageData = DataImportHandler.parseMessageTable(msgTable);
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
+        Map<String, Set<String>> groupData = DataImportHandler.parseGroupChatTable(gcTable);
+        List<User> userData = DataImportHandler.parseUserTable(userTable);
+        Map<String, List<Message>> messageData = DataImportHandler.parseMessageTable(msgTable);
     }
 
     private void createConnection() {

@@ -1,18 +1,15 @@
 package preproject.backend.handlers;
 
+import preproject.backend.Connector;
+
 import java.net.PasswordAuthentication;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Optional;
 
-public class LoginHandler {
-    Connection connect;
-
-    public LoginHandler(Connection connect) {
-        this.connect = connect;
-    }
+public class LoginHandler{
+    public LoginHandler() {}
 
     /**
      * Checks if the user exists in the database through sql query.
@@ -22,7 +19,7 @@ public class LoginHandler {
      * @throws SQLException
      */
     private Optional<ResultSet> findUserByEmail(String emailInput) throws SQLException {
-        PreparedStatement statement = connect
+        PreparedStatement statement = Connector.connect
                 .prepareStatement("SELECT * FROM user_acc WHERE user_acc.email = ?");
         statement.setString(1, emailInput);
 
@@ -37,11 +34,18 @@ public class LoginHandler {
      * @return correct password authentication
      * @throws SQLException
      */
-    private boolean verifyUserAuthentication(PasswordAuthentication pwdAuth, ResultSet userRepo) throws SQLException {
-        String hash = userRepo.getString(3);
-        String salt = userRepo.getString(4);
+    private boolean verifyUserAuthentication(PasswordAuthentication pwdAuth, ResultSet userRepo) {
+        try {
+            if (userRepo.next()) {
+                String hash = userRepo.getString(3);
+                String salt = userRepo.getString(4);
 
-        return new PasswordHandler().verifyPassword(String.valueOf(pwdAuth.getPassword()), hash, salt);
+                return new PasswordHandler().verifyPassword(String.valueOf(pwdAuth.getPassword()), hash, salt);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     /**
@@ -53,17 +57,20 @@ public class LoginHandler {
      *
      * @param pwdAuth repo for password/username
      * @return row data
-     * @throws SQLException
      */
-    public Optional<ResultSet> exportUserRepo(PasswordAuthentication pwdAuth) throws SQLException {
-        Optional<ResultSet> userRepo = findUserByEmail(pwdAuth.getUserName());
+    public Optional<ResultSet> loginUser(PasswordAuthentication pwdAuth) {
+        Optional<ResultSet> userRepo;
+        try {
+            userRepo = findUserByEmail(pwdAuth.getUserName());
 
-        if (userRepo.isPresent()) {
-            if (verifyUserAuthentication(pwdAuth, userRepo.get())) {
-                return userRepo;
+            if (userRepo.isPresent()) {
+                if (verifyUserAuthentication(pwdAuth, userRepo.get())) {
+                    return userRepo;
+                }
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-
         return Optional.empty();
     }
 }

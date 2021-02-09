@@ -34,11 +34,13 @@ public class PasswordHandler {
 
     private static String SALT;
 
+    public PasswordHandler() {};
+
     public String getSalt() {
         return SALT;
     }
 
-    public static Optional<String> generateHashPassword(String password) {
+    public Optional<String> generateHashPassword(String password) {
         SALT = generateSalt(); // salt that has length of 64
         return hashPassword(password, SALT);
     }
@@ -48,14 +50,14 @@ public class PasswordHandler {
         return optEncrypted.map(s -> s.equals(key)).orElse(false);
     }
 
-    private static String generateSalt() {
+    private String generateSalt() {
         byte[] salt = new byte[64];
         RAND.nextBytes(salt);
 
         return Base64.getEncoder().encodeToString(salt);
     }
 
-    private static Optional<String> hashPassword(String password, String salt) {
+    private Optional<String> hashPassword(String password, String salt) {
         char[] chars = password.toCharArray();
         byte[] bytes = salt.getBytes();
 

@@ -1,16 +1,20 @@
 package preproject.backend;
 
 import preproject.backend.handlers.DataImportHandler;
+import preproject.backend.handlers.LoginHandler;
+import preproject.backend.handlers.RegisterHandler;
 import preproject.backend.models.Message;
 import preproject.backend.models.User;
 
+import java.net.PasswordAuthentication;
 import java.sql.*;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 public class Connector {
-    private Connection connect;
+    public static Connection connect;
 
     /**
      * The joined table for finding the users for a certain group chat.
@@ -31,23 +35,15 @@ public class Connector {
         new Connector();
     }
 
-    private Connector() {
+    public Connector() {
         createConnection();
-
-        ResultSet gcTable = readDatabase(GROUP_CHAT_TABLE);
-        ResultSet userTable = readDatabase (USER_ACCOUNTS_TABLE);
-        ResultSet msgTable = readDatabase(MESSAGES_TABLE);
-
-        Map<String, Set<String>> groupData = DataImportHandler.parseGroupChatTable(gcTable);
-        List<User> userData = DataImportHandler.parseUserTable(userTable);
-        Map<String, List<Message>> messageData = DataImportHandler.parseMessageTable(msgTable);
     }
 
     private void createConnection() {
         try {
             Class.forName("com.mysql.jdbc.Driver");
 
-            connect = DriverManager.getConnection("jdbc:mysql://localhost/feedback?autoReconnect=true&useSSL=false"
+            connect = DriverManager.getConnection("jdbc:mysql://localhost/messenger?autoReconnect=true&useSSL=false"
                     ,"cs222-pregrp3", "prelimgroup3");
 
             System.out.println("DATABASE CONNECTION SUCCESS");
@@ -69,5 +65,9 @@ public class Connector {
             throwables.printStackTrace();
         }
         return resultSet;
+    }
+
+    public Connection getConnect() {
+        return connect;
     }
 }

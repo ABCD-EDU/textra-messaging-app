@@ -3,6 +3,13 @@
 ## Starting Information
 **First, make sure to set the project's SDK and Language level to both java version "11.0.9" and 11 - Local variable syntax for lambda parameters**
 
+## Project Setup
+1. Create a JavaFX Project inside Intellij.
+2. After successfully creating the project, go into VCS and create a Git repository. (Same directory as project)
+3. Go ahead and click Git and select Manage Remotes.
+4. Get the HTTPS clone link of our repository and add it as one of our remotes.
+5. Go to Git again and click Fetch then Pull.
+
 ### How to add JavaFX and JDBC Drivers lib
 #### JDBC
 
@@ -18,8 +25,10 @@ To download JavaFX, select the LTS for Java 11.0.9.
 #### Installation
 Step 1. Extract the zip file into a safe location in your PC or "C:\Program Files\***Folder Name***".<br/>
 Change **Folder Name** to MySQL Connector or Java FX<br/>
-Step 2. Go to IDEA and select File > Project Structure > Libraries<br/>
-Step 3. Here, we can now import the Libraries that we'll use.<br/>
+Step 2. Go to IDEA and select File > Project Structure > Modules<br/>
+Step 3. Click the + button on the right side window and click add JARs or Directories<br/>
+Step 4. Here select all the files in your javafx/lib folder including the zip file<br/>
+Step 5. Now, go to Run > Edit Configurations and add this into your VM options --module-path "path to javafx/lib" --add-modules=javafx.controls,javafx.fxml<br/>
 
 ### For JDBC:
 For the MySQL Connector, choose mysql-connector-java-<'version'>-bin.jar to import as an external library.

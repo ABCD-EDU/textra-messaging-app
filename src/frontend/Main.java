@@ -1,4 +1,4 @@
-package sample;
+package frontend;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -10,9 +10,11 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("resources/view/SignInScreen.fxml"));
+        Scene scene = new Scene(root);
+//        scene.getStylesheets().add("frontend/resources/css/master.css");
         primaryStage.setTitle("Messaging App");
-        primaryStage.setScene(new Scene(root));
+        primaryStage.setScene(scene);
         primaryStage.show();
     }
 

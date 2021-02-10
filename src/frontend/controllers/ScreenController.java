@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -17,6 +18,11 @@ public class ScreenController {
 
     public ScreenController(ActionEvent event) {
         this.window = (Stage)((Node)event.getSource()).getScene().getWindow();
+        scenes = new HashMap<>();
+    }
+
+    public ScreenController(Node node) {
+        this.window = (Stage)node.getScene().getWindow();
         scenes = new HashMap<>();
     }
 

@@ -41,7 +41,7 @@ public class SignInController implements Initializable{
     @FXML
     void registerLabelPressed() {
         sController = new ScreenController((Stage)(register_label.getScene().getWindow()));
-        sController.activateUsingPath("../resources/view/RegisterScreenOne.fxml");
+        sController.activateUsingPath("../resources/view/RegisterScreen.fxml");
     }
 
     /**

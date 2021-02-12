@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <GridPane fx:id="users1" layoutX="6.0" prefHeight="720.0" prefWidth="426.0">
+         <columnConstraints>
+            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints maxHeight="384.0" minHeight="0.0" prefHeight="34.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="480.0" minHeight="0.0" prefHeight="71.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="615.0" minHeight="10.0" prefHeight="615.0" vgrow="SOMETIMES" />
+         </rowConstraints>
+         <children>
+            <Label text="Sign Up Requests">
+               <font>
+                  <Font name="System Bold" size="16.0" />
+               </font></Label>
+            <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="60.0" GridPane.rowIndex="1">
+               <children>
+                  <Button fx:id="declineall" mnemonicParsing="false" text="DECLINE ALL" textAlignment="CENTER" />
+                  <Button fx:id="acceptall" mnemonicParsing="false" text="ACCEPT ALL" textAlignment="CENTER" />
+               </children>
+            </HBox>
+         </children>
+      </GridPane>
+      <GridPane fx:id="users" layoutX="420.0" prefHeight="720.0" prefWidth="854.0">
+         <columnConstraints>
+            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints maxHeight="175.0" minHeight="10.0" prefHeight="45.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="308.0" minHeight="10.0" prefHeight="60.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="595.0" minHeight="10.0" prefHeight="541.0" vgrow="SOMETIMES" />
+             <RowConstraints maxHeight="358.0" minHeight="10.0" prefHeight="70.0" vgrow="SOMETIMES" />
+         </rowConstraints>
+         <children>
+            <TableView prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="2">
+              <columns>
+                  <TableColumn prefWidth="100.0" text="Status" />
+                  <TableColumn prefWidth="300.0" text="Email Address" />
+                  <TableColumn prefWidth="150.0" text="First Name" />
+                  <TableColumn prefWidth="150.0" text="Last Name" />
+                  <TableColumn prefWidth="115.0" text="Action" />
+              </columns>
+               <padding>
+                  <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+               </padding>
+            </TableView>
+            <Label text="ADMIN PANEL" textAlignment="CENTER">
+               <font>
+                  <Font name="Roboto Bold" size="14.0" />
+               </font>
+            </Label>
+            <Label text="Registered Users" GridPane.rowIndex="1">
+               <font>
+                  <Font name="Roboto Bold" size="18.0" />
+               </font>
+            </Label>
+            <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="500.0" GridPane.rowIndex="3">
+               <children>
+                  <Button fx:id="previous" mnemonicParsing="false" text="PREVIOUS" />
+                  <Button fx:id="next" mnemonicParsing="false" text="NEXT" />
+               </children>
+            </HBox>
+         </children>
+      </GridPane>
+   </children>
+</AnchorPane>

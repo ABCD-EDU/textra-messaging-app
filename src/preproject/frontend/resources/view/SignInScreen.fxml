@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 
-<GridPane fx:id="gird_pane" alignment="center" hgap="10" maxHeight="1080.0" maxWidth="1920.0" prefHeight="720.0" prefWidth="1280.0" stylesheets="@../css/master.css" vgap="10" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="frontend.controllers.SignInController">
+<GridPane fx:id="gird_pane" alignment="center" hgap="10" maxHeight="1080.0" maxWidth="1920.0" prefHeight="720.0" prefWidth="1280.0" stylesheets="@../css/master.css" vgap="10" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="preproject.frontend.controllers.SignInController">
    <columnConstraints>
       <ColumnConstraints />
    </columnConstraints>

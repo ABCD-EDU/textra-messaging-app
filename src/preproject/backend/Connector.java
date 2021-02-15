@@ -43,7 +43,7 @@ public class Connector {
         try {
             Class.forName("com.mysql.jdbc.Driver");
 
-            connect = DriverManager.getConnection("jdbc:mysql://localhost/messenger?autoReconnect=true&useSSL=false"
+            connect = DriverManager.getConnection("jdbc:mysql://localhost/messenger?allowPublicKeyRetrieval=true&autoReconnect=true&useSSL=false"
                     ,"cs222-pregrp3", "prelimgroup3");
 
             System.out.println("DATABASE CONNECTION SUCCESS");

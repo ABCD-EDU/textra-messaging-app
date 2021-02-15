@@ -5,14 +5,19 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import preproject.frontend.controllers.AdminController;
 
 public class Main extends Application {
 
+    private Object AdminController;
+
     @Override
     public void start(Stage primaryStage) throws Exception{
+        FXMLLoader loader = new FXMLLoader();
+        loader.setController(AdminController);
         Parent root = FXMLLoader.load(getClass().getResource("resources/view/AdminScreen.fxml"));
         Scene scene = new Scene(root);
-//        scene.getStylesheets().add("preproject.frontend/resources/css/master.css");
+        scene.getStylesheets().add(getClass().getResource("resources/css/AdminScreenStyle.css").toExternalForm());
         primaryStage.setTitle("Messaging App");
         primaryStage.setScene(scene);
         primaryStage.show();

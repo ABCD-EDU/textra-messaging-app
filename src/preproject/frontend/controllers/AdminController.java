@@ -14,6 +14,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import preproject.backend.Connector;
 import preproject.backend.handlers.DataImportHandler;
@@ -45,19 +46,10 @@ public class AdminController implements Initializable {
     private VBox signUpVbox;
 
     @FXML
-    private Label userName;
-
-    @FXML
-    private Button declineButton;
-
-    @FXML
-    private Button acceptButton;
-
-
-    @FXML
     TableView<User> studentTable;
-//    @FXML
-//    TableColumn<User, String> status;
+
+    @FXML
+    TableColumn<User, String> status;
     @FXML
     TableColumn<User, String> email;
     @FXML
@@ -66,39 +58,46 @@ public class AdminController implements Initializable {
     TableColumn<User, String> lName;
 
 
-//    ObservableList<User> list = FXCollections.observableArrayList(getDataFromDB());
+    ObservableList<User> list = FXCollections.observableArrayList(getDataFromDB());
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        loadDataToTable();
-        loadSignUpsToScrollPane();
 
+        loadSignUpsToScrollPane();
+        loadDataToTable();
     }
 
-
+    //Load user info to vbox in the scrollpane
     public void loadSignUpsToScrollPane(){
-        Node[] nodes = new Node[20];
+        Node[] nodes = new Node[list.size()];
         for (int i=0;i<nodes.length;i++){
             try {
-                nodes[i] = FXMLLoader.load(getClass().getResource("../resources/view/UserSignUpHbox.fxml"));
+                //Assigns formatted fxml file to each Hbox
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("../resources/view/UserSignUpHbox.fxml"));
+                AdminSignUpsController controller = new AdminSignUpsController();
+                loader.setController(controller);
+                nodes[i] = loader.load();
+                //Add an Hbox node to the vbox node
                 signUpVbox.getChildren().add(nodes[i]);
+                controller.setUserHbox(list.get(i));
             }catch (Exception e){
                 e.printStackTrace();
             }
-        }
+         }
     }
 
     public void loadDataToTable(){
         email.setCellValueFactory(new PropertyValueFactory<User, String>("email"));
         fName.setCellValueFactory(new PropertyValueFactory<User, String>("firstName"));
         lName.setCellValueFactory(new PropertyValueFactory<User, String>("lastName"));
-//        studentTable.setItems(list);
+        studentTable.setItems(list);
     }
 
-//    public List<User> getDataFromDB() {
-//        final String DATABASE = "messenger.user_acc";
-//        Connector connector = new Connector();
-//        ResultSet table = connector.readDatabase(DATABASE);
-//        return DataImportHandler.parseUserTable(table);
-//    }
+    public List<User> getDataFromDB() {
+        final String DATABASE = "messenger.user_acc";
+        Connector.createConnection();
+        Connector connector = new Connector();
+        ResultSet table = connector.readDatabase(DATABASE);
+        return DataImportHandler.parseUserTable(table);
+    }
 }

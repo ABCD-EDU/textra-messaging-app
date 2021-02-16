@@ -4,6 +4,7 @@
 .table-row-cell{
     -fx-cell-size: 50px;
 }
+
 #studentTable{
     -fx-font-family: Roboto;
     -fx-font-size: 15;

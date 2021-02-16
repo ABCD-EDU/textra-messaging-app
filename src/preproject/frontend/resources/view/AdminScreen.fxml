@@ -44,17 +44,7 @@
                            <children>
                               <VBox fx:id="signUpVbox">
                                  <children>
-                                    <HBox fx:id="userSigningUpHbox" alignment="CENTER" prefHeight="47.0" prefWidth="349.0" spacing="10.0" style="-fx-border-style: hidden hidden solid hidden;-fx-border-color: #333333;-fx-border-width: .1;">
-                                       <children>
-                                          <Label fx:id="userName" alignment="CENTER" contentDisplay="CENTER" prefHeight="47.0" prefWidth="186.0" text="User Name">
-                                             <font>
-                                                <Font name="Segoe UI" size="15.0" />
-                                             </font>
-                                          </Label>
-                                          <Button fx:id="declineButton" mnemonicParsing="false" style="-fx-background-color: #DB5461;-fx-text-fill: WHITE;" text="Decline" />
-                                          <Button fx:id="acceptButton" mnemonicParsing="false" style="-fx-background-color: #00A676;-fx-text-fill: WHITE;" text="Accept" />
-                                       </children>
-                                    </HBox>
+
                                  </children>
                               </VBox>
                            </children>

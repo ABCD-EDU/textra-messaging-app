@@ -7,10 +7,7 @@ import preproject.backend.models.User;
 import java.io.*;
 import java.net.PasswordAuthentication;
 import java.net.Socket;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.util.*;
 
 import static preproject.backend.State.*;
@@ -76,6 +73,12 @@ public class UserThread extends Thread {
                 case Action.ADD_GROUP_NEW_MEMBER:
                     this.addGroupMembers((Map<String, Object>) readData.getValue());
                     break;
+                case Action.GET_VERIFIED_USERS:
+                    this.getVerifiedUsers();
+                case Action.GET_UNVERIFIED_USERS:
+                    this.getVerifiedUsers();
+                case Action.ADD_VERIFIED_USERS:
+                    this.addVerifiedUsers((List<Integer>) readData.getValue());
             }
         } catch (IOException | ClassNotFoundException | SQLException e) {
             e.printStackTrace();
@@ -319,6 +322,83 @@ public class UserThread extends Thread {
             e.printStackTrace();
         }
     }
+
+    /**
+     * This is used to send a list of verified users from the database to the admin panel
+     */
+    private void getVerifiedUsers(){
+        List<User> verifiedUsers = getUsersForAdmin(1);
+        try {
+            writer.writeObject(Map.entry(SUCCESS_GET_VERIFIED_USERS, verifiedUsers));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+    }
+
+    /**
+     * This is used to send a list of verified users from the database to the admin panel
+     */
+    private void getUnverifiedUsers(){
+        List<User> unVerifiedUsers = getUsersForAdmin(0);
+        try {
+            writer.writeObject(Map.entry(SUCCESS_GET_UNVERIFIED_USERS, unVerifiedUsers));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+    /**
+     * This is a helper method for each getVerified and getUnverified methods. It gets called by either of the 2 methods mentioned
+     * and returns a list of users where they could be either verified or not depending on the parameter.
+     * @param verifiedOrUnverified is an integer value that stands as a boolean where 1 is considered true and 0 false.
+     * @return users that falls under the parameter provided.
+     */
+    private List<User> getUsersForAdmin(int verifiedOrUnverified){
+        try {
+            //Declare SQL statement that gets the necessary columns needed for building User model
+            String SQL = "SELECT user_id, email, user_fname, user_lname WHERE verified ="+Integer.toString(verifiedOrUnverified);
+            PreparedStatement statement = Connector.connect.prepareStatement(SQL);
+            ResultSet resultSet = statement.executeQuery();
+
+            List<User> users = new ArrayList<>();
+            while (resultSet.next()){
+                int userId = resultSet.getInt("user_id");
+                String email = resultSet.getString("email");
+                String firstName = resultSet.getString("user_fname");
+                String lastName = resultSet.getString("user_lname");
+                //Add the users with verified status to the list which will be returned to the admin client
+                users.add(new User(userId,email,firstName,lastName));
+            }
+            return users;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * Adds the users that have been verified by the admin
+     * @param newlyVerifiedIDs the user ID of users that have been verified
+     */
+    public void addVerifiedUsers(List<Integer> newlyVerifiedIDs){
+        try {
+            //Declare SQL statement that changes the verified status of unregistered users
+            String SQL = "UPDATE messenger.user_acc SET (verified) WHERE (user_id)"+"VALUES(?,?)";
+            PreparedStatement statement = Connector.connect.prepareStatement(SQL);
+
+            for (Integer id: newlyVerifiedIDs){
+                statement.setString(1, "1"); //Assign the value one to the verified column to verify a user
+                statement.setInt(2, id);
+                //Add the statement to the batch of statements to be executed
+                statement.addBatch();
+            }
+            statement.executeBatch();
+            writer.writeObject(Map.entry(SUCCESS_ADD_VERIFIED_USERS, true));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
 
     protected User getUser() {
         return this.user;

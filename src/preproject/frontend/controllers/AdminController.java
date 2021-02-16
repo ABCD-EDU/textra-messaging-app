@@ -66,7 +66,7 @@ public class AdminController implements Initializable {
     TableColumn<User, String> lName;
 
 
-    ObservableList<User> list = FXCollections.observableArrayList(getDataFromDB());
+//    ObservableList<User> list = FXCollections.observableArrayList(getDataFromDB());
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -92,13 +92,13 @@ public class AdminController implements Initializable {
         email.setCellValueFactory(new PropertyValueFactory<User, String>("email"));
         fName.setCellValueFactory(new PropertyValueFactory<User, String>("firstName"));
         lName.setCellValueFactory(new PropertyValueFactory<User, String>("lastName"));
-        studentTable.setItems(list);
+//        studentTable.setItems(list);
     }
 
-    public List<User> getDataFromDB() {
-        final String DATABASE = "messenger.user_acc";
-        Connector connector = new Connector();
-        ResultSet table = connector.readDatabase(DATABASE);
-        return DataImportHandler.parseUserTable(table);
-    }
+//    public List<User> getDataFromDB() {
+//        final String DATABASE = "messenger.user_acc";
+//        Connector connector = new Connector();
+//        ResultSet table = connector.readDatabase(DATABASE);
+//        return DataImportHandler.parseUserTable(table);
+//    }
 }

@@ -23,13 +23,7 @@ public final class DataImportHandler {
                 String groupId = table.getString("group_id");
                 String userId = table.getString("user_id");
 
-                if (groupMap.containsKey(groupId)) {
-                    groupMap.get(groupId).add(userId);
-                } else {
-                    Set<String> set = new HashSet<>();
-                    set.add(userId);
-                    groupMap.put(groupId, set);
-                }
+                groupMap.get(groupId).add(userId);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -42,7 +36,7 @@ public final class DataImportHandler {
         try {
             userList = new ArrayList<>();
             while (table.next()) {
-                String userId = table.getString("user_id");
+                int userId = table.getInt("user_id");
                 String email = table.getString("email");
                 String firstName = table.getString("user_fname");
                 String lastName = table.getString("user_lname");

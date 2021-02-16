@@ -1,9 +1,6 @@
 package preproject.backend.models;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * This class will be used to create an object of user which holds all of the information of the account and also the
@@ -14,33 +11,27 @@ import java.util.Map;
  * a unique ID.
  */
 public class User {
-    private String userId;
+    private int userId;
     private String email;
     private String firstName;
     private String lastName;
     private Map<String, List<Message>> messageList; // where String = id, Message = messages for that group chat's id
+    private Set<GroupChat> groups;
 
-    public User(String id, String email, String fN, String lN) {
+    public User(int id, String email, String fN, String lN) {
         this.userId = id;
         this.email = email;
         this.firstName = fN;
         this.lastName = lN;
         this.messageList = new HashMap<>();
+        this.groups = new HashSet<>();
     }
 
-    public User(String id, String email, String fN, String lN, Map<String, List<Message>> mL) {
-        this.userId = id;
-        this.email = email;
-        this.firstName = fN;
-        this.lastName = lN;
-        this.messageList = mL;
-    }
-
-    public String getUserId() {
+    public int getUserId() {
         return userId;
     }
 
-    public void setUserId(String userId) {
+    public void setUserId(int userId) {
         this.userId = userId;
     }
 

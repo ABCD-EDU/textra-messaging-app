@@ -1,17 +1,6 @@
 package preproject.backend;
 
-import preproject.backend.handlers.DataImportHandler;
-import preproject.backend.handlers.LoginHandler;
-import preproject.backend.handlers.RegisterHandler;
-import preproject.backend.models.Message;
-import preproject.backend.models.User;
-
-import java.net.PasswordAuthentication;
 import java.sql.*;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 
 public class Connector {
     public static Connection connect;
@@ -31,15 +20,9 @@ public class Connector {
      */
     private static final String MESSAGES_TABLE = "messenger.message";
 
-    public static void main(String[] args) {
-        new Connector();
-    }
+    public Connector() {}
 
-    public Connector() {
-        createConnection();
-    }
-
-    private void createConnection() {
+    public static void createConnection() {
         try {
             Class.forName("com.mysql.jdbc.Driver");
 
@@ -67,7 +50,7 @@ public class Connector {
         return resultSet;
     }
 
-    public Connection getConnect() {
+    public static Connection getConnect() {
         return connect;
     }
 }

@@ -13,12 +13,14 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.*;
 
+import static preproject.backend.State.*;
+
 /**
  * This class runs a session for the server. Where each {@code UserThread} is considered as one session.
  * The server will continually accept the ongoing connection to the socket as much as possible which leads to
  * multiple users accessing in one client.
  */
-public class UserThread {
+public class UserThread extends Thread {
     private final Socket SOCKET;
     private final ChatServer SERVER;
     private ObjectOutputStream writer;
@@ -29,7 +31,8 @@ public class UserThread {
         this.SERVER = server;
     }
 
-    public void init() {
+    @Override
+    public void run() {
         try {
             InputStream input = SOCKET.getInputStream();
             ObjectInputStream reader = new ObjectInputStream(input);
@@ -117,9 +120,9 @@ public class UserThread {
                 insertGroupMembers.setBoolean(3, false);
             }
 
-            writer.writeObject(Map.entry(State.SUCCESS_ADD_GROUP_NEW_MEMBER, true));
+            writer.writeObject(Map.entry(SUCCESS_ADD_GROUP_NEW_MEMBER, true));
         } catch (SQLException e) {
-            writer.writeObject(Map.entry(State.FAIL_ADD_GROUP_NEW_MEMBER, false));
+            writer.writeObject(Map.entry(FAIL_ADD_GROUP_NEW_MEMBER, false));
             e.printStackTrace();
         }
     }
@@ -189,9 +192,9 @@ public class UserThread {
 
             this.importGroupMembers(userIdList, groupAlias, creator);
 
-            writer.writeObject(Map.entry(State.SUCCESS_ADD_GROUP, true));
+            writer.writeObject(Map.entry(SUCCESS_ADD_GROUP, true));
         } catch (SQLException e) {
-            writer.writeObject(Map.entry(State.FAIL_ADD_GROUP, false));
+            writer.writeObject(Map.entry(FAIL_ADD_GROUP, false));
             e.printStackTrace();
         }
     }
@@ -206,7 +209,7 @@ public class UserThread {
             findGroup.setInt(2, Integer.parseInt(groupCreator));
 
             if (!findGroup.executeQuery().wasNull()) {
-                writer.writeObject(Map.entry(State.FAIL_ADD_FAVOURITE, false));
+                writer.writeObject(Map.entry(FAIL_ADD_FAVOURITE, false));
             }
             return true;
         } catch (SQLException | IOException e) {
@@ -230,9 +233,9 @@ public class UserThread {
 
             preparedStatement.executeUpdate();
 
-            writer.writeObject(Map.entry(State.SUCCESS_ADD_FAVOURITE, true));
+            writer.writeObject(Map.entry(SUCCESS_ADD_FAVOURITE, true));
         } catch (SQLException e) {
-            writer.writeObject(Map.entry(State.FAIL_ADD_FAVOURITE, false));
+            writer.writeObject(Map.entry(FAIL_ADD_FAVOURITE, false));
             e.printStackTrace();
         }
     }
@@ -270,9 +273,9 @@ public class UserThread {
         // send a boolean back to the client that identifies if the register attempt is a success or not
         // if not, tell the user to try again later.
         if (registerAttempt) {
-            writer.writeObject(Map.entry(State.SUCCESS_REGISTER_USER, true));
+            writer.writeObject(Map.entry(SUCCESS_REGISTER_USER, true));
         } else {
-            writer.writeObject(Map.entry(State.FAIL_REGISTER_USER, false));
+            writer.writeObject(Map.entry(FAIL_REGISTER_USER, false));
         }
     }
 
@@ -292,13 +295,13 @@ public class UserThread {
             userRepo.put("lastName", lastName);
 
             // send data back to client
-            writer.writeObject(Map.entry(State.SUCCESS_LOGIN_USER, userRepo));
+            writer.writeObject(Map.entry(SUCCESS_LOGIN_USER, userRepo));
 
             // TODO:after sending the data into the client, set this thread into the current user's information containing
             //  the data for the group lists, user info, and all of the messages connected to them
             this.user = new User(resultSet.getInt("user_id"), email, firstName, lastName);
         } else {
-            writer.writeObject(Map.entry(State.FAIL_LOGIN_USER, false)); // if userRepo does not have any value in it, return false (login failed)
+            writer.writeObject(Map.entry(FAIL_LOGIN_USER, false)); // if userRepo does not have any value in it, return false (login failed)
         }
     }
 

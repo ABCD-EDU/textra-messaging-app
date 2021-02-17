@@ -1,29 +1,19 @@
 package preproject.frontend.controllers;
 
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import preproject.backend.Connector;
-import preproject.backend.handlers.DataImportHandler;
 import preproject.backend.models.User;
 
-import java.awt.event.ActionEvent;
 import java.net.URL;
-import java.sql.Array;
-import java.sql.ResultSet;
 import java.util.*;
 
 public class AdminController implements Initializable {
@@ -93,11 +83,17 @@ public class AdminController implements Initializable {
         studentTable.setItems(list);
     }
 
+    /**
+     * instead of doing this, make a call from the server in order to get the data you need. see {@link preproject.backend.UserThread}
+     * @return
+     */
     public List<User> getDataFromDB() {
-        final String DATABASE = "messenger.user_acc";
-        Connector.createConnection();
-        Connector connector = new Connector();
-        ResultSet table = connector.readDatabase(DATABASE);
-        return DataImportHandler.parseUserTable(table);
+//        final String DATABASE = "messenger.user_acc";
+//        Connector.createConnection();
+//        Connector connector = new Connector();
+//        ResultSet table = connector.readDatabase(DATABASE);
+//        return DataImportHandler.parseUserTable(table);
+
+        return null;
     }
 }

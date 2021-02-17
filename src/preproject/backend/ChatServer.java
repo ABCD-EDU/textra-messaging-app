@@ -1,14 +1,8 @@
 package preproject.backend;
 
-import com.sun.source.tree.ReturnTree;
-import preproject.backend.handlers.DataImportHandler;
-import preproject.backend.models.GroupChat;
-
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -30,37 +24,28 @@ public class ChatServer {
         this.PORT = port;
         this.onlineUserNames = new ArrayList<>();
         this.onlineUsers = new ArrayList<>();
-        this.groupList = getGroupList(); // TODO: need to get group list as users add members and create new groups
+        // TODO: need to get group list as users add members and create new groups
+
+//        RegisterHandler registerHandler = new RegisterHandler();
+//        registerHandler.registerUser(new PasswordAuthentication("johndoe@gmail.com", "password123".toCharArray()), "john", "doe");
     }
 
     public void init() {
         try (ServerSocket serverSocket = new ServerSocket(this.PORT)){
             System.out.println("Server listening on PORT: " + this.PORT);
-
+//            RegisterHandler registerHandler = new RegisterHandler();
+//            registerHandler.registerUser(new PasswordAuthentication("testemail@gmail.com", "password123".toCharArray()), "test", "user");
             while (true) {
                 Socket socket = serverSocket.accept();
-                System.out.println("A user has logged in");
+                System.out.println("A client has connected to the server");
 
                 UserThread userThread = new UserThread(socket, this);
                 onlineUsers.add(userThread);
+                userThread.start();
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    private Map<String, Set<String>> getGroupList() {
-        // TODO: FIND A BETTER WAY TO DO THIS
-        try {
-            PreparedStatement preparedStatement = Connector.connect.prepareStatement(
-                    "SELECT * FROM messenger.group_msg"
-            );
-
-            return DataImportHandler.parseGroupChatTable(preparedStatement.executeQuery());
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     /**

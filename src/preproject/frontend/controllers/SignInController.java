@@ -1,6 +1,7 @@
 package preproject.frontend.controllers;
 
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -8,9 +9,12 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+import preproject.frontend.*;
 
+import java.io.IOException;
+import java.net.PasswordAuthentication;
 import java.net.URL;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class SignInController implements Initializable{
 
@@ -32,8 +36,44 @@ public class SignInController implements Initializable{
     private Label register_label;
 
     @FXML
+    @SuppressWarnings("unchecked")
     void loginPressed(ActionEvent event) {
+        try {
+            String email = email_field.getText();
+            String password = pass_field.getText();
 
+            Map<String, String> userRepo = new HashMap<>();
+
+            userRepo.put("action", Action.LOGIN_USER);
+            userRepo.put("email", email);
+            userRepo.put("password", password);
+
+            List<Map<String, String>> mapRepo = new ArrayList<>();
+            mapRepo.add(userRepo);
+
+            Main.serverConnector.getObjOut().writeObject(userRepo);
+            Map<String, Object> loginRepo = (Map<String, Object>) Main.serverConnector.getObjIn().readObject();
+
+            System.out.println("userid: " + loginRepo.get("userId"));
+            System.out.println("email: " + loginRepo.get("email"));
+            System.out.println("first name: " + loginRepo.get("firstName"));
+            System.out.println("last name: " + loginRepo.get("lastName"));
+            System.out.println("is verified: " + loginRepo.get("isVerified"));
+            System.out.println("is admin: " + loginRepo.get("isAdmin"));
+
+            if ((boolean) loginRepo.get("isVerified") && (boolean) loginRepo.get("isAdmin")) {
+                sController = new ScreenController((Stage) (signIn_btn.getScene().getWindow()));
+                sController.activateUsingPath("../resources/view/AdminScreen.fxml");
+            }
+
+            if ((boolean) loginRepo.get("isVerified") && !((boolean) loginRepo.get("isAdmin"))) {
+                sController = new ScreenController((Stage) (signIn_btn.getScene().getWindow()));
+                System.out.println("USER VERIFIED");
+//                sController.activateUsingPath("src/preproject/frontend/resources/view/AdminScreen.fxml");
+            }
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML
@@ -57,6 +97,7 @@ public class SignInController implements Initializable{
      */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+//        this.signIn_btn.setOnAction(this::loginPressed);
 //        try{
 //            System.out.println("initializing");
 //            FXMLLoader loader = new FXMLLoader(getClass().getResource("../resources/view/SignInScreen.fxml"));

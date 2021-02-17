@@ -44,8 +44,8 @@ public class RegisterHandler{
             System.out.println(salt);
 
             try (PreparedStatement statement = Connector.connect.prepareStatement("INSERT INTO messenger.user_acc " +
-                            "(email, pwd_hash, salt, user_fname, user_lname, verified)" +
-                            "VALUES (?, ?, ?, ?, ?, ?)")){
+                            "(email, pwd_hash, salt, user_fname, user_lname, verified, is_admin)" +
+                            "VALUES (?, ?, ?, ?, ?, ?, ?)")){
 
                 statement.setString(1, email);
                 statement.setString(2, hashPassword.get());
@@ -53,6 +53,7 @@ public class RegisterHandler{
                 statement.setString(4, fName);
                 statement.setString(5, lName);
                 statement.setBoolean(6, false);
+                statement.setBoolean(7, false);
 
                 statement.executeUpdate();
 

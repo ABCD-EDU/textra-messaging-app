@@ -66,7 +66,7 @@ public class UserThread extends Thread {
                 this.broadcastMessage((Map<String, String>) readData.get("messageRepo"));
                 break;
             case Action.ADD_FAVOURITE:
-                this.addUserFavouriteGroup((Map.Entry<String, String>) readData.get("favRepo"));
+                this.addUserFavouriteGroup((Map<String, String>) readData.get("favRepo"));
                 break;
             case Action.ADD_GROUP:
                 this.addGroup((Map<String, Object>) readData.get("groupRepo"));
@@ -183,9 +183,9 @@ public class UserThread extends Thread {
                 insertGroupMembers.setBoolean(3, false);
             }
 
-            objOut.writeObject(Map.entry(SUCCESS_ADD_GROUP_NEW_MEMBER, true));
+            objOut.writeObject(new HashMap<String, Boolean>().put(SUCCESS_ADD_GROUP_NEW_MEMBER, true));
         } catch (SQLException e) {
-            objOut.writeObject(Map.entry(FAIL_ADD_GROUP_NEW_MEMBER, false));
+            objOut.writeObject(new HashMap<String, Boolean>().put(FAIL_ADD_GROUP_NEW_MEMBER, false));
             e.printStackTrace();
         }
     }
@@ -255,9 +255,9 @@ public class UserThread extends Thread {
 
             this.importGroupMembers(userIdList, groupAlias, creator);
 
-            objOut.writeObject(Map.entry(SUCCESS_ADD_GROUP, true));
+            objOut.writeObject(new HashMap<String, Boolean>().put(SUCCESS_ADD_GROUP, true));
         } catch (SQLException e) {
-            objOut.writeObject(Map.entry(FAIL_ADD_GROUP, false));
+            objOut.writeObject(new HashMap<String, Boolean>().put(FAIL_ADD_GROUP, false));
             e.printStackTrace();
         }
     }
@@ -272,7 +272,7 @@ public class UserThread extends Thread {
             findGroup.setInt(2, Integer.parseInt(groupCreator));
 
             if (!findGroup.executeQuery().wasNull()) {
-                objOut.writeObject(Map.entry(FAIL_ADD_FAVOURITE, false));
+                objOut.writeObject(new HashMap<String, Boolean>().put(FAIL_ADD_FAVOURITE, false));
             }
             return true;
         } catch (SQLException | IOException e) {
@@ -281,9 +281,9 @@ public class UserThread extends Thread {
         return false;
     }
 
-    private void addUserFavouriteGroup(Map.Entry<String, String> faveRepo) throws IOException {
-        String userId = faveRepo.getKey();
-        String groupId = faveRepo.getValue();
+    private void addUserFavouriteGroup(Map<String, String> faveRepo) throws IOException {
+        String userId = faveRepo.get("userId");
+        String groupId = faveRepo.get("groupId");
 
         try {
             // TODO: find the group id of the given data first
@@ -296,9 +296,9 @@ public class UserThread extends Thread {
 
             preparedStatement.executeUpdate();
 
-            objOut.writeObject(Map.entry(SUCCESS_ADD_FAVOURITE, true));
+            objOut.writeObject(new HashMap<String, Boolean>().put(SUCCESS_ADD_FAVOURITE, true));
         } catch (SQLException e) {
-            objOut.writeObject(Map.entry(FAIL_ADD_FAVOURITE, false));
+            objOut.writeObject(new HashMap<String, Boolean>().put(FAIL_ADD_FAVOURITE, false));
             e.printStackTrace();
         }
     }
@@ -336,13 +336,14 @@ public class UserThread extends Thread {
         // send a boolean back to the client that identifies if the register attempt is a success or not
         // if not, tell the user to try again later.
         if (registerAttempt) {
-            objOut.writeObject(Map.entry(SUCCESS_REGISTER_USER, true));
+            objOut.writeObject(new HashMap<String, Boolean>().put(SUCCESS_REGISTER_USER, true));
         } else {
-            objOut.writeObject(Map.entry(FAIL_REGISTER_USER, false));
+            objOut.writeObject(new HashMap<String, Boolean>().put(FAIL_REGISTER_USER, false));
         }
     }
 
     private void loginAuthentication(LoginHandler loginHandler, HashMap<String, Object> userAuth) throws IOException, SQLException {
+        System.out.println(userAuth.get("email") + " " + userAuth.get("password"));
         Optional<ResultSet> userLoginRepo = loginHandler.loginUser(new PasswordAuthentication((String) userAuth.get("email"), ((String) userAuth.get("password")).toCharArray()));
         if (userLoginRepo.isPresent()) {
             // TODO: if userRepo exists then load all of the data that needs to be rendered and send it to the client
@@ -371,7 +372,7 @@ public class UserThread extends Thread {
             //  the data for the group lists, user info, and all of the messages connected to them
             this.user = new User(resultSet.getInt("user_id"), email, firstName, lastName);
         } else {
-            objOut.writeObject(Map.entry(FAIL_LOGIN_USER, false)); // if userRepo does not have any value in it, return false (login failed)
+            objOut.writeObject(new HashMap<String, Boolean>().put(FAIL_LOGIN_USER, false)); // if userRepo does not have any value in it, return false (login failed)
         }
     }
 
@@ -384,7 +385,7 @@ public class UserThread extends Thread {
      */
     protected void sendMessage(String message, String address) {
         try {
-            objOut.writeObject(Map.entry(address, message)); // send message to the server
+            objOut.writeObject(new HashMap<String, String>().put(address, message)); // send message to the server
         } catch (IOException e) {
             e.printStackTrace();
         }

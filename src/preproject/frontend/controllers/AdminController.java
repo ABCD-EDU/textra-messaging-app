@@ -60,9 +60,9 @@ public class AdminController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        loadSignUpsToScrollPane();
         importUserRepo();
-        loadDataToTable();
+        loadSignUpsToScrollPane();
+//        loadDataToTable();
     }
 
     //TODO: Find a better way to implement this
@@ -113,9 +113,9 @@ public class AdminController implements Initializable {
 
     public void loadDataToTable() {
 //        status.setCellValueFactory(new PropertyValueFactory<>("status"));
-        email.setCellValueFactory(new PropertyValueFactory<>("email"));
-        fName.setCellValueFactory(new PropertyValueFactory<>("firstName"));
-        lName.setCellValueFactory(new PropertyValueFactory<>("lastName"));
+//        email.setCellValueFactory(new PropertyValueFactory<>("email"));
+//        fName.setCellValueFactory(new PropertyValueFactory<>("firstName"));
+//        lName.setCellValueFactory(new PropertyValueFactory<>("lastName"));
         studentTable.setItems(userRegisteredRepo);
     }
 

@@ -20,7 +20,7 @@ import static preproject.backend.State.*;
 public class UserThread extends Thread {
     private final Socket SOCKET;
     private final ChatServer SERVER;
-    private ObjectOutputStream objOut;
+    private ObjectOutputStream writer;
     private User user;
 
     public UserThread(Socket socket, ChatServer server) {
@@ -35,15 +35,14 @@ public class UserThread extends Thread {
             ObjectInputStream reader = new ObjectInputStream(input);
 
             OutputStream output = SOCKET.getOutputStream();
-            objOut = new ObjectOutputStream(output);
+            writer = new ObjectOutputStream(output);
 
             // constantly receive data being sent and process it
-            SOCKET.setKeepAlive(true);
-            while (SOCKET.isConnected()) {
+            while (true) {
                 processReadData(reader);
             }
 
-        } catch (IOException | SQLException | ClassNotFoundException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -181,9 +180,9 @@ public class UserThread extends Thread {
                 insertGroupMembers.setBoolean(3, false);
             }
 
-            objOut.writeObject(Map.entry(SUCCESS_ADD_GROUP_NEW_MEMBER, true));
+            writer.writeObject(Map.entry(SUCCESS_ADD_GROUP_NEW_MEMBER, true));
         } catch (SQLException e) {
-            objOut.writeObject(Map.entry(FAIL_ADD_GROUP_NEW_MEMBER, false));
+            writer.writeObject(Map.entry(FAIL_ADD_GROUP_NEW_MEMBER, false));
             e.printStackTrace();
         }
     }
@@ -253,9 +252,9 @@ public class UserThread extends Thread {
 
             this.importGroupMembers(userIdList, groupAlias, creator);
 
-            objOut.writeObject(Map.entry(SUCCESS_ADD_GROUP, true));
+            writer.writeObject(Map.entry(SUCCESS_ADD_GROUP, true));
         } catch (SQLException e) {
-            objOut.writeObject(Map.entry(FAIL_ADD_GROUP, false));
+            writer.writeObject(Map.entry(FAIL_ADD_GROUP, false));
             e.printStackTrace();
         }
     }
@@ -270,7 +269,7 @@ public class UserThread extends Thread {
             findGroup.setInt(2, Integer.parseInt(groupCreator));
 
             if (!findGroup.executeQuery().wasNull()) {
-                objOut.writeObject(Map.entry(FAIL_ADD_FAVOURITE, false));
+                writer.writeObject(Map.entry(FAIL_ADD_FAVOURITE, false));
             }
             return true;
         } catch (SQLException | IOException e) {
@@ -294,9 +293,9 @@ public class UserThread extends Thread {
 
             preparedStatement.executeUpdate();
 
-            objOut.writeObject(Map.entry(SUCCESS_ADD_FAVOURITE, true));
+            writer.writeObject(Map.entry(SUCCESS_ADD_FAVOURITE, true));
         } catch (SQLException e) {
-            objOut.writeObject(Map.entry(FAIL_ADD_FAVOURITE, false));
+            writer.writeObject(Map.entry(FAIL_ADD_FAVOURITE, false));
             e.printStackTrace();
         }
     }
@@ -334,14 +333,14 @@ public class UserThread extends Thread {
         // send a boolean back to the client that identifies if the register attempt is a success or not
         // if not, tell the user to try again later.
         if (registerAttempt) {
-            objOut.writeObject(Map.entry(SUCCESS_REGISTER_USER, true));
+            writer.writeObject(Map.entry(SUCCESS_REGISTER_USER, true));
         } else {
-            objOut.writeObject(Map.entry(FAIL_REGISTER_USER, false));
+            writer.writeObject(Map.entry(FAIL_REGISTER_USER, false));
         }
     }
 
-    private void loginAuthentication(LoginHandler loginHandler, HashMap<String, Object> userAuth) throws IOException, SQLException {
-        Optional<ResultSet> userLoginRepo = loginHandler.loginUser(new PasswordAuthentication((String) userAuth.get("email"), ((String) userAuth.get("password")).toCharArray()));
+    private void loginAuthentication(LoginHandler loginHandler, PasswordAuthentication userAuth) throws IOException, SQLException {
+        Optional<ResultSet> userLoginRepo = loginHandler.loginUser(userAuth);
         if (userLoginRepo.isPresent()) {
             // TODO: if userRepo exists then load all of the data that needs to be rendered and send it to the client
             //  data includes: contacts (groups), messages in each group, user account information
@@ -363,13 +362,13 @@ public class UserThread extends Thread {
             userRepo.put("isAdmin", isAdmin);
 
             // send data back to client
-            objOut.writeObject(userRepo);
+            writer.writeObject(Map.entry(SUCCESS_LOGIN_USER, userRepo));
 
             // TODO:after sending the data into the client, set this thread into the current user's information containing
             //  the data for the group lists, user info, and all of the messages connected to them
             this.user = new User(resultSet.getInt("user_id"), email, firstName, lastName);
         } else {
-            objOut.writeObject(Map.entry(FAIL_LOGIN_USER, false)); // if userRepo does not have any value in it, return false (login failed)
+            writer.writeObject(Map.entry(FAIL_LOGIN_USER, false)); // if userRepo does not have any value in it, return false (login failed)
         }
     }
 
@@ -382,11 +381,88 @@ public class UserThread extends Thread {
      */
     protected void sendMessage(String message, String address) {
         try {
-            objOut.writeObject(Map.entry(address, message)); // send message to the server
+            writer.writeObject(Map.entry(address, message)); // send message to the server
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
+    /**
+     * This is used to send a list of verified users from the database to the admin panel
+     */
+    private void getVerifiedUsers(){
+        List<User> verifiedUsers = getUsersForAdmin(1);
+        try {
+            writer.writeObject(Map.entry(SUCCESS_GET_VERIFIED_USERS, verifiedUsers));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+    }
+
+    /**
+     * This is used to send a list of verified users from the database to the admin panel
+     */
+    private void getUnverifiedUsers(){
+        List<User> unVerifiedUsers = getUsersForAdmin(0);
+        try {
+            writer.writeObject(Map.entry(SUCCESS_GET_UNVERIFIED_USERS, unVerifiedUsers));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+    /**
+     * This is a helper method for each getVerified and getUnverified methods. It gets called by either of the 2 methods mentioned
+     * and returns a list of users where they could be either verified or not depending on the parameter.
+     * @param verifiedOrUnverified is an integer value that stands as a boolean where 1 is considered true and 0 false.
+     * @return users that falls under the parameter provided.
+     */
+    private List<User> getUsersForAdmin(int verifiedOrUnverified){
+        try {
+            //Declare SQL statement that gets the necessary columns needed for building User model
+            String SQL = "SELECT user_id, email, user_fname, user_lname WHERE verified ="+Integer.toString(verifiedOrUnverified);
+            PreparedStatement statement = Connector.connect.prepareStatement(SQL);
+            ResultSet resultSet = statement.executeQuery();
+
+            List<User> users = new ArrayList<>();
+            while (resultSet.next()){
+                int userId = resultSet.getInt("user_id");
+                String email = resultSet.getString("email");
+                String firstName = resultSet.getString("user_fname");
+                String lastName = resultSet.getString("user_lname");
+                //Add the users with verified status to the list which will be returned to the admin client
+                users.add(new User(userId,email,firstName,lastName));
+            }
+            return users;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * Adds the users that have been verified by the admin
+     * @param newlyVerifiedIDs the user ID of users that have been verified
+     */
+    public void addVerifiedUsers(List<Integer> newlyVerifiedIDs){
+        try {
+            //Declare SQL statement that changes the verified status of unregistered users
+            String SQL = "UPDATE messenger.user_acc SET (verified) WHERE (user_id)"+"VALUES(?,?)";
+            PreparedStatement statement = Connector.connect.prepareStatement(SQL);
+
+            for (Integer id: newlyVerifiedIDs){
+                statement.setString(1, "1"); //Assign the value one to the verified column to verify a user
+                statement.setInt(2, id);
+                //Add the statement to the batch of statements to be executed
+                statement.addBatch();
+            }
+            statement.executeBatch();
+            writer.writeObject(Map.entry(SUCCESS_ADD_VERIFIED_USERS, true));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
 
     protected User getUser() {
         return this.user;

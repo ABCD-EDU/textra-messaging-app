@@ -13,14 +13,16 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import preproject.backend.Connector;
 import preproject.backend.models.User;
+import preproject.frontend.Action;
+import preproject.frontend.Main;
 
+import java.io.IOException;
 import java.net.URL;
-import java.sql.ResultSet;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
+
+import static preproject.frontend.State.SUCCESS_GET_UNVERIFIED_USERS;
+import static preproject.frontend.State.SUCCESS_GET_VERIFIED_USERS;
 
 public class AdminController implements Initializable {
 
@@ -54,67 +56,86 @@ public class AdminController implements Initializable {
     TableColumn<User, String> lName;
 
 
-    ObservableList<Map<String, String>> list = FXCollections.observableArrayList();
+    ObservableList<Map<String, String>> userRegisteredRepo = FXCollections.observableArrayList();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         loadSignUpsToScrollPane();
+        importUserRepo();
         loadDataToTable();
     }
 
     //TODO: Find a better way to implement this
     //Load user info to vbox in the scrollpane
-    public void loadSignUpsToScrollPane(){
-
+    public void loadSignUpsToScrollPane() {
         //Declare nodes which will be assigned with HBox nodes which will contain 3 children nodes which are label, declineButton and acceptButton
-        Node[] nodes = new Node[list.size()];
-        for (int i=0;i<nodes.length;i++){
-            try {
-                //Assigns formatted fxml file to each Hbox
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("../resources/view/UserSignUpHbox.fxml"));
-                nodes[i] = loader.load();
-                //Get the 3 nodes from the HBox
-                for (Node subNode: ((HBox) nodes[i]).getChildren()){
-                    //Check if the node provided is label type then assign the user's first and last names to that node label in the Hbox
-                    int currentIndex= i;
-//                    if (subNode instanceof Label){
-//                        ((Label) subNode).setText(list.get(i).getFirstName()+" "+ list.get(i).getLastName());
-//                        //Check if the node has an ID of decline button if true then assign an action even to the button
-//                    }else if (subNode.getId().equals("declineButton")){
-//                        ((Button) subNode).setOnAction(action->{
-//                            System.out.println("No");
-//                            ((VBox) subNode.getParent().getParent()).getChildren().remove((HBox) nodes[currentIndex]);
-////                            //If the action of the admin is decline then he removes that user to the list
-////                            list.remove(currentIndex);
-//                        });
-//                    }else {
-//                        ((Button) subNode).setOnAction(action -> {
-//                            System.out.println("Yes");
-//                            ((VBox) subNode.getParent().getParent()).getChildren().remove((HBox) nodes[currentIndex]);
-////                            //If the action of the admin is decline then he removes that user to the list
-////                            list.remove(currentIndex);
-//                        });
-//                    }
-                }
 
-                //Add an Hbox node to the vbox node
-                signUpVbox.getChildren().add(nodes[i]);
-            }catch (Exception e){
+        Node node = null;
+        for (int i = 0; i < userRegisteredRepo.size(); i++) {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../resources/view/UserSignUpHbox.fxml"));
+
+            try {
+                node = loader.load();
+            } catch (IOException e) {
                 e.printStackTrace();
             }
+
+            assert node != null;
+            for (Node component : ((HBox) node).getChildren()) {
+                Node finalNode = node;
+                Map<String, String> userRepo = userRegisteredRepo.get(i);
+
+                if (component instanceof Label) {
+                    ((Label) component).setText(userRepo.get("email"));
+                }
+
+                else if (component instanceof Button) {
+                    if (component.getId().equals("declineButton")) {
+                        ((Button) component).setOnAction(e -> {
+                            ((VBox) component.getParent().getParent()).getChildren().remove(finalNode);
+                        });
+
+                        // TODO: request update to denied
+                    }
+
+                    else if (component.getId().equals("acceptButton")) {
+                        ((Button) component).setOnAction(e -> {
+                            ((VBox) component.getParent().getParent()).getChildren().remove(finalNode);
+                        });
+
+                        // TODO: request update to verified
+                    }
+                }
+            }
+            signUpVbox.getChildren().add(node);
         }
     }
 
-    public void loadDataToTable(){
-        status.setCellValueFactory(new PropertyValueFactory<>("status"));
+    public void loadDataToTable() {
+//        status.setCellValueFactory(new PropertyValueFactory<>("status"));
         email.setCellValueFactory(new PropertyValueFactory<>("email"));
         fName.setCellValueFactory(new PropertyValueFactory<>("firstName"));
         lName.setCellValueFactory(new PropertyValueFactory<>("lastName"));
-        studentTable.setItems(list);
+        studentTable.setItems(userRegisteredRepo);
     }
 
-    public List<User> getDataFromDB() {
-        return null;
+    public void importUserRepo() {
+        try {
+            Map<String, String> actionMap = new HashMap<>();
+            actionMap.put("action", Action.GET_UNVERIFIED_USERS);
+            Main.serverConnector.getObjOut().writeObject(actionMap);
+
+            Map<String, List<Map<String, String>>> mapRead = (Map<String, List<Map<String, String>>>) Main.serverConnector.getObjIn().readObject();
+
+            List<Map<String, String>> mapRepo = mapRead.get(SUCCESS_GET_UNVERIFIED_USERS);
+            if (userRegisteredRepo == null) {
+                System.out.println("error");
+            }
+            System.out.println("SIZEEEEEE " + mapRepo.size());
+            userRegisteredRepo.addAll(mapRepo);
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
 

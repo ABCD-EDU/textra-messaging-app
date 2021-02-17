@@ -75,10 +75,10 @@ public class UserThread extends Thread {
                 this.addGroupMembers((Map<String, Object>) readData.get("membersRepo"));
                 break;
             case Action.GET_VERIFIED_USERS:
-                this.getUsersForAdmin(true);
+                this.getUsersForAdmin(1);
                 break;
             case Action.GET_UNVERIFIED_USERS:
-                this.getUsersForAdmin(false);
+                this.getUsersForAdmin(0);
                 break;
             case Action.POST_VERIFIED_USERS:
                 this.updateVerifiedUsers((List<Integer>) readData.get("userIdRepo"));
@@ -103,36 +103,38 @@ public class UserThread extends Thread {
         }
     }
 
-    private void getUsersForAdmin(boolean isVerified) {
+    private void getUsersForAdmin(int isVerified) {
         try {
             PreparedStatement preparedStatement = Connector.connect.prepareStatement(
                     "SELECT * FROM user_acc WHERE verified = ?"
             );
-
-            preparedStatement.setBoolean(1, isVerified);
+            preparedStatement.setInt(1, isVerified);
 
             ResultSet resultSet = preparedStatement.executeQuery();
+            System.out.println("test");
 
-            Map<String, Object> writeObject = new HashMap<>();
-            List<Map<String, Object>> userRepo = new ArrayList<>();
+            Map<String, List<Map<String,String>>> writeObject = new HashMap<>(); // write back
+            List<Map<String, String>> userRepo = new ArrayList<>(); // list of userRepo
             while (resultSet.next()) {
-                Map<String, Object> mapRepo = new HashMap<>();
-                int userId = resultSet.getInt("user_id");
-                String email = resultSet.getString("user_id");
-                String firstName = resultSet.getString("user_id");
-                String lastName = resultSet.getString("user_id");
-                boolean verified = resultSet.getBoolean("user_id");
+                Map<String, String> mapRepo = new HashMap<>();
+                String userId = String.valueOf(resultSet.getInt("user_id"));
+                String email = resultSet.getString("email");
+                String firstName = resultSet.getString("user_fname");
+                String lastName = resultSet.getString("user_lname");
+                String isAdmin = String.valueOf(resultSet.getBoolean("is_admin"));
 
                 mapRepo.put("userId", userId);
                 mapRepo.put("email", email);
                 mapRepo.put("firstName", firstName);
                 mapRepo.put("lastName", lastName);
-                mapRepo.put("verified", verified);
+                mapRepo.put("isVerified", String.valueOf(isVerified));
+                mapRepo.put("isAdmin", isAdmin);
 
                 userRepo.add(mapRepo);
+                System.out.println("SIZE OF REPO " + userRepo.size());
             }
 
-            if (isVerified) {
+            if (isVerified == 1) {
                 writeObject.put(SUCCESS_GET_VERIFIED_USERS, userRepo);
             } else {
                 writeObject.put(SUCCESS_GET_UNVERIFIED_USERS, userRepo);

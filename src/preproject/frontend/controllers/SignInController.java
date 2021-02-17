@@ -49,7 +49,7 @@ public class SignInController implements Initializable{
             userRepo.put("password", password);
 
             Main.serverConnector.getObjOut().writeObject(userRepo);
-            Map<String, Object> loginRepo = (Map<String, Object>) Main.serverConnector.getObjIn().readObject();
+            Map<String, String> loginRepo = (Map<String, String>) Main.serverConnector.getObjIn().readObject();
 
             System.out.println("userid: " + loginRepo.get("userId"));
             System.out.println("email: " + loginRepo.get("email"));
@@ -58,12 +58,12 @@ public class SignInController implements Initializable{
             System.out.println("is verified: " + loginRepo.get("isVerified"));
             System.out.println("is admin: " + loginRepo.get("isAdmin"));
 
-            if ((boolean) loginRepo.get("isVerified") && (boolean) loginRepo.get("isAdmin")) {
+            if (Boolean.parseBoolean(loginRepo.get("isVerified")) && Boolean.parseBoolean(loginRepo.get("isAdmin"))) {
                 sController = new ScreenController((Stage) (signIn_btn.getScene().getWindow()));
                 sController.activateUsingPath("../resources/view/AdminScreen.fxml");
             }
 
-            if ((boolean) loginRepo.get("isVerified") && !((boolean) loginRepo.get("isAdmin"))) {
+            if (Boolean.parseBoolean(loginRepo.get("isVerified")) && !Boolean.parseBoolean(loginRepo.get("isAdmin"))) {
                 sController = new ScreenController((Stage) (signIn_btn.getScene().getWindow()));
                 System.out.println("USER VERIFIED");
 //                sController.activateUsingPath("src/preproject/frontend/resources/view/AdminScreen.fxml");

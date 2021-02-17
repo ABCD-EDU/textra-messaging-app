@@ -27,6 +27,4 @@ public class AdminSignUpsController implements Initializable {
     public void setUserHbox(User user){
         userName.setText(user.getFirstName()+" "+user.getLastName());
     }
-
-
 }

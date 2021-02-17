@@ -76,7 +76,7 @@ public class UserThread extends Thread {
                 case Action.GET_VERIFIED_USERS:
                     this.getVerifiedUsers();
                 case Action.GET_UNVERIFIED_USERS:
-                    this.getVerifiedUsers();
+                    this.getUnverifiedUsers();
                 case Action.ADD_VERIFIED_USERS:
                     this.addVerifiedUsers((List<Integer>) readData.getValue());
             }

@@ -118,6 +118,10 @@ public class AdminController implements Initializable {
         studentTable.setItems(list);
     }
 
+    /**
+     * instead of doing this, make a call from the server in order to get the data you need. see {@link preproject.backend.UserThread}
+     * @return
+     */
     public List<User> getDataFromDB() {
         final String DATABASE = "messenger.user_acc";
         Connector.createConnection();

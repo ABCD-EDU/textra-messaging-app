@@ -48,39 +48,96 @@ public class UserThread extends Thread {
     }
 
     @SuppressWarnings("unchecked")
-    private void processReadData(ObjectInputStream reader) {
+    private void processReadData(ObjectInputStream reader) throws IOException, SQLException, ClassNotFoundException {
+
+        HashMap<String, Object> readData = (HashMap<String, Object>) reader.readObject();
+        switch (String.valueOf(readData.get("action"))) {
+            case Action.LOGIN_USER:
+                this.loginAuthentication(new LoginHandler(), readData);
+                break;
+            case Action.LOGOUT_USER:
+                this.SOCKET.close(); // close the socket when user logouts
+                break;
+            case Action.REGISTER_USER:
+                this.registerUser(new RegisterHandler(), (Map<String, String>) readData.get("userRepo"));
+                break;
+            case Action.SEND_MESSAGE:
+                this.broadcastMessage((Map<String, String>) readData.get("messageRepo"));
+                break;
+            case Action.ADD_FAVOURITE:
+                this.addUserFavouriteGroup((Map.Entry<String, String>) readData.get("favRepo"));
+                break;
+            case Action.ADD_GROUP:
+                this.addGroup((Map<String, Object>) readData.get("groupRepo"));
+                break;
+            case Action.ADD_GROUP_NEW_MEMBER:
+                this.addGroupMembers((Map<String, Object>) readData.get("membersRepo"));
+                break;
+            case Action.GET_VERIFIED_USERS:
+                this.getUsersForAdmin(true);
+                break;
+            case Action.GET_UNVERIFIED_USERS:
+                this.getUsersForAdmin(false);
+                break;
+            case Action.POST_VERIFIED_USERS:
+                this.updateVerifiedUsers((List<Integer>) readData.get("userIdRepo"));
+                break;
+        }
+    }
+
+    private void updateVerifiedUsers(List<Integer> userIdList) {
         try {
-            Map.Entry<String, Object> readData = (Map.Entry<String, Object>) reader.readObject();
-            switch (readData.getKey()) {
-                case Action.LOGIN_USER:
-                    this.loginAuthentication(new LoginHandler(), (PasswordAuthentication) readData.getValue());
-                    break;
-                case Action.LOGOUT_USER:
-                    this.SOCKET.close(); // close the socket when user logouts
-                    break;
-                case Action.REGISTER_USER:
-                    this.registerUser(new RegisterHandler(), (Map<String, String>) readData.getValue());
-                    break;
-                case Action.SEND_MESSAGE:
-                    this.broadcastMessage((Map<String, String>) readData.getValue());
-                    break;
-                case Action.ADD_FAVOURITE:
-                    this.addUserFavouriteGroup((Map.Entry<String, String>) readData.getValue());
-                    break;
-                case Action.ADD_GROUP:
-                    this.addGroup((Map<String, Object>) readData.getValue());
-                    break;
-                case Action.ADD_GROUP_NEW_MEMBER:
-                    this.addGroupMembers((Map<String, Object>) readData.getValue());
-                    break;
-                case Action.GET_VERIFIED_USERS:
-                    this.getVerifiedUsers();
-                case Action.GET_UNVERIFIED_USERS:
-                    this.getUnverifiedUsers();
-                case Action.ADD_VERIFIED_USERS:
-                    this.addVerifiedUsers((List<Integer>) readData.getValue());
+            PreparedStatement preparedStatement = Connector.connect.prepareStatement(
+                    "UPDATE user_acc SET verified = ? WHERE user_id = ?"
+            );
+
+            for (Integer userId : userIdList) {
+                preparedStatement.setBoolean(1, true);
+                preparedStatement.setInt(2, userId);
+
+                preparedStatement.executeUpdate();
             }
-        } catch (IOException | ClassNotFoundException | SQLException e) {
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void getUsersForAdmin(boolean isVerified) {
+        try {
+            PreparedStatement preparedStatement = Connector.connect.prepareStatement(
+                    "SELECT * FROM user_acc WHERE verified = ?"
+            );
+
+            preparedStatement.setBoolean(1, isVerified);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            Map<String, Object> writeObject = new HashMap<>();
+            List<Map<String, Object>> userRepo = new ArrayList<>();
+            while (resultSet.next()) {
+                Map<String, Object> mapRepo = new HashMap<>();
+                int userId = resultSet.getInt("user_id");
+                String email = resultSet.getString("user_id");
+                String firstName = resultSet.getString("user_id");
+                String lastName = resultSet.getString("user_id");
+                boolean verified = resultSet.getBoolean("user_id");
+
+                mapRepo.put("userId", userId);
+                mapRepo.put("email", email);
+                mapRepo.put("firstName", firstName);
+                mapRepo.put("lastName", lastName);
+                mapRepo.put("verified", verified);
+
+                userRepo.add(mapRepo);
+            }
+
+            if (isVerified) {
+                writeObject.put(SUCCESS_GET_VERIFIED_USERS, userRepo);
+            } else {
+                writeObject.put(SUCCESS_GET_UNVERIFIED_USERS, userRepo);
+            }
+            objOut.writeObject(writeObject);
+        } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
     }
@@ -289,13 +346,20 @@ public class UserThread extends Thread {
             //  data includes: contacts (groups), messages in each group, user account information
             Map<String, String> userRepo = new HashMap<>();
             ResultSet resultSet = userLoginRepo.get();
+            String userId = String.valueOf(resultSet.getInt("user_id"));
             String email = resultSet.getString("email");
             String firstName = resultSet.getString("user_fname");
             String lastName = resultSet.getString("user_lname");
+            String isVerified = String.valueOf(resultSet.getBoolean("verified"));
+            String isAdmin = String.valueOf(resultSet.getBoolean("is_admin"));
 
+            userRepo.put(SUCCESS_LOGIN_USER, String.valueOf(true));
+            userRepo.put("userId", userId);
             userRepo.put("email", email);
             userRepo.put("firstName", firstName);
             userRepo.put("lastName", lastName);
+            userRepo.put("isVerified", isVerified);
+            userRepo.put("isAdmin", isAdmin);
 
             // send data back to client
             writer.writeObject(Map.entry(SUCCESS_LOGIN_USER, userRepo));

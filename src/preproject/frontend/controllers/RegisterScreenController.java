@@ -8,6 +8,12 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
+import preproject.frontend.Action;
+import preproject.frontend.Main;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class RegisterScreenController {
 
@@ -53,7 +59,7 @@ public class RegisterScreenController {
     }
 
     @FXML
-    void registerButtonPressed(ActionEvent event) {
+    void registerButtonPressed(ActionEvent event) throws IOException, ClassNotFoundException {
 
         boolean fieldsAreValid = true;
 
@@ -69,9 +75,7 @@ public class RegisterScreenController {
         String passWord = pass_field.getText().trim();
         String cPassWord = cPass_field.getText().trim();
 
-        // Validate email
-        // validate fName
-        // validate lName
+        // validate email, fName, lastName here
 
         if (!passWord.equals(cPassWord)) {
             password_warning.setVisible(true);
@@ -79,7 +83,16 @@ public class RegisterScreenController {
         }else password_warning.setVisible(false);
 
         if (fieldsAreValid) {
-            //TODO:  Check credentials here
+            Map<String, String> userRepo = new HashMap<>();
+
+            userRepo.put("action", Action.REGISTER_USER);
+            userRepo.put("email", email);
+            userRepo.put("password", passWord);
+            userRepo.put("firstName", fName);
+            userRepo.put("lastName", lName);
+
+            Main.serverConnector.getObjOut().writeObject(userRepo);
+            Main.serverConnector.getObjIn().readObject();
         }
 
     }

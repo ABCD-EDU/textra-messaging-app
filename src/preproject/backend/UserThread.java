@@ -60,7 +60,7 @@ public class UserThread extends Thread {
                 this.SOCKET.close(); // close the socket when user logouts
                 break;
             case Action.REGISTER_USER:
-                this.registerUser(new RegisterHandler(), (Map<String, String>) readData.get("userRepo"));
+                this.registerUser(new RegisterHandler(), readData);
                 break;
             case Action.SEND_MESSAGE:
                 this.broadcastMessage((Map<String, String>) readData.get("messageRepo"));
@@ -326,10 +326,10 @@ public class UserThread extends Thread {
     }
 
     // TODO: Register the student into admin braodcast group
-    private void registerUser(RegisterHandler registerHandler, Map<String, String> userRepo) throws IOException {
+    private void registerUser(RegisterHandler registerHandler, HashMap<String, Object> userRepo) throws IOException {
         boolean registerAttempt = registerHandler.registerUser(
-                new PasswordAuthentication(userRepo.get("email"), userRepo.get("password").toCharArray()),
-                userRepo.get("firstName"), userRepo.get("lastName"));
+                new PasswordAuthentication((String) userRepo.get("email"), ((String)userRepo.get("password")).toCharArray()),
+                (String)userRepo.get("firstName"), (String)userRepo.get("lastName"));
 
         // send a boolean back to the client that identifies if the register attempt is a success or not
         // if not, tell the user to try again later.

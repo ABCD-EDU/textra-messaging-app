@@ -48,9 +48,6 @@ public class SignInController implements Initializable{
             userRepo.put("email", email);
             userRepo.put("password", password);
 
-            List<Map<String, String>> mapRepo = new ArrayList<>();
-            mapRepo.add(userRepo);
-
             Main.serverConnector.getObjOut().writeObject(userRepo);
             Map<String, Object> loginRepo = (Map<String, Object>) Main.serverConnector.getObjIn().readObject();
 

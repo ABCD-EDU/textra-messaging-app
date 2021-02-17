@@ -38,4 +38,5 @@ public class ServerConnector extends Thread {
     public ObjectOutputStream getObjOut() {
         return writeThread.getObjOut();
     }
+
 }

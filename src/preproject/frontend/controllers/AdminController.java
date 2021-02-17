@@ -7,14 +7,20 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import preproject.backend.Connector;
 import preproject.backend.models.User;
 
 import java.net.URL;
-import java.util.*;
+import java.sql.ResultSet;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
 
 public class AdminController implements Initializable {
 
@@ -36,7 +42,7 @@ public class AdminController implements Initializable {
     private VBox signUpVbox;
 
     @FXML
-    TableView<User> studentTable;
+    TableView<Map<String, String>> studentTable;
 
     @FXML
     TableColumn<User, String> status;
@@ -48,52 +54,68 @@ public class AdminController implements Initializable {
     TableColumn<User, String> lName;
 
 
-    ObservableList<User> list = FXCollections.observableArrayList(getDataFromDB());
+    ObservableList<Map<String, String>> list = FXCollections.observableArrayList();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
         loadSignUpsToScrollPane();
         loadDataToTable();
     }
 
+    //TODO: Find a better way to implement this
     //Load user info to vbox in the scrollpane
     public void loadSignUpsToScrollPane(){
+
+        //Declare nodes which will be assigned with HBox nodes which will contain 3 children nodes which are label, declineButton and acceptButton
         Node[] nodes = new Node[list.size()];
         for (int i=0;i<nodes.length;i++){
             try {
                 //Assigns formatted fxml file to each Hbox
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("../resources/view/UserSignUpHbox.fxml"));
-                AdminSignUpsController controller = new AdminSignUpsController();
-                loader.setController(controller);
                 nodes[i] = loader.load();
+                //Get the 3 nodes from the HBox
+                for (Node subNode: ((HBox) nodes[i]).getChildren()){
+                    //Check if the node provided is label type then assign the user's first and last names to that node label in the Hbox
+                    int currentIndex= i;
+//                    if (subNode instanceof Label){
+//                        ((Label) subNode).setText(list.get(i).getFirstName()+" "+ list.get(i).getLastName());
+//                        //Check if the node has an ID of decline button if true then assign an action even to the button
+//                    }else if (subNode.getId().equals("declineButton")){
+//                        ((Button) subNode).setOnAction(action->{
+//                            System.out.println("No");
+//                            ((VBox) subNode.getParent().getParent()).getChildren().remove((HBox) nodes[currentIndex]);
+////                            //If the action of the admin is decline then he removes that user to the list
+////                            list.remove(currentIndex);
+//                        });
+//                    }else {
+//                        ((Button) subNode).setOnAction(action -> {
+//                            System.out.println("Yes");
+//                            ((VBox) subNode.getParent().getParent()).getChildren().remove((HBox) nodes[currentIndex]);
+////                            //If the action of the admin is decline then he removes that user to the list
+////                            list.remove(currentIndex);
+//                        });
+//                    }
+                }
+
                 //Add an Hbox node to the vbox node
                 signUpVbox.getChildren().add(nodes[i]);
-                controller.setUserHbox(list.get(i));
             }catch (Exception e){
                 e.printStackTrace();
             }
-         }
+        }
     }
 
     public void loadDataToTable(){
-        email.setCellValueFactory(new PropertyValueFactory<User, String>("email"));
-        fName.setCellValueFactory(new PropertyValueFactory<User, String>("firstName"));
-        lName.setCellValueFactory(new PropertyValueFactory<User, String>("lastName"));
+        status.setCellValueFactory(new PropertyValueFactory<>("status"));
+        email.setCellValueFactory(new PropertyValueFactory<>("email"));
+        fName.setCellValueFactory(new PropertyValueFactory<>("firstName"));
+        lName.setCellValueFactory(new PropertyValueFactory<>("lastName"));
         studentTable.setItems(list);
     }
 
-    /**
-     * instead of doing this, make a call from the server in order to get the data you need. see {@link preproject.backend.UserThread}
-     * @return
-     */
     public List<User> getDataFromDB() {
-//        final String DATABASE = "messenger.user_acc";
-//        Connector.createConnection();
-//        Connector connector = new Connector();
-//        ResultSet table = connector.readDatabase(DATABASE);
-//        return DataImportHandler.parseUserTable(table);
-
         return null;
     }
+
+
 }

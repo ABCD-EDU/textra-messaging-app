@@ -16,7 +16,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception {
         FXMLLoader loader = new FXMLLoader();
         loader.setController(AdminController);
-        Parent root = FXMLLoader.load(getClass().getResource("resources/view/SignInScreen.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("resources/view/AdminScreen.fxml"));
         Scene scene = new Scene(root);
 //        scene.getStylesheets().add(getClass().getResource("resources/css/AdminScreenStyle.css").toExternalForm());
         primaryStage.setTitle("Messaging App");

@@ -11,7 +11,9 @@ public class State {
     public final static String SUCCESS_ADD_GROUP_NEW_MEMBER = "SUCCESS_ADD_GROUP_NEW_MEMBER";
     public final static String SUCCESS_GET_VERIFIED_USERS = "SUCCESS_GET_VERIFIED_USERS";
     public final static String SUCCESS_GET_UNVERIFIED_USERS = "SUCCESS_GET_UNVERIFIED_USERS";
-    public final static String SUCCESS_ADD_VERIFIED_USERS = "SUCCESS_ADD_VERIFIED_USERS";
+    public final static String SUCCESS_POST_VERIFIED_USERS = "SUCCESS_POST_VERIFIED_USERS";
+    public final static String SUCCESS_ACCEPT_ALL_USERS = "SUCCESS_ACCEPT_ALL_USERS";
+    public static final String SUCCESS_DECLINE_ALL_USERS = "SUCCESS_DECLINE_ALL_USERS";
 
     // fail states
     public final static String FAIL_LOGIN_USER = "FAIL_LOGIN_USER";
@@ -23,5 +25,7 @@ public class State {
     public final static String FAIL_ADD_GROUP_NEW_MEMBER = "FAIL_ADD_GROUP_NEW_MEMBER";
     public final static String FAIL_GET_VERIFIED_USERS = "FAIL_GET_VERIFIED_USERS";
     public final static String FAIL_GET_UNVERIFIED_USERS = "FAIL_GET_UNVERIFIED_USERS";
-    public final static String FAIL_ADD_VERIFIED_USERS = "FAIL_ADD_VERIFIED_USERS";
+    public final static String FAIL_POST_VERIFIED_USERS = "FAIL_POST_VERIFIED_USERS";
+    public final static String FAIL_ACCEPT_ALL_USERS = "FAIL_ACCEPT_ALL_USERS";
+    public static final String FAIL_DECLINE_ALL_USERS = "FAIL_DECLINE_ALL_USERS";
 }

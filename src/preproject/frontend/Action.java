@@ -18,5 +18,7 @@ public class Action {
 
     // POST REQUESTS
     public static final String POST_VERIFIED_USERS = "POST_VERIFIED_USERS";
+    public static final String ACCEPT_ALL_USERS = "ACCEPT_ALL_USERS";
+    public static final String DECLINE_ALL_USERS = "DECLINE_ALL_USERS";
 
 }

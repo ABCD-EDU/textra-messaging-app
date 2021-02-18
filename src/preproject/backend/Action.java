@@ -11,10 +11,12 @@ public class Action {
 
     // GET REQUESTS
     public static final String GET_GROUP_LIST = "GET_GROUP_LIST";
-    public static final String GET_MESSAGE_LIST = "GET_MESSAGE_LIST";
     public static final String GET_ONLINEUSERS_LIST = "GET_ONLINEUSERS_LIST";
     public static final String GET_VERIFIED_USERS = "GET_VERIFIED_USERS";
     public static final String GET_UNVERIFIED_USERS = "GET_UNVERIFIED_USERS";
+    public static final String GET_USER_INFORMATION = "GET_USER_INFORMATION";
+    public static final String GET_GROUP_MEMBERS = "GET_GROUP_MEMBERS";
+    public static final String GET_GROUP_MESSAGES = "GET_GROUP_MESSAGES";
 
     // POST REQUESTS
     public static final String POST_VERIFIED_USERS = "POST_VERIFIED_USERS";

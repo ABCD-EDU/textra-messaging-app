@@ -90,6 +90,19 @@ public class UserThread extends Thread {
                 break;
             case Action.DECLINE_ALL_USERS:
                 this.updateALlRegistrations(0);
+                break;
+            case Action.GET_GROUP_LIST:
+                this.writeGroupList();
+                break;
+            case Action.GET_USER_INFORMATION:
+                this.writeUserInformation((String) readData.get("email"));
+                break;
+            case Action.GET_GROUP_MEMBERS:
+                this.getGroupMembersList((String) readData.get("groupId"));
+                break;
+            case Action.GET_GROUP_MESSAGES:
+                this.getGroupMessages((String) readData.get("groupId"));
+                break;
         }
     }
 
@@ -413,16 +426,40 @@ public class UserThread extends Thread {
         if (userLoginRepo.isPresent()) {
             // TODO: if userRepo exists then load all of the data that needs to be rendered and send it to the client
             //  data includes: contacts (groups), messages in each group, user account information
-            Map<String, String> userRepo = new HashMap<>();
             ResultSet resultSet = userLoginRepo.get();
-            String userId = String.valueOf(resultSet.getInt("user_id"));
             String email = resultSet.getString("email");
+            String firstName = resultSet.getString("user_fname");
+            String lastName = resultSet.getString("user_lname");
+
+            // send data back to client
+            objOut.writeObject(true);
+
+            // TODO:after sending the data into the client, set this thread into the current user's information containing
+            //  the data for the group lists, user info, and all of the messages connected to them
+            this.user = new User(resultSet.getInt("user_id"), email, firstName, lastName);
+        } else {
+            objOut.writeObject(false); // if userRepo does not have any value in it, return false (login failed)
+        }
+    }
+
+    private void writeUserInformation(String email) {
+        try {
+            PreparedStatement preparedStatement = Connector.connect.prepareStatement(
+                    "SELECT * FROM user_acc WHERE email = ?"
+            );
+
+            preparedStatement.setString(1, email);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            // TODO: if userRepo exists then load all of the data that needs to be rendered and send it to the client
+            //  data includes: contacts (groups), messages in each group, user account information
+            Map<String, String> userRepo = new HashMap<>();
+            String userId = String.valueOf(resultSet.getInt("user_id"));
             String firstName = resultSet.getString("user_fname");
             String lastName = resultSet.getString("user_lname");
             String isVerified = String.valueOf(resultSet.getBoolean("verified"));
             String isAdmin = String.valueOf(resultSet.getBoolean("is_admin"));
 
-            userRepo.put(SUCCESS_LOGIN_USER, String.valueOf(true));
             userRepo.put("userId", userId);
             userRepo.put("email", email);
             userRepo.put("firstName", firstName);
@@ -430,15 +467,119 @@ public class UserThread extends Thread {
             userRepo.put("isVerified", isVerified);
             userRepo.put("isAdmin", isAdmin);
 
-            // send data back to client
             objOut.writeObject(userRepo);
-
-            // TODO:after sending the data into the client, set this thread into the current user's information containing
-            //  the data for the group lists, user info, and all of the messages connected to them
-            this.user = new User(resultSet.getInt("user_id"), email, firstName, lastName);
-        } else {
-            objOut.writeObject(new HashMap<String, Boolean>().put(FAIL_LOGIN_USER, false)); // if userRepo does not have any value in it, return false (login failed)
+        } catch (SQLException | IOException e) {
+            e.printStackTrace();
         }
+    }
+
+    private void writeGroupList() {
+        try {
+            List<Map<String, String>> groupList = getGroupList();
+            objOut.writeObject(groupList);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private List<Map<String, String>> getGroupList() {
+        List<Map<String, String>> groupList = new ArrayList<>();
+
+        try {
+            PreparedStatement preparedStatement = Connector.connect.prepareStatement(
+                    "SELECT * FROM group_repo"
+            );
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                String groupId = String.valueOf(resultSet.getInt("group_id"));
+                String isAdmin = String.valueOf(resultSet.getBoolean("is_admin"));
+                String alias = resultSet.getString("alias");
+                Timestamp timeSent = resultSet.getTimestamp("time_sent");
+
+                Map<String, String> groupMap = new HashMap<>();
+                groupMap.put("groupId", groupId);
+                groupMap.put("isAdmin", isAdmin);
+                groupMap.put("alias", alias);
+                groupMap.put("timeSent", String.valueOf(timeSent));
+
+                groupList.add(groupMap);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return groupList;
+    }
+
+    private void getGroupMembersList(String groupId) {
+        List<Map<String, String>> memberRepo = new ArrayList<>();
+        try {
+            PreparedStatement preparedStatement = Connector.connect.prepareStatement(
+                    "SELECT user_id FROM group_msg WHERE group_id = ?"
+            );
+
+            preparedStatement.setInt(1, Integer.parseInt(groupId));
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                String userId = resultSet.getString("user_id");
+                Optional<ResultSet> resultSetOptional = queryUserInformation(userId);
+
+                if (resultSetOptional.isPresent()) {
+                    ResultSet userResult = resultSetOptional.get();
+                    Map<String, String> userMap = new HashMap<>();
+                    userMap.put("userId", userId);
+                    userMap.put("email", userResult.getString("email"));
+                    userMap.put("firstName", userResult.getString("user_fname"));
+                    userMap.put("lastName", userResult.getString("user_lname"));
+
+                    memberRepo.add(userMap);
+                }
+            }
+            objOut.writeObject(memberRepo);
+        } catch (SQLException | IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void getGroupMessages(String groupId) {
+        List<Map<String, String>> groupMsgRepo = new ArrayList<>();
+        try {
+            PreparedStatement preparedStatement = Connector.connect.prepareStatement(
+                    "SELECT * FROM message WHERE group_id = ?"
+            );
+            preparedStatement.setInt(1, Integer.parseInt(groupId));
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                Map<String, String> msgRepo = new HashMap<>();
+                msgRepo.put("sender", resultSet.getString("from_user"));
+                msgRepo.put("groupId", groupId);
+                msgRepo.put("message", resultSet.getString("message"));
+                msgRepo.put("timeSent", String.valueOf(resultSet.getTimestamp("time_sent")));
+                groupMsgRepo.add(msgRepo);
+            }
+            objOut.writeObject(groupMsgRepo);
+        } catch (SQLException | IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private Optional<ResultSet> queryUserInformation(String userId) {
+        try {
+            PreparedStatement preparedStatement = Connector.connect.prepareStatement(
+                    "SELECT email,user_fname,user_lname FROM user_acc WHERE user_id = ?"
+            );
+
+            preparedStatement.setInt(1, Integer.parseInt(userId));
+
+            return Optional.ofNullable(preparedStatement.executeQuery());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return Optional.empty();
     }
 
     /**
@@ -448,9 +589,14 @@ public class UserThread extends Thread {
      * @param message message to send
      * @param address who receives the message
      */
-    protected void sendMessage(String message, String address) {
+    protected void sendMessage(String sender, String address, String message, Timestamp timeSent) {
         try {
-            objOut.writeObject(new HashMap<String, String>().put(address, message)); // send message to the server
+            Map<String, String> messageRepo = new HashMap<>();
+            messageRepo.put("sender", sender);
+            messageRepo.put("address", address);
+            messageRepo.put("message", message);
+            messageRepo.put("timeSent", timeSent.toString());
+            objOut.writeObject(messageRepo); // send message to the server
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -36,20 +36,6 @@ public class Connector {
         }
     }
 
-    public ResultSet readDatabase(String table) {
-        ResultSet resultSet = null;
-        try {
-            Statement statement = connect.createStatement();
-            resultSet = statement.executeQuery(String.format("SELECT * FROM %s", table));
-
-            System.out.println("GET data from " + table + " SUCCESS");
-        } catch (SQLException throwables) {
-            System.err.println("GET data from " + table + " FAIL");
-            throwables.printStackTrace();
-        }
-        return resultSet;
-    }
-
     public static Connection getConnect() {
         return connect;
     }

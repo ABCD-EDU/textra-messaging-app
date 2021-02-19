@@ -77,19 +77,19 @@ public class UserThread extends Thread {
                 this.addGroupMembers((Map<String, Object>) readData.get("membersRepo"));
                 break;
             case Action.GET_VERIFIED_USERS:
-                this.getUsersForAdmin(1);
+                this.getUsersForAdmin(true);
                 break;
             case Action.GET_UNVERIFIED_USERS:
-                this.getUsersForAdmin(0);
+                this.getUsersForAdmin(false);
                 break;
             case Action.POST_VERIFIED_USERS:
                 this.updateVerifiedUsers((String)readData.get("email"), (String)readData.get("isVerified"));
                 break;
             case Action.ACCEPT_ALL_USERS:
-                this.updateALlRegistrations(1);
+                this.updateALlRegistrations(true);
                 break;
             case Action.DECLINE_ALL_USERS:
-                this.updateALlRegistrations(0);
+                this.updateALlRegistrations(false);
                 break;
             case Action.GET_GROUP_LIST:
                 this.writeGroupList();
@@ -106,92 +106,61 @@ public class UserThread extends Thread {
         }
     }
 
-    private void updateALlRegistrations(int isVerified){
+    private void updateALlRegistrations(boolean isVerified) throws IOException {
         try {
-            if (isVerified == 1) {
-
+            if (isVerified) {
                 PreparedStatement updateStatement = Connector.connect.prepareStatement(
-                        "UPDATE user_acc SET verified = ? WHERE verified=?");
-                updateStatement.setInt(1, 1);
-                updateStatement.setInt(2, 0); //Verify unverified users
+                        "UPDATE user_acc SET verified = ? WHERE verified = ?");
+                updateStatement.setBoolean(1, false);
+                updateStatement.setBoolean(2, true); //Verify unverified users
                 updateStatement.executeUpdate();
-
-                PreparedStatement selectStatement= Connector.connect.prepareStatement("SELECT * FROM user_acc WHERE verified=1");
-                ResultSet resultSet = selectStatement.executeQuery();
-
-                Map<String, List<Map<String, String>>> writeObject = new HashMap<>(); // write back users that have been
-                List<Map<String, String>> userRepo = new ArrayList<>(); // list of userRepo
-
-                while (resultSet.next()) {
-
-                    Map<String, String> mapRepo = new HashMap<>();
-                    String userId = String.valueOf(resultSet.getInt("user_id"));
-                    String email = resultSet.getString("email");
-                    String firstName = resultSet.getString("user_fname");
-                    String lastName = resultSet.getString("user_lname");
-                    String isAdmin = String.valueOf(resultSet.getBoolean("is_admin"));
-
-                    mapRepo.put("userId", userId);
-                    mapRepo.put("email", email);
-                    mapRepo.put("firstName", firstName);
-                    mapRepo.put("lastName", lastName);
-                    mapRepo.put("isVerified", String.valueOf(1));
-                    mapRepo.put("isAdmin", isAdmin);
-                    userRepo.add(mapRepo);
-                }
-                writeObject.put(SUCCESS_ACCEPT_ALL_USERS, userRepo);
-                objOut.writeObject(writeObject);
             } else {
                 PreparedStatement preparedStatement = Connector.connect.prepareStatement(
                         "DELETE FROM user_acc WHERE verified =?");
-                preparedStatement.setInt(1, isVerified);
+                preparedStatement.setBoolean(1, false);
                 preparedStatement.executeUpdate();
-                Map<String, List<Map<String, String>>> writeObject = new HashMap<>();
-                List<Map<String, String>> nullUsers = new ArrayList<>();
-                writeObject.put(SUCCESS_DECLINE_ALL_USERS, nullUsers);
-                objOut.writeObject(writeObject);
             }
+            objOut.writeObject(true);
+            return;
         }catch(Exception e){
             e.printStackTrace();
         }
+        objOut.writeObject(false);
     }
 
-    private void updateVerifiedUsers(String email, String isVerified) {
-
+    private void updateVerifiedUsers(String email, String isVerified) throws IOException {
+        Map<String, Boolean> writeObject= new HashMap<>();
         try {
-            Map<String, Boolean> writeObject= new HashMap<>();
-            if (Integer.parseInt(isVerified)==1) {
+            if (Boolean.parseBoolean(isVerified)) {
                 PreparedStatement preparedStatement = Connector.connect.prepareStatement(
                         "UPDATE user_acc SET verified = ? WHERE user_id = ?");
-                preparedStatement.setInt(1, Integer.parseInt(isVerified));
+                preparedStatement.setBoolean(1, true);
                 preparedStatement.setInt(2, getUserId(email));
                 preparedStatement.executeUpdate();
-                writeObject.put(SUCCESS_POST_VERIFIED_USERS,true);
             }else {
                 PreparedStatement preparedStatement = Connector.connect.prepareStatement(
                         "DELETE FROM user_acc WHERE user_id = ?");
                 preparedStatement.setInt(1, getUserId(email));
                 preparedStatement.executeUpdate();
-                writeObject.put(SUCCESS_POST_VERIFIED_USERS,false);
             }
-            objOut.writeObject(writeObject);
-
+            writeObject.put(SUCCESS_POST_VERIFIED_USERS,true);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        writeObject.put(SUCCESS_POST_VERIFIED_USERS,true);
+        objOut.writeObject(writeObject);
     }
 
-    private void getUsersForAdmin(int isVerified) {
+    private void getUsersForAdmin(boolean isVerified) {
         try {
             PreparedStatement preparedStatement = Connector.connect.prepareStatement(
                     "SELECT * FROM user_acc WHERE verified = ?"
             );
-            preparedStatement.setInt(1, isVerified);
+            preparedStatement.setBoolean(1, isVerified);
 
             ResultSet resultSet = preparedStatement.executeQuery();
 //            System.out.println("test");
 
-            Map<String, List<Map<String,String>>> writeObject = new HashMap<>(); // write back
             List<Map<String, String>> userRepo = new ArrayList<>(); // list of userRepo
             while (resultSet.next()) {
                 Map<String, String> mapRepo = new HashMap<>();
@@ -205,19 +174,14 @@ public class UserThread extends Thread {
                 mapRepo.put("email", email);
                 mapRepo.put("firstName", firstName);
                 mapRepo.put("lastName", lastName);
-                mapRepo.put("isVerified", String.valueOf(isVerified));
+                mapRepo.put("isVerified", String.valueOf(resultSet.getBoolean("verified")));
                 mapRepo.put("isAdmin", isAdmin);
 
                 userRepo.add(mapRepo);
 //                System.out.println("SIZE OF REPO " + userRepo.size());
             }
 
-            if (isVerified == 1) {
-                writeObject.put(SUCCESS_GET_VERIFIED_USERS, userRepo);
-            } else {
-                writeObject.put(SUCCESS_GET_UNVERIFIED_USERS, userRepo);
-            }
-            objOut.writeObject(writeObject);
+            objOut.writeObject(userRepo);
         } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
@@ -331,6 +295,8 @@ public class UserThread extends Thread {
             insertGroupRepo.setString(2, groupAlias);
             insertGroupRepo.setInt(3, userIdList.get(0));
 
+            insertGroupRepo.executeUpdate();
+
             this.importGroupMembers(userIdList, groupAlias, creator);
 
             objOut.writeObject(new HashMap<String, Boolean>().put(SUCCESS_ADD_GROUP, true));
@@ -349,11 +315,8 @@ public class UserThread extends Thread {
             findGroup.setString(1, groupAlias);
             findGroup.setInt(2, Integer.parseInt(groupCreator));
 
-            if (!findGroup.executeQuery().wasNull()) {
-                objOut.writeObject(new HashMap<String, Boolean>().put(FAIL_ADD_FAVOURITE, false));
-            }
             return true;
-        } catch (SQLException | IOException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return false;

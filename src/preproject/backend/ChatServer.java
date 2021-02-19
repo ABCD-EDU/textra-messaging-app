@@ -1,6 +1,9 @@
 package preproject.backend;
 
+import preproject.backend.handlers.RegisterHandler;
+
 import java.io.IOException;
+import java.net.PasswordAuthentication;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Date;
@@ -29,7 +32,11 @@ public class ChatServer {
         this.onlineUserNames = new ArrayList<>();
         this.onlineUsers = new ArrayList<>();
         // TODO: need to get group list as users add members and create new groups
-    }
+        RegisterHandler registerHandler = new RegisterHandler();
+        for (int i = 0; i < 100; i++) {
+            registerHandler.registerUser(new PasswordAuthentication("test" + i + "@gmail.com", "password".toCharArray()), "test", String.valueOf(i));
+        }
+     }
 
     public void init() {
         try (ServerSocket serverSocket = new ServerSocket(this.PORT)){

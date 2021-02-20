@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.shape.Circle?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="55.0" prefWidth="260.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Circle fx:id="group_picture" fill="DODGERBLUE" layoutX="37.0" layoutY="28.0" radius="20.0" stroke="BLACK" strokeType="INSIDE" />
+      <Label fx:id="groupAlias_label" layoutX="70.0" layoutY="18.0" prefHeight="17.0" prefWidth="152.0" text="Label" />
+      <RadioButton fx:id="favorite_button" layoutX="206.0" layoutY="18.0" mnemonicParsing="false" text="&lt;3" />
+   </children>
+</Pane>

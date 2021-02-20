@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="preproject.client.controllers.ChatController">
+   <children>
+      <Pane fx:id="header_pane" layoutX="260.0" prefHeight="53.0" prefWidth="1020.0" style="-fx-background-color: FAFAFA;">
+         <children>
+            <Label fx:id="header_label" layoutX="80.0" layoutY="18.0" prefHeight="17.0" prefWidth="550.0" text="Select a group" />
+         </children>
+      </Pane>
+      <Pane prefHeight="720.0" prefWidth="260.0" style="-fx-background-color: EEEEEE;">
+         <children>
+            <Pane fx:id="newConversations_Pane" layoutY="132.0" onMouseClicked="#onNewConversationClick" prefHeight="55.0" prefWidth="260.0">
+               <children>
+                  <Circle fill="DODGERBLUE" layoutX="37.0" layoutY="28.0" radius="20.0" stroke="BLACK" strokeType="INSIDE" />
+                  <Label fx:id="groupAlias_label" layoutX="70.0" layoutY="18.0" prefHeight="17.0" prefWidth="152.0" text="Start a Conversation" />
+               </children>
+            </Pane>
+            <ScrollPane fx:id="messages_scrollPane" layoutY="187.0">
+               <content>
+                  <VBox fx:id="people_vBox" prefHeight="533.0" prefWidth="260.0" />
+               </content>
+            </ScrollPane>
+         </children>
+      </Pane>
+      <Pane layoutX="260.0" layoutY="653.0" prefHeight="67.0" prefWidth="1020.0" style="-fx-background-color: FEFEFE;">
+         <children>
+            <TextArea fx:id="message_area" layoutX="16.0" layoutY="15.0" onKeyPressed="#onKeyPress" prefHeight="30.0" prefWidth="988.0" wrapText="true" />
+         </children>
+      </Pane>
+      <ScrollPane fx:id="messages_scrollPane" hbarPolicy="NEVER" layoutX="260.0" layoutY="53.0" vvalue="1.0">
+         <content>
+            <VBox fx:id="messages_vBox" prefHeight="600.0" prefWidth="1018.0" />
+         </content>
+      </ScrollPane>
+   </children>
+</Pane>

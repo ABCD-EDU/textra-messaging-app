@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Circle?>
@@ -16,6 +18,8 @@
       </Pane>
       <Pane prefHeight="720.0" prefWidth="260.0" style="-fx-background-color: EEEEEE;">
          <children>
+            <Label fx:id="email_label" alignment="CENTER" layoutY="24.0" prefHeight="17.0" prefWidth="260.0" text="EMAIL HERE" textAlignment="CENTER" />
+            <TextField fx:id="searchContacts_field" alignment="CENTER" layoutX="13.0" layoutY="52.0" prefHeight="26.0" prefWidth="234.0" promptText=" Search Contacts" />
             <Pane fx:id="newConversations_Pane" layoutY="132.0" onMouseClicked="#onNewConversationClick" prefHeight="55.0" prefWidth="260.0">
                <children>
                   <Circle fill="DODGERBLUE" layoutX="37.0" layoutY="28.0" radius="20.0" stroke="BLACK" strokeType="INSIDE" />
@@ -27,6 +31,7 @@
                   <VBox fx:id="people_vBox" prefHeight="533.0" prefWidth="260.0" />
                </content>
             </ScrollPane>
+            <Button fx:id="broadcast_button" layoutX="97.0" layoutY="91.0" mnemonicParsing="false" text="Broadcast" />
          </children>
       </Pane>
       <Pane layoutX="260.0" layoutY="653.0" prefHeight="67.0" prefWidth="1020.0" style="-fx-background-color: FEFEFE;">

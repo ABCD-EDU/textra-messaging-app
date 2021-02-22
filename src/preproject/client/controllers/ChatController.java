@@ -36,6 +36,12 @@ public class ChatController implements Initializable {
     private Label header_label;
 
     @FXML
+    private Label email_label;
+
+    @FXML
+    private TextField searchContacts_field;
+
+    @FXML
     private Pane newConversations_Pane;
 
     @FXML
@@ -46,6 +52,9 @@ public class ChatController implements Initializable {
 
     @FXML
     private VBox people_vBox;
+
+    @FXML
+    private Button broadcast_button;
 
     @FXML
     private TextArea message_area;
@@ -276,6 +285,7 @@ public class ChatController implements Initializable {
         this.ID = userInformation.get("userId");
         this.name = userInformation.get("firstName") + userInformation.get("lastName");
         this.email = userInformation.get("email");
+        email_label.setText(this.email);
     }
 
     /**
@@ -328,8 +338,16 @@ public class ChatController implements Initializable {
             if (component.getId().equals("header_label"))
                 ((Label) component).setText(alias);
             if (component.getId().equals("header_button"))
+                /*
+                    TODO: Add functionality to this button.
+                     Its functionality should be different if user is admin of said group opened.
+                     If user is NOT admin: show list of users and allow adding of other members
+                     If user is admin: show list of users and allow removal and addition of other members
+                     Suggestion:
+                     Open a new window where the user can perform these actions upon press of button
+                 */
                 if (!isAdmin)
-                    component.setVisible(false);
+                    component.setVisible(false); // for debug purposes only
         }
         header_pane.getChildren().add(node);
     }
@@ -350,6 +368,7 @@ public class ChatController implements Initializable {
 
     /**
      *  Set values of header, text placeholder, listOfPeople, messages
+     *  TODO: Clean this code
      */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle){
@@ -361,8 +380,10 @@ public class ChatController implements Initializable {
 
         messages_scrollPane.vvalueProperty().bind(messages_vBox.heightProperty());
         HashMap<String, Object> request = new HashMap<>();
+
         request.put("action", Action.GET_USER_INFORMATION);
         request.put("email", this.email);
+
         try {
             ClientExecutable.serverConnector.getObjOut().writeObject(request);
             System.out.println("USER INFORMATION REQUEST SENT");
@@ -370,6 +391,8 @@ public class ChatController implements Initializable {
             e.printStackTrace();
         }
 
+
+        // TODO: Clean up code by turning this block into a function that takes in varargs as argument
         HashMap<String, Object> request1 = new HashMap<>();
         request1.put("action", Action.GET_GROUP_LIST);
         try {

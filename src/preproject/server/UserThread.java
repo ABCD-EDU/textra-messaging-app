@@ -69,7 +69,7 @@ public class UserThread extends Thread {
                 this.broadcastMessage(readData);
                 break;
             case Action.ADD_FAVOURITE:
-                this.addUserFavouriteGroup((Map<String, String>) readData.get("favRepo"));
+                this.toggleFavorite(readData);
                 break;
             case Action.ADD_GROUP:
                 this.addGroup(readData);
@@ -385,24 +385,31 @@ public class UserThread extends Thread {
         return false;
     }
 
-    private void addUserFavouriteGroup(Map<String, String> faveRepo) throws IOException {
-        String userId = faveRepo.get("userId");
-        String groupId = faveRepo.get("groupId");
+    private void toggleFavorite(HashMap<String, Object> faveRepo) throws IOException {
+        System.out.println("FAVORITE TOGGLED");
+        String userId = (String)faveRepo.get("userId");
+        String groupId = (String)faveRepo.get("groupId");
+        String isFav = (String)faveRepo.get("isFav");
 
         try {
             // TODO: find the group id of the given data first
             PreparedStatement preparedStatement = Connector.connect.prepareStatement(
-                    "UPDATE group_msg SET is_fav = 1 where user_id = ? AND group_id = ?"
+                    "UPDATE group_msg SET is_fav = ? where user_id = ? AND group_id = ?"
             );
 
-            preparedStatement.setString(1, userId);
-            preparedStatement.setString(2, groupId);
+            preparedStatement.setInt(1, Integer.parseInt(isFav));
+            preparedStatement.setString(2, userId);
+            preparedStatement.setString(3, groupId);
 
             preparedStatement.executeUpdate();
 
-            objOut.writeObject(new HashMap<String, Boolean>().put(SUCCESS_ADD_FAVOURITE, true));
+            Map<String, Object> response = new HashMap<>();
+            response.put("action", Action.ON_FAVORITE_TOGGLED);
+            response.put("groupId", groupId);
+            response.put("isFav", isFav);
+            objOut.writeObject(response);
         } catch (SQLException e) {
-            objOut.writeObject(new HashMap<String, Boolean>().put(FAIL_ADD_FAVOURITE, false));
+            System.out.println("FAVORITE TOGGLE UNSUCCESSFUL");
             e.printStackTrace();
         }
     }

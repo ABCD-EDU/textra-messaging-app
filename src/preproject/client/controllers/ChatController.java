@@ -62,6 +62,65 @@ public class ChatController implements Initializable {
     @FXML
     private VBox messages_vBox;
 
+    private class ClientThread extends Thread {
+
+        public void run(){
+            System.out.println("CLIENT THREAD STARTED");
+            while (true) {
+                Map<String, Object> readData = null;
+                try{
+                    readData = (Map<String, Object>) ClientExecutable.serverConnector.getObjIn().readObject();
+                }catch (Exception e) {
+                    e.printStackTrace();
+                    continue;
+                }
+                System.out.println("==== NEW ACTION RECEIVED ==== " + readData.get("action"));
+                switch(String.valueOf(readData.get("action"))){
+                    case Action.ON_GROUP_LIST_SEND:
+                        System.out.println("GROUP LIST RECEIVED");
+                        groupsList = (List<Map<String, String>>)readData.get("data");
+                        System.out.println("size: " + groupsList.size());
+                        renderGroupsList();
+                        break;
+                    case Action.ON_USER_INFO_SEND:
+                        System.out.println("USER INFO RECEIVED");
+                        handleUserInformationSend((Map<String, String>)readData.get("data"));
+                        break;
+                    case Action.ON_MESSAGE_RECEIVE:
+                        System.out.println("MESSAGE RECEIVED");
+                        handleMessagesReceived((Map<String, String>) readData.get("messages"));
+                        break;
+                    case Action.ON_GROUP_CREATION:
+                        handleGroupCreation((String)readData.get("status"));
+                        break;
+                    case Action.ON_INITIAL_MESSAGES_RECEIVED:
+                        System.out.println("INITIAL MESSAGES RECEIVED");
+                        handleInitialMessagesReceived((List<Map<String, String>>) readData.get("messages"));
+                        break;
+                    case Action.ON_FAVORITE_TOGGLED:
+                        System.out.println("FAVORITE TOGGLED");
+                        handleFavoriteToggle((String)readData.get("groupId"), (String)readData.get("isFav"));
+                        break;
+                }
+            }
+        }
+
+    }
+
+    private void handleFavoriteToggle(String groupId, String isFav) {
+        Platform.runLater(() -> people_vBox.getChildren().clear());
+        for (Map<String, String> group : groupsList) {
+            System.out.println(group);
+            if (group.get("groupId").equals(groupId)) {
+                group.replace("is_fav", isFav);
+                System.out.println("group id: " + groupId + " " + isFav);
+                System.out.println("favorite value replace ---");
+            }
+            System.out.println(group);
+        }
+        renderGroupsList();
+    }
+
     @FXML
     void onKeyPress(KeyEvent key) throws IOException {
         if (key.getCode().equals(KeyCode.ENTER)) {
@@ -158,46 +217,6 @@ public class ChatController implements Initializable {
     }
 
 
-    private class ClientThread extends Thread {
-
-        public void run(){
-            System.out.println("CLIENT THREAD STARTED");
-            while (true) {
-                Map<String, Object> readData = null;
-                try{
-                    readData = (Map<String, Object>) ClientExecutable.serverConnector.getObjIn().readObject();
-                }catch (Exception e) {
-                    e.printStackTrace();
-                    continue;
-                }
-                System.out.println("==== NEW ACTION RECEIVED ==== " + readData.get("action"));
-                switch(String.valueOf(readData.get("action"))){
-                    case Action.ON_GROUP_LIST_SEND:
-                        System.out.println("GROUP LIST RECEIVED");
-                        groupsList = (List<Map<String, String>>)readData.get("data");
-                        handleGroupListRequest();
-                        break;
-                    case Action.ON_USER_INFO_SEND:
-                        System.out.println("USER INFO RECEIVED");
-                        handleUserInformationSend((Map<String, String>)readData.get("data"));
-                        break;
-                    case Action.ON_MESSAGE_RECEIVE:
-                        System.out.println("MESSAGE RECEIVED");
-                        handleMessagesReceived((Map<String, String>) readData.get("messages"));
-                        break;
-                    case Action.ON_GROUP_CREATION:
-                        handleGroupCreation((String)readData.get("status"));
-                        break;
-                    case Action.ON_INITIAL_MESSAGES_RECEIVED:
-                        System.out.println("INITIAL MESSAGES RECEIVED");
-                        handleInitialMessagesReceived((List<Map<String, String>>) readData.get("messages"));
-                        break;
-                }
-            }
-        }
-
-    }
-
     private void handleInitialMessagesReceived(List<Map<String, String>> initialMessages) {
         Platform.runLater(() -> messages_vBox.getChildren().clear());
         if (initialMessages.size() == 0)
@@ -225,15 +244,15 @@ public class ChatController implements Initializable {
         previewMessage(msgData);
     }
 
-    private void handleGroupListRequest() {
+    private void renderGroupsList() {
         try {
             System.out.println("GROUP REQUEST ACCEPTED NUMBER OF GROUPS: " + groupsList.size());
             Platform.runLater(() -> people_vBox.getChildren().clear());
+            sortGroupList();
             for (Map<String, String> groupMap : groupsList) {
                 String alias = groupMap.get("alias");
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("../resources/view/ConversationBox.fxml"));
                 Node node = loader.load();
-
                 node.setOnMouseClicked((event) -> {
                     messages = new ArrayList<>();
                     HashMap<String, Object> request = new HashMap<>();
@@ -254,14 +273,62 @@ public class ChatController implements Initializable {
                     }
                     if (component.getId().equals("favorite_button")) {
                         ((RadioButton)component).setSelected(groupMap.get("is_fav").equals("1"));
+                        ((RadioButton)component).selectedProperty().addListener((obs, wasPreviouslySelected, isNowSelected) -> {
+                            Map<String, String> request = new HashMap<>();
+                            request.put("action", Action.ADD_FAVOURITE);
+                            request.put("userId", this.ID);
+                            request.put("groupId", groupMap.get("groupId"));
+                            if (isNowSelected) { // CHECK IF IT EVEN ENTERS IF AND ELSE
+                                System.out.println("radio box sele3cted");
+                                request.put("isFav", "1");
+                            } else {
+                                request.put("isFav", "0");
+                                System.out.println("radio box not selected");
+                            }
+                            System.out.println("toggle request: ");
+                            System.out.println(request.get("action"));
+                            System.out.println(request.get("userId"));
+                            System.out.println(request.get("isFav"));
+                            try {
+                                ClientExecutable.serverConnector.getObjOut().writeObject(request);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        });
                     }
                 }
                 Platform.runLater(() -> people_vBox.getChildren().add(node));
-
             }
         }catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Sorts the groupList such that favorites will be placed in the beginning of the list
+     *
+     * Algorithm:
+     * 1. For each element of groupList check if element is a favorite
+     * 2. If it is a favorite, add it into the sortedList and remove from grouplist
+     * 3. Else, do nothing
+     * 4. Do steps 1 to 3 until there are no more favorites inside groupList
+     * 5. Add all remaining non favorites into the list
+     * 7. groupList = sortedList
+     */
+    private void sortGroupList() {
+        List<Map<String, String>> sortedList = new ArrayList<>();
+        System.out.println(groupsList.size());
+        for (int i = 0; i < groupsList.size(); i++) { // put all favotires in sortedList
+            Map<String, String> group = groupsList.get(i);
+            if (group.get("is_fav").equals("1")) {
+                sortedList.add(group);
+                groupsList.remove(group);
+            }
+            try{ groupsList.get(i+1);
+            }catch (IndexOutOfBoundsException e){ break; }
+        }
+        sortedList.addAll(groupsList); // put remaining groups in sortedList
+        groupsList = sortedList; // set groupList = sortedList
     }
 
     private void handleGroupCreation(String creationStatus) {

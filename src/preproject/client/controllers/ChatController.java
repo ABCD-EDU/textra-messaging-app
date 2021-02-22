@@ -204,9 +204,11 @@ public class ChatController implements Initializable {
         }
     }
 
+    // TODO: Get sender name as well - fix in backend
     private void handleMessagesReceived(Map<String, String> message) {
+        if (!message.get("address").equals(this.currentlySelectedGroupID)) return;
         Message[] msgData = {new Message(
-                message.get("senderId"),
+                message.get("sender"),
                 Timestamp.valueOf(message.get("timeSent")),
                 message.get("sender"),
                 message.get("message")
@@ -240,6 +242,9 @@ public class ChatController implements Initializable {
                 for (Node component : ((Pane)node).getChildren()) {
                     if (component.getId().equals("groupAlias_label")) {
                         ((Label)component).setText(alias);
+                    }
+                    if (component.getId().equals("favorite_button")) {
+                        ((RadioButton)component).setSelected(groupMap.get("is_fav").equals("1"));
                     }
                 }
                 Platform.runLater(() -> people_vBox.getChildren().add(node));
@@ -354,6 +359,7 @@ public class ChatController implements Initializable {
         messages = new ArrayList<>();
         groupsList = new ArrayList<>();
 
+        messages_scrollPane.vvalueProperty().bind(messages_vBox.heightProperty());
         HashMap<String, Object> request = new HashMap<>();
         request.put("action", Action.GET_USER_INFORMATION);
         request.put("email", this.email);

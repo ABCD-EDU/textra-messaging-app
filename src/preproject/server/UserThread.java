@@ -9,6 +9,7 @@ import java.net.PasswordAuthentication;
 import java.net.Socket;
 import java.sql.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static preproject.server.State.*;
 import static preproject.server.State.SUCCESS_POST_VERIFIED_USERS;
@@ -187,12 +188,18 @@ public class UserThread extends Thread {
         }
     }
 
+    // TODO: hook up with SERVER groupList update
     @SuppressWarnings("unchecked")
     private void addGroupMembers(Map<String, Object> groupMap) {
+        System.out.println("ADD GROUP MEMBER");
         String groupAlias = (String) groupMap.get("alias");
         String creator = (String) groupMap.get("creator");
         List<String> userList = (List<String>) groupMap.get("members");
         List<Integer> userIdList = getUserIdList(userList);
+        userIdList.forEach((id) ->
+                SERVER.updateGroupList(
+                        String.valueOf(getGroupId(groupAlias, Integer.parseInt(creator))),
+                        id.toString()));
         try {
             this.importGroupMembers(userIdList, groupAlias, creator);
         } catch (IOException e) {
@@ -265,13 +272,13 @@ public class UserThread extends Thread {
         return -1;
     }
 
-    private int getGroupId(String alias, int userId) {
+    private int getGroupId(String alias, int adminUserId) {
         try {
             PreparedStatement getGroupId = Connector.connect.prepareStatement(
                     "SELECT * FROM group_repo WHERE alias = ? AND uid_admin = ?");
 
             getGroupId.setString(1, alias);
-            getGroupId.setInt(2, userId);
+            getGroupId.setInt(2, adminUserId);
 
             ResultSet returnedValue = getGroupId.executeQuery();
             if (returnedValue.next()) {
@@ -337,6 +344,12 @@ public class UserThread extends Thread {
             System.out.println("query executed update");
 
             this.importGroupMembers(userIdList, groupAlias, creator);
+
+            // Update groupList in server
+            SERVER.updateGroupList(
+                    String.valueOf(getGroupId(groupAlias, userIdList.get(0))),
+                    userIdList.stream().map(String::valueOf).collect(Collectors.toList())
+            );
 
             responseMap.put("status", "true");
             objOut.writeObject(responseMap);
@@ -534,32 +547,48 @@ public class UserThread extends Thread {
         }
     }
 
+    /**
+     * Return a list of groups the client is a member of.
+     *
+     * Algorithm:
+     * 1. Get group_ids the client is part of in group_msg table
+     * 2. Get rows corresponding to those group_id's in the group_repo table
+     */
     private List<Map<String, String>> getGroupList() {
         List<Map<String, String>> groupList = new ArrayList<>();
-
         try {
-            PreparedStatement preparedStatement = Connector.connect.prepareStatement(
-                    "SELECT * FROM group_repo"
+
+            // get group_ids the client is part of
+            PreparedStatement getGroup_idsStatement = Connector.connect.prepareStatement(
+                    "SELECT group_id, is_fav FROM group_msg WHERE user_id = ?"
             );
+            getGroup_idsStatement.setInt(1, this.user.getUserId());
+            ResultSet group_idsStatement = getGroup_idsStatement.executeQuery();
 
-            ResultSet resultSet = preparedStatement.executeQuery();
+            // get group info of those group_ids and add each of them to groupList
+            while (group_idsStatement.next()) {
+                PreparedStatement getGroupInfoStatement = Connector.connect.prepareStatement(
+                        "SELECT * FROM group_repo WHERE group_id = ?"
+                );
+                getGroupInfoStatement.setInt(1, group_idsStatement.getInt("group_id"));
+                ResultSet resultSet = getGroupInfoStatement.executeQuery();
 
-            while (resultSet.next()) {
+                resultSet.next();
                 String groupId = String.valueOf(resultSet.getInt("group_id"));
                 String isAdmin = String.valueOf(resultSet.getBoolean("is_admin"));
                 String alias = resultSet.getString("alias");
                 String uidAdmin = String.valueOf(resultSet.getInt("uid_admin"));
-//                Timestamp timeSent = resultSet.getTimestamp("time_sent");
 
                 Map<String, String> groupMap = new HashMap<>();
                 groupMap.put("groupId", groupId);
                 groupMap.put("isAdmin", isAdmin);
                 groupMap.put("alias", alias);
                 groupMap.put("uidAdmin",uidAdmin);
-//                groupMap.put("timeSent", String.valueOf(timeSent));
+                groupMap.put("is_fav", String.valueOf(group_idsStatement.getInt("is_fav")));
 
                 groupList.add(groupMap);
             }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -649,6 +678,8 @@ public class UserThread extends Thread {
     /**
      * This is used to send the message from each user to the client. This is a helper method for the {@link ChatServer}
      * class
+     *
+     * TODO: Send sender name as well
      *
      * @param message message to send
      * @param address who receives the message

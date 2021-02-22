@@ -79,8 +79,8 @@ public class ChatController implements Initializable {
                     case Action.ON_GROUP_LIST_SEND:
                         System.out.println("GROUP LIST RECEIVED");
                         groupsList = (List<Map<String, String>>)readData.get("data");
-                        System.out.println("size: " + groupsList.size());
-                        renderGroupsList();
+                        System.out.println("Received groups list size: " + groupsList.size());
+                        renderGroupsList(sortGroupList(groupsList));
                         break;
                     case Action.ON_USER_INFO_SEND:
                         System.out.println("USER INFO RECEIVED");
@@ -107,6 +107,39 @@ public class ChatController implements Initializable {
 
     }
 
+    /**
+     * TODO: take into consideration if entered key is shift + enter
+     */
+    @FXML
+    void onKeyPress(KeyEvent key) throws IOException {
+        if (key.getCode().equals(KeyCode.ENTER)) {
+            handleMessageSend(message_area.getText().trim());
+            message_area.clear();
+        }
+    }
+
+    /**
+     * update people_vBox such that the converstaionBoxes inside it will
+     * be those that have an alias that match the inputted string
+     *
+     * Algorithm:
+     * 1. Get list of groups that match the specified string
+     * 2. Render that list of groups
+     * @param event
+     */
+    @FXML
+    void onSearchFieldInput(KeyEvent event) {
+        if (searchContacts_field.getText().isBlank())
+            renderGroupsList(sortGroupList(groupsList));
+        List<Map<String, String>> results = new ArrayList<>();
+        for (Map<String, String> group : groupsList) {
+            if (group.get("alias").startsWith(searchContacts_field.getText().trim())) {
+                results.add(group);
+            }
+        }
+        renderGroupsList(sortGroupList(results));
+    }
+
     private void handleFavoriteToggle(String groupId, String isFav) {
         Platform.runLater(() -> people_vBox.getChildren().clear());
         for (Map<String, String> group : groupsList) {
@@ -116,17 +149,9 @@ public class ChatController implements Initializable {
                 System.out.println("group id: " + groupId + " " + isFav);
                 System.out.println("favorite value replace ---");
             }
-            System.out.println(group);
         }
-        renderGroupsList();
-    }
-
-    @FXML
-    void onKeyPress(KeyEvent key) throws IOException {
-        if (key.getCode().equals(KeyCode.ENTER)) {
-            handleMessageSend(message_area.getText().trim());
-            message_area.clear();
-        }
+        System.out.println("Handle favorite toggle: " + groupsList.size());
+        renderGroupsList(sortGroupList(groupsList));
     }
 
     private void handleMessageSend(String message) throws IOException {
@@ -244,11 +269,12 @@ public class ChatController implements Initializable {
         previewMessage(msgData);
     }
 
-    private void renderGroupsList() {
+    private void renderGroupsList(List<Map<String, String>> groupsList) {
+        System.out.println("Render Groups List: " + groupsList.size());
         try {
             System.out.println("GROUP REQUEST ACCEPTED NUMBER OF GROUPS: " + groupsList.size());
             Platform.runLater(() -> people_vBox.getChildren().clear());
-            sortGroupList();
+//            sortGroupList();
             for (Map<String, String> groupMap : groupsList) {
                 String alias = groupMap.get("alias");
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("../resources/view/ConversationBox.fxml"));
@@ -306,29 +332,29 @@ public class ChatController implements Initializable {
 
     /**
      * Sorts the groupList such that favorites will be placed in the beginning of the list
-     *
+     * TODO: algorithm is trash pls optimize lmao
      * Algorithm:
-     * 1. For each element of groupList check if element is a favorite
-     * 2. If it is a favorite, add it into the sortedList and remove from grouplist
-     * 3. Else, do nothing
-     * 4. Do steps 1 to 3 until there are no more favorites inside groupList
-     * 5. Add all remaining non favorites into the list
-     * 7. groupList = sortedList
+     * 1. add all favorites
+     * 2. add all non favorites
+     * 3. return
      */
-    private void sortGroupList() {
+    private List<Map<String, String>> sortGroupList(List<Map<String, String>> groupsList) {
+
+        System.out.println("Sort Groups List: " + groupsList.size());
         List<Map<String, String>> sortedList = new ArrayList<>();
         System.out.println(groupsList.size());
-        for (int i = 0; i < groupsList.size(); i++) { // put all favotires in sortedList
+        for (int i = 0; i < groupsList.size(); i++) { // put all favorites in sortedList
             Map<String, String> group = groupsList.get(i);
-            if (group.get("is_fav").equals("1")) {
+            if (group.get("is_fav").equals("1"))
                 sortedList.add(group);
-                groupsList.remove(group);
-            }
-            try{ groupsList.get(i+1);
-            }catch (IndexOutOfBoundsException e){ break; }
         }
-        sortedList.addAll(groupsList); // put remaining groups in sortedList
-        groupsList = sortedList; // set groupList = sortedList
+        for (int i = 0; i < groupsList.size(); i++) { // put all not favorites in sortedList
+            Map<String, String> group = groupsList.get(i);
+            if (group.get("is_fav").equals("0"))
+                sortedList.add(group);
+        }
+        System.out.println("size after sorting: " + this.groupsList.size());
+        return sortedList; // set groupList = sortedList
     }
 
     private void handleGroupCreation(String creationStatus) {
@@ -383,10 +409,6 @@ public class ChatController implements Initializable {
                 e.printStackTrace();
             }
         });
-
-    }
-
-    private void handleConversationChange() {
 
     }
 
@@ -446,8 +468,8 @@ public class ChatController implements Initializable {
         groupsList = new ArrayList<>();
 
         messages_scrollPane.vvalueProperty().bind(messages_vBox.heightProperty());
-        HashMap<String, Object> request = new HashMap<>();
 
+        HashMap<String, Object> request = new HashMap<>();
         request.put("action", Action.GET_USER_INFORMATION);
         request.put("email", this.email);
 

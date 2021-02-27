@@ -4,11 +4,18 @@
 <?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.shape.Circle?>
+<?import javafx.scene.text.Font?>
 
 <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="55.0" prefWidth="260.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <Circle fx:id="group_picture" fill="DODGERBLUE" layoutX="37.0" layoutY="28.0" radius="20.0" stroke="BLACK" strokeType="INSIDE" />
-      <Label fx:id="groupAlias_label" layoutX="70.0" layoutY="18.0" prefHeight="17.0" prefWidth="152.0" text="Label" />
+      <Label fx:id="groupAlias_label" layoutX="70.0" layoutY="18.0" prefHeight="17.0" prefWidth="103.0" text="Label" />
       <RadioButton fx:id="favorite_button" layoutX="206.0" layoutY="18.0" mnemonicParsing="false" text="&lt;3" />
+      <Circle fx:id="notif_circle" fill="#ff3e3b" layoutX="51.0" layoutY="12.0" radius="9.0" stroke="BLACK" strokeType="INSIDE" />
+      <Label fx:id="unreadMsgs_label" alignment="CENTER" layoutX="43.0" layoutY="3.0" prefHeight="17.0" prefWidth="16.0" text="69" textFill="WHITE">
+         <font>
+            <Font size="8.0" />
+         </font>
+      </Label>
    </children>
 </Pane>

@@ -22,7 +22,8 @@ import java.util.*;
 public class ChatController implements Initializable {
 
     private ClientThread clientThread;
-    private String name;
+    private String fName;
+    private String lName;
     private ArrayList<Message> messages;
     private String ID;
     private String email;
@@ -62,6 +63,15 @@ public class ChatController implements Initializable {
     @FXML
     private VBox messages_vBox;
 
+    @FXML
+    private Label timeStamp_label;
+
+    @FXML
+    private Label fInitial_label;
+
+    @FXML
+    private Label lInitial_label;
+
     private class ClientThread extends Thread {
 
         public void run(){
@@ -80,7 +90,7 @@ public class ChatController implements Initializable {
                         System.out.println("GROUP LIST RECEIVED");
                         groupsList = (List<Map<String, String>>)readData.get("data");
                         System.out.println("Received groups list size: " + groupsList.size());
-                        renderGroupsList(sortGroupList(groupsList));
+                        renderGroupsList(sortGroupList(groupsList, "-1"));
                         break;
                     case Action.ON_USER_INFO_SEND:
                         System.out.println("USER INFO RECEIVED");
@@ -130,14 +140,14 @@ public class ChatController implements Initializable {
     @FXML
     void onSearchFieldInput(KeyEvent event) {
         if (searchContacts_field.getText().isBlank())
-            renderGroupsList(sortGroupList(groupsList));
+            renderGroupsList(sortGroupList(groupsList, "-1"));
         List<Map<String, String>> results = new ArrayList<>();
         for (Map<String, String> group : groupsList) {
             if (group.get("alias").startsWith(searchContacts_field.getText().trim())) {
                 results.add(group);
             }
         }
-        renderGroupsList(sortGroupList(results));
+        renderGroupsList(sortGroupList(results, "-1"));
     }
 
     private void handleFavoriteToggle(String groupId, String isFav) {
@@ -151,7 +161,7 @@ public class ChatController implements Initializable {
             }
         }
         System.out.println("Handle favorite toggle: " + groupsList.size());
-        renderGroupsList(sortGroupList(groupsList));
+        renderGroupsList(sortGroupList(groupsList, "-1"));
     }
 
     private void handleMessageSend(String message) throws IOException {
@@ -169,7 +179,7 @@ public class ChatController implements Initializable {
 
         for (int i = 0; i < msgData.length; i++) {
             Timestamp time = new Timestamp(new Date().getTime());
-            messages[i] = new Message(this.ID,time,this.name,msgData[i]);
+            messages[i] = new Message(this.ID,time,this.fName + " " + this.lName,msgData[i]);
         }
 
         return messages;
@@ -208,32 +218,35 @@ public class ChatController implements Initializable {
             boolean primary = true;
             if (messages.size() != 0)
                 primary = !messages.get(messages.size()-1).getSenderID().equals(msgData[i].getSenderID());
-            System.out.println(messages.toString());
+
             FXMLLoader loader = null;
-//            System.out.println(loader.toString());
-            if (primary){
+            if (primary)
                 loader = new FXMLLoader(getClass().getResource("../resources/view/MessageBoxPrimary.fxml"));
-                System.out.println("Loaded Primary");
-            } else {
+            else
                 loader = new FXMLLoader(getClass().getResource("../resources/view/MessageBoxSecondary.fxml"));
-                System.out.println("Loaded Secondary");
-            }
-//            System.out.println(loader.toString());
 
             try { node = loader.load(); }
             catch (IOException e) { e.printStackTrace(); }
-
             assert node != null;
 
+            // Update other labels here.
             for (Node component : ((Pane) node).getChildren()) {
-                System.out.println(component.getId());
                 if (component.getId().equals("message_label"))
                     ((Label)component).setText(msgData[i].getMessage());
                 else if (component.getId().equals("name_label"))
                     ((Label)component).setText(msgData[i].getSenderName());
+                if (component.getId().equals("fInitial_label")) {
+                    if (fName.length() > 0)
+                        ((Label)component).setText(String.valueOf(fName.charAt(0)));
+                }
+                if (component.getId().equals("lInitial_label")) {
+                    if (lName.length() > 0)
+                        ((Label)component).setText(String.valueOf(lName.charAt(0)));
+                }
+                if (component.getId().equals("timeStamp_label"))
+                    ((Label)component).setText(msgData[i].getTimeStamp().toString());
             }
 
-            System.out.println("NOde added " + primary);
             messages.addAll(Arrays.asList(msgData));
             Node finalNode = node;
             Platform.runLater(() -> messages_vBox.getChildren().add(finalNode));
@@ -259,7 +272,18 @@ public class ChatController implements Initializable {
 
     // TODO: Get sender name as well - fix in backend
     private void handleMessagesReceived(Map<String, String> message) {
-        if (!message.get("address").equals(this.currentlySelectedGroupID)) return;
+//        System.out.println("======== message received ========== address:" + message.get("address"));
+        if (!message.get("address").equals(this.currentlySelectedGroupID)) {
+            for (Map<String, String> groupMap : groupsList) {
+                if (groupMap.get("groupId").equals(message.get("address"))){
+                    groupMap.replace("unreadMessages",
+                            String.valueOf(Integer.parseInt(groupMap.get("unreadMessages"))+1));
+                    break;
+                }
+            }
+            renderGroupsList(sortGroupList(groupsList, message.get("address")));
+            return;
+        }
         Message[] msgData = {new Message(
                 message.get("sender"),
                 Timestamp.valueOf(message.get("timeSent")),
@@ -267,6 +291,7 @@ public class ChatController implements Initializable {
                 message.get("message")
         )};
         previewMessage(msgData);
+
     }
 
     private void renderGroupsList(List<Map<String, String>> groupsList) {
@@ -289,14 +314,38 @@ public class ChatController implements Initializable {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+                    // Remove unread messages circle
+                    for (Node component : ((Pane)node).getChildren()) {
+                        if (component.getId().equals("notif_circle"))
+                            component.setVisible(false);
+                        if (component.getId().equals("unreadMsgs_label"))
+                            component.setVisible(false);
+                        for (Map<String, String> globalGrpMap : groupsList) {
+                            if (globalGrpMap.equals(groupMap)) {
+                                globalGrpMap.replace("unreadMessages", "0");
+                            }
+                        }
+                    }
                     setConversationHeader(groupMap.get("alias"), String.valueOf(this.ID).equals(groupMap.get("uidAdmin")));
                     currentlySelectedGroupID = groupMap.get("groupId");
                 });
-
+//                System.out.println(groupMap.get());
                 for (Node component : ((Pane)node).getChildren()) {
-                    if (component.getId().equals("groupAlias_label")) {
-                        ((Label)component).setText(alias);
+                    if (Integer.parseInt(groupMap.get("unreadMessages")) > 0) {
+                        if (component.getId().equals("notif_circle"))
+                            component.setVisible(true);
+                        if (component.getId().equals("unreadMsgs_label")) {
+                            component.setVisible(true);
+                            ((Label)component).setText(groupMap.get("unreadMessages"));
+                        }
+                    }else {
+                        if (component.getId().equals("notif_circle"))
+                            component.setVisible(false);
+                        if (component.getId().equals("unreadMsgs_label"))
+                            component.setVisible(false);
                     }
+                    if (component.getId().equals("groupAlias_label"))
+                        ((Label)component).setText(alias);
                     if (component.getId().equals("favorite_button")) {
                         ((RadioButton)component).setSelected(groupMap.get("is_fav").equals("1"));
                         ((RadioButton)component).selectedProperty().addListener((obs, wasPreviouslySelected, isNowSelected) -> {
@@ -304,17 +353,10 @@ public class ChatController implements Initializable {
                             request.put("action", Action.ADD_FAVOURITE);
                             request.put("userId", this.ID);
                             request.put("groupId", groupMap.get("groupId"));
-                            if (isNowSelected) { // CHECK IF IT EVEN ENTERS IF AND ELSE
-                                System.out.println("radio box sele3cted");
+                            if (isNowSelected) // CHECK IF IT EVEN ENTERS IF AND ELSE
                                 request.put("isFav", "1");
-                            } else {
+                            else
                                 request.put("isFav", "0");
-                                System.out.println("radio box not selected");
-                            }
-                            System.out.println("toggle request: ");
-                            System.out.println(request.get("action"));
-                            System.out.println(request.get("userId"));
-                            System.out.println(request.get("isFav"));
                             try {
                                 ClientExecutable.serverConnector.getObjOut().writeObject(request);
                             } catch (IOException e) {
@@ -332,28 +374,43 @@ public class ChatController implements Initializable {
 
     /**
      * Sorts the groupList such that favorites will be placed in the beginning of the list
+     * Set priorityGrpId to -1 if there is no group to prioritize
      * TODO: algorithm is trash pls optimize lmao
      * Algorithm:
      * 1. add all favorites
      * 2. add all non favorites
-     * 3. return
+     * 3. place priority group on top
+     * 4. return
      */
-    private List<Map<String, String>> sortGroupList(List<Map<String, String>> groupsList) {
-
+    private List<Map<String, String>> sortGroupList(List<Map<String, String>> groupsList, String priorityGrpId) {
         System.out.println("Sort Groups List: " + groupsList.size());
-        List<Map<String, String>> sortedList = new ArrayList<>();
+        ArrayList<Map<String, String>> sortedList = new ArrayList<>();
         System.out.println(groupsList.size());
-        for (int i = 0; i < groupsList.size(); i++) { // put all favorites in sortedList
-            Map<String, String> group = groupsList.get(i);
-            if (group.get("is_fav").equals("1"))
+        int favorites = 0;
+        for (Map<String, String> group : groupsList) { // put all favorites in sortedList
+            if (group.get("is_fav").equals("1")) {
                 sortedList.add(group);
+                favorites++;
+            }
         }
-        for (int i = 0; i < groupsList.size(); i++) { // put all not favorites in sortedList
-            Map<String, String> group = groupsList.get(i);
+        for (Map<String, String> group : groupsList) { // put all not favorites in sortedList
             if (group.get("is_fav").equals("0"))
                 sortedList.add(group);
         }
-        System.out.println("size after sorting: " + this.groupsList.size());
+        if (priorityGrpId.equals("-1"))
+            return sortedList;
+        for (Map<String, String> group : groupsList) { // put priority on top
+            if (group.get("groupId").equals(priorityGrpId)) {
+                int origIdxOfGrp = sortedList.indexOf(group);
+                if (group.get("is_fav").equals("1"))
+                    sortedList.add(0, group);
+                else
+                    sortedList.add(favorites, group);
+                sortedList.remove(origIdxOfGrp+1);
+            }
+        }
+        // TODO: Find more elegant way of doing this - randomly updating global variable in method bad - bad practice
+        this.groupsList = sortedList;
         return sortedList; // set groupList = sortedList
     }
 
@@ -376,7 +433,8 @@ public class ChatController implements Initializable {
 
     private void handleUserInformationSend(Map<String, String> userInformation) {
         this.ID = userInformation.get("userId");
-        this.name = userInformation.get("firstName") + userInformation.get("lastName");
+        this.fName = userInformation.get("firstName");
+        this.lName = userInformation.get("lastName");
         this.email = userInformation.get("email");
         email_label.setText(this.email);
     }
@@ -452,7 +510,6 @@ public class ChatController implements Initializable {
 
         ClientExecutable.serverConnector.getObjOut().writeObject(userRepo);
         System.out.println("REQUESTED NEW CONVERSATION");
-//        Main.serverConnector.getObjIn().readObject();
     }
 
     /**

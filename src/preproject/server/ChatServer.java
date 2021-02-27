@@ -105,11 +105,11 @@ public class ChatServer {
             System.out.println("Server listening on PORT: " + this.PORT);
             while (true) {
                 Socket socket = serverSocket.accept();
-                System.out.println("A client has connected to the server");
-
                 UserThread userThread = new UserThread(socket, this);
+
                 onlineUsers.add(userThread);
                 userThread.start();
+                System.out.println("A client has connected to the server. Total number of users: " + onlineUsers.size());
             }
         } catch (IOException e) {
             e.printStackTrace();

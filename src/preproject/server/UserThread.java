@@ -318,8 +318,6 @@ public class UserThread extends Thread {
         Map<String, String> responseMap = new HashMap<>();
         responseMap.put("action", Action.ON_GROUP_CREATION);
 
-//        System.out.println("alias: " + );
-
         if (doesGroupExists(groupAlias, Integer.toString(getUserId(creator)))) {
             objOut.writeObject(false);
             System.out.println("Group already exists");
@@ -591,6 +589,8 @@ public class UserThread extends Thread {
                 groupMap.put("isAdmin", isAdmin);
                 groupMap.put("alias", alias);
                 groupMap.put("uidAdmin",uidAdmin);
+                // TODO: Update this when messages table is already functional
+                groupMap.put("unreadMessages", "0");
                 groupMap.put("is_fav", String.valueOf(group_idsStatement.getInt("is_fav")));
 
                 groupList.add(groupMap);

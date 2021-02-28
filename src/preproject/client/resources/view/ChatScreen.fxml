@@ -5,44 +5,128 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.paint.Color?>
 <?import javafx.scene.shape.Circle?>
+<?import javafx.scene.text.Font?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="preproject.client.controllers.ChatController">
+<AnchorPane prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Pane fx:id="header_pane" layoutX="260.0" prefHeight="53.0" prefWidth="1020.0" style="-fx-background-color: FAFAFA;">
+      <HBox prefHeight="720.0" prefWidth="1280.0" style="-fx-background-color: red;">
          <children>
-            <Label fx:id="header_label" layoutX="80.0" layoutY="18.0" prefHeight="17.0" prefWidth="550.0" text="Select a group" />
-         </children>
-      </Pane>
-      <Pane prefHeight="720.0" prefWidth="260.0" style="-fx-background-color: EEEEEE;">
-         <children>
-            <Label fx:id="email_label" alignment="CENTER" layoutY="24.0" prefHeight="17.0" prefWidth="260.0" text="EMAIL HERE" textAlignment="CENTER" />
-            <TextField fx:id="searchContacts_field" alignment="CENTER" layoutX="13.0" layoutY="52.0" onKeyPressed="#onSearchFieldInput" prefHeight="26.0" prefWidth="234.0" promptText=" Search Contacts" />
-            <Pane fx:id="newConversations_Pane" layoutY="132.0" onMouseClicked="#onNewConversationClick" prefHeight="55.0" prefWidth="260.0">
+            <GridPane prefHeight="655.0" prefWidth="260.0" style="-fx-background-color: #EEEEEE;">
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="-Infinity" prefWidth="260.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="53.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="26.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="54.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="1.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="53.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="533.0" minHeight="10.0" prefHeight="422.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="533.0" minHeight="10.0" prefHeight="111.0" vgrow="SOMETIMES" />
+              </rowConstraints>
                <children>
-                  <Circle fill="DODGERBLUE" layoutX="37.0" layoutY="28.0" radius="20.0" stroke="BLACK" strokeType="INSIDE" />
-                  <Label fx:id="groupAlias_label" layoutX="70.0" layoutY="18.0" prefHeight="17.0" prefWidth="152.0" text="Start a Conversation" />
+                  <Pane prefHeight="41.0" prefWidth="260.0" style="-fx-background-color: #EEEEEE;">
+                     <children>
+                        <Label fx:id="email_label" alignment="CENTER" layoutX="14.0" layoutY="18.0" prefHeight="17.0" prefWidth="234.0" text="currentUser@Email" textAlignment="CENTER">
+                           <font>
+                              <Font name="System Bold" size="12.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </Pane>
+                  <Pane prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="1">
+                     <children>
+                        <TextField fx:id="searchContacts_field" alignment="CENTER" layoutX="13.0" onKeyPressed="#onSearchFieldInput" prefHeight="26.0" prefWidth="234.0" promptText="Search Contacts" style="-fx-background-color: #DDDDDD; -fx-prompt-text-fill: #666666;" />
+                     </children>
+                  </Pane>
+                  <Pane prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="2">
+                     <children>
+                        <Button fx:id="broadcast_button" layoutX="80.0" layoutY="14.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="100.0" style="-fx-background-color: #00A676;" text="Broadcast" textFill="WHITE" />
+                     </children>
+                  </Pane>
+                  <Pane prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="3">
+                     <children>
+                        <Pane layoutX="16.0" layoutY="-1.0" prefHeight="1.0" prefWidth="228.0" style="-fx-border-color: #AAAAAA; -fx-border-style: solid hidden hidden hidden;" />
+                     </children>
+                  </Pane>
+                  <Pane prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="4">
+                     <children>
+                        <Pane fx:id="newConversations_Pane" layoutX="13.0" onMouseClicked="#onNewConversationClick" prefHeight="53.0" prefWidth="234.0">
+                           <children>
+                              <Circle fill="#aaaaaa" layoutX="27.0" layoutY="27.0" radius="17.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" />
+                              <Label fx:id="groupAlias_label" layoutX="54.0" layoutY="18.0" prefHeight="17.0" prefWidth="119.0" text="Start a Conversation" />
+                           </children>
+                        </Pane>
+                     </children>
+                  </Pane>
+                  <AnchorPane prefHeight="442.0" prefWidth="260.0" style="-fx-background-color: #EEEEEE;" GridPane.rowIndex="5">
+                     <children>
+                        <ScrollPane fx:id="conversation_scrollPane" layoutX="13.0" prefHeight="424.0" prefWidth="234.0" style="-fx-background-color: #EEEEEE; -fx-background: #EEEEEE;">
+                           <content>
+                              <VBox fx:id="people_vBox" prefHeight="422.0" prefWidth="232.0" style="-fx-background-color: #EEEEEE;" />
+                           </content>
+                        </ScrollPane>
+                     </children>
+                  </AnchorPane>
+                  <Pane prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="6">
+                     <children>
+                        <Button layoutX="94.0" layoutY="32.0" mnemonicParsing="false" prefHeight="23.0" prefWidth="72.0" style="-fx-background-color: DB5461;" text="Logout" textFill="WHITE">
+                           <font>
+                              <Font size="11.0" />
+                           </font>
+                        </Button>
+                     </children>
+                  </Pane>
                </children>
-            </Pane>
-            <ScrollPane fx:id="messages_scrollPane" layoutY="187.0">
-               <content>
-                  <VBox fx:id="people_vBox" prefHeight="533.0" prefWidth="260.0" />
-               </content>
-            </ScrollPane>
-            <Button fx:id="broadcast_button" layoutX="97.0" layoutY="91.0" mnemonicParsing="false" text="Broadcast" />
+            </GridPane>
+            <GridPane>
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="-Infinity" prefWidth="1020.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="53.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="600.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="67.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+               <children>
+                  <ScrollPane fx:id="messages_scrollPane" hbarPolicy="NEVER" prefHeight="600.0" prefWidth="1020.0" style="-fx-background-color: #FAFAFA;" vvalue="1.0" GridPane.rowIndex="1">
+                     <content>
+                        <VBox fx:id="messages_vBox" prefHeight="598.0" prefWidth="1017.0" style="-fx-background-color: #FAFAFA;" />
+                     </content>
+                  </ScrollPane>
+                  <Pane prefHeight="67.0" prefWidth="1020.0" style="-fx-background-color: #FAFAFA;" GridPane.rowIndex="2">
+                     <children>
+                        <TextArea fx:id="message_area" layoutX="16.0" layoutY="19.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" onKeyPressed="#onKeyPress" prefHeight="30.0" prefWidth="988.0" promptText="message 'conversation name'" style="-fx-control-inner-background: #EEEEEE; -fx-prompt-text-fill: #666666;" wrapText="true">
+                           <font>
+                              <Font size="14.0" />
+                           </font></TextArea>
+                     </children>
+                  </Pane>
+                  <Pane fx:id="header_pane" prefHeight="53.0" prefWidth="1020.0" style="-fx-background-color: #FAFAFA;">
+                     <children>
+                        <Label fx:id="header_label" layoutX="80.0" layoutY="18.0" prefHeight="17.0" prefWidth="550.0" text="Select a group" />
+                     </children>
+                     <effect>
+                        <DropShadow blurType="ONE_PASS_BOX" height="10.0" radius="2.0" width="0.0">
+                           <color>
+                              <Color opacity="0.699999988079071" />
+                           </color>
+                        </DropShadow>
+                     </effect>
+                  </Pane>
+               </children>
+            </GridPane>
          </children>
-      </Pane>
-      <Pane layoutX="260.0" layoutY="653.0" prefHeight="67.0" prefWidth="1020.0" style="-fx-background-color: FEFEFE;">
-         <children>
-            <TextArea fx:id="message_area" layoutX="16.0" layoutY="15.0" onKeyPressed="#onKeyPress" prefHeight="30.0" prefWidth="988.0" wrapText="true" />
-         </children>
-      </Pane>
-      <ScrollPane fx:id="messages_scrollPane" hbarPolicy="NEVER" layoutX="260.0" layoutY="53.0" vvalue="1.0">
-         <content>
-            <VBox fx:id="messages_vBox" prefHeight="600.0" prefWidth="1018.0" />
-         </content>
-      </ScrollPane>
+      </HBox>
    </children>
-</Pane>
+</AnchorPane>

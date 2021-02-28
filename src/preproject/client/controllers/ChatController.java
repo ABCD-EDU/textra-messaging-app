@@ -49,6 +49,9 @@ public class ChatController implements Initializable {
     private Label groupAlias_label;
 
     @FXML
+    private ScrollPane conversation_scrollPane;
+
+    @FXML
     private ScrollPane messages_scrollPane;
 
     @FXML

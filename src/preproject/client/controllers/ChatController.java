@@ -5,12 +5,16 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import preproject.client.Action;
 import preproject.client.ClientExecutable;
 
@@ -235,19 +239,27 @@ public class ChatController implements Initializable {
             catch (IOException e) { e.printStackTrace(); }
             assert node != null;
 
-            // Update other labels here.
+            /*
+             TODO: Separate the processing for primary and secondary message boxes to improve efficiency
+                secondary message box only has message_label component
+             */
             for (Node component : ((Pane) node).getChildren()) {
                 if (component.getId().equals("message_label"))
                     ((Label)component).setText(msgData[i].getMessage());
                 else if (component.getId().equals("name_label"))
                     ((Label)component).setText(msgData[i].getSenderName());
+//                String senderName = msgData[i].getSenderName().split(" ")
+                /*
+                 TODO: Parsing sender name in client side is not efficient. Make server send first name and last name
+                    instead of sending whole name.
+                 */
                 if (component.getId().equals("fInitial_label")) {
                     if (fName.length() > 0)
-                        ((Label)component).setText(String.valueOf(fName.charAt(0)));
+                        ((Label)component).setText(String.valueOf(msgData[i].getSenderName().charAt(0)));
                 }
                 if (component.getId().equals("lInitial_label")) {
                     if (lName.length() > 0)
-                        ((Label)component).setText(String.valueOf(lName.charAt(0)));
+                        ((Label)component).setText(String.valueOf(msgData[i].getSenderName().charAt(msgData[i].getSenderName().indexOf(" ")+1)));
                 }
                 if (component.getId().equals("timeStamp_label"))
                     ((Label)component).setText(msgData[i].getTimeStamp().toString());
@@ -353,22 +365,22 @@ public class ChatController implements Initializable {
                     if (component.getId().equals("groupAlias_label"))
                         ((Label)component).setText(alias);
                     if (component.getId().equals("favorite_button")) {
-                        ((RadioButton)component).setSelected(groupMap.get("is_fav").equals("1"));
-                        ((RadioButton)component).selectedProperty().addListener((obs, wasPreviouslySelected, isNowSelected) -> {
-                            Map<String, String> request = new HashMap<>();
-                            request.put("action", Action.ADD_FAVOURITE);
-                            request.put("userId", this.ID);
-                            request.put("groupId", groupMap.get("groupId"));
-                            if (isNowSelected) // CHECK IF IT EVEN ENTERS IF AND ELSE
-                                request.put("isFav", "1");
-                            else
-                                request.put("isFav", "0");
-                            try {
-                                ClientExecutable.serverConnector.getObjOut().writeObject(request);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        });
+//                        ((RadioButton)component).setSelected(groupMap.get("is_fav").equals("1"));
+//                        ((RadioButton)component).selectedProperty().addListener((obs, wasPreviouslySelected, isNowSelected) -> {
+//                            Map<String, String> request = new HashMap<>();
+//                            request.put("action", Action.ADD_FAVOURITE);
+//                            request.put("userId", this.ID);
+//                            request.put("groupId", groupMap.get("groupId"));
+//                            if (isNowSelected) // CHECK IF IT EVEN ENTERS IF AND ELSE
+//                                request.put("isFav", "1");
+//                            else
+//                                request.put("isFav", "0");
+//                            try {
+//                                ClientExecutable.serverConnector.getObjOut().writeObject(request);
+//                            } catch (IOException e) {
+//                                e.printStackTrace();
+//                            }
+//                        });
                     }
                 }
                 Platform.runLater(() -> people_vBox.getChildren().add(node));
@@ -450,30 +462,38 @@ public class ChatController implements Initializable {
      */
     @FXML
     private void onNewConversationClick(MouseEvent event) {
-        header_pane.getChildren().removeIf(component -> component.getId().equals("header_label"));
-        header_pane.getChildren().removeIf(component -> component.getId().equals("header_button"));
-        TextField aliasField = new TextField();
-        aliasField.setPromptText("conference name");
-        header_pane.getChildren().add(aliasField);
-        TextField membersField = new TextField();
-        membersField.setPromptText("members");
-        header_pane.getChildren().add(membersField);
-        Button newConvoButton = new Button("add");
-        header_pane.getChildren().add(newConvoButton);
-        newConvoButton.setLayoutX(100);
-        aliasField.setLayoutX(300);
-        newConvoButton.setOnAction(keyEvent -> {
-            System.out.println("new conversation button pressed");
-            System.out.println(aliasField.getText().trim());
-            System.out.println(membersField.getText().trim());
-            try {
-                createNewConversation(aliasField.getText().trim(),
-                        membersField.getText().trim());
-            } catch (IOException | ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-        });
-
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../resources/view/NewConversationStage.fxml"));
+            Stage stage = (Stage)fxmlLoader.load();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            NewConversationStageController controller = fxmlLoader.getController();
+            controller.setEmail(this.email);
+            stage.show();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        //        header_pane.getChildren().clear();
+//        TextField aliasField = new TextField();
+//        aliasField.setPromptText("conference name");
+//        header_pane.getChildren().add(aliasField);
+//        TextField membersField = new TextField();
+//        membersField.setPromptText("members");
+//        header_pane.getChildren().add(membersField);
+//        Button newConvoButton = new Button("add");
+//        header_pane.getChildren().add(newConvoButton);
+//        newConvoButton.setLayoutX(100);
+//        aliasField.setLayoutX(300);
+//        newConvoButton.setOnAction(keyEvent -> {
+//            System.out.println("new conversation button pressed");
+//            System.out.println(aliasField.getText().trim());
+//            System.out.println(membersField.getText().trim());
+//            try {
+//                createNewConversation(aliasField.getText().trim(),
+//                        membersField.getText().trim());
+//            } catch (IOException | ClassNotFoundException e) {
+//                e.printStackTrace();
+//            }
+//        });
     }
 
     private void setConversationHeader(String alias, Boolean isAdmin) {
@@ -503,19 +523,6 @@ public class ChatController implements Initializable {
                     component.setVisible(false); // for debug purposes only
         }
         header_pane.getChildren().add(node);
-    }
-
-    private void createNewConversation(String alias, String members) throws IOException, ClassNotFoundException {
-        Map<String, Object> userRepo = new HashMap<>();
-        userRepo.put("action", Action.ADD_GROUP);
-
-        userRepo.put("alias", alias);
-        userRepo.put("creator", this.email); // valid
-        userRepo.put("members", new ArrayList<>(Arrays.asList(members.split(","))));
-        System.out.println(userRepo.get("members"));
-
-        ClientExecutable.serverConnector.getObjOut().writeObject(userRepo);
-        System.out.println("REQUESTED NEW CONVERSATION");
     }
 
     /**

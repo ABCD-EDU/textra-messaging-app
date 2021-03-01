@@ -61,6 +61,9 @@ public class ChatController implements Initializable {
     private Button broadcast_button;
 
     @FXML
+    private Button logout_button;
+
+    @FXML
     private TextArea message_area;
 
     @FXML

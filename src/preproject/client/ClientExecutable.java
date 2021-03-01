@@ -18,7 +18,6 @@ public class ClientExecutable extends Application {
         loader.setController(AdminController);
         Parent root = FXMLLoader.load(getClass().getResource("resources/view/SignInScreen.fxml"));
         Scene scene = new Scene(root);
-//        scene.getStylesheets().add(getClass().getResource("resources/css/AdminScreenStyle.css").toExternalForm());
         primaryStage.setTitle("Messaging App");
         primaryStage.setScene(scene);
         primaryStage.show();

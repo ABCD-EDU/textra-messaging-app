@@ -77,7 +77,7 @@
                   </Pane>
                   <AnchorPane prefHeight="442.0" prefWidth="260.0" style="-fx-background-color: #EEEEEE;" GridPane.rowIndex="5">
                      <children>
-                        <ScrollPane fx:id="conversation_scrollPane" layoutX="12.0" prefHeight="426.0" prefWidth="236.0" style="-fx-background-color: #EEEEEE; -fx-background: #EEEEEE;">
+                        <ScrollPane fx:id="conversation_scrollPane" hbarPolicy="NEVER" layoutX="12.0" prefHeight="426.0" prefWidth="236.0" style="-fx-background-color: #EEEEEE; -fx-background: #EEEEEE;">
                            <content>
                               <VBox fx:id="people_vBox" prefHeight="424.0" prefWidth="234.0" style="-fx-background-color: #EEEEEE;" />
                            </content>

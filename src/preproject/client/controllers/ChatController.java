@@ -365,22 +365,26 @@ public class ChatController implements Initializable {
                     if (component.getId().equals("groupAlias_label"))
                         ((Label)component).setText(alias);
                     if (component.getId().equals("favorite_button")) {
-//                        ((RadioButton)component).setSelected(groupMap.get("is_fav").equals("1"));
-//                        ((RadioButton)component).selectedProperty().addListener((obs, wasPreviouslySelected, isNowSelected) -> {
-//                            Map<String, String> request = new HashMap<>();
-//                            request.put("action", Action.ADD_FAVOURITE);
-//                            request.put("userId", this.ID);
-//                            request.put("groupId", groupMap.get("groupId"));
-//                            if (isNowSelected) // CHECK IF IT EVEN ENTERS IF AND ELSE
-//                                request.put("isFav", "1");
-//                            else
-//                                request.put("isFav", "0");
-//                            try {
-//                                ClientExecutable.serverConnector.getObjOut().writeObject(request);
-//                            } catch (IOException e) {
-//                                e.printStackTrace();
-//                            }
-//                        });
+                        if (!groupMap.get("is_fav").equals("1")) {
+                            ((Button)component).setStyle("-fx-shape:  \"M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z\"; -fx-background-color:  #DDDDDD; -fx-border-color: #EDB458");
+                        }else {
+                            ((Button)component).setStyle("-fx-shape:  \"M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z\"; -fx-background-color:  #EDB458");
+                        }
+                        ((Button)component).setOnMouseClicked((e) -> {
+                            Map<String, String> request = new HashMap<>();
+                            request.put("action", Action.ADD_FAVOURITE);
+                            request.put("userId", this.ID);
+                            request.put("groupId", groupMap.get("groupId"));
+                            if (!groupMap.get("is_fav").equals("1"))
+                                request.put("isFav", "1");
+                            else
+                                request.put("isFav", "0");
+                            try {
+                                ClientExecutable.serverConnector.getObjOut().writeObject(request);
+                            } catch (IOException err) {
+                                err.printStackTrace();
+                            }
+                        });
                     }
                 }
                 Platform.runLater(() -> people_vBox.getChildren().add(node));

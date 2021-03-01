@@ -4,11 +4,25 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.shape.Circle?>
+<?import javafx.scene.text.Font?>
 
 <Pane fx:id="header_pane" prefHeight="53.0" prefWidth="1020.0" style="-fx-background-color: FAFAFA;" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Label fx:id="header_label" layoutX="80.0" layoutY="18.0" prefHeight="17.0" prefWidth="550.0" text="NAMES HERE" />
-      <Button fx:id="header_button" layoutX="935.0" layoutY="14.0" mnemonicParsing="false" text="Options" />
-      <Circle fx:id="header_picture" fill="DODGERBLUE" layoutX="45.0" layoutY="27.0" radius="20.0" stroke="BLACK" strokeType="INSIDE" />
+      <Button fx:id="delete_button" layoutX="934.0" layoutY="15.0" mnemonicParsing="false" prefHeight="1.0" prefWidth="70.0" style="-fx-background-color: DB5461;" text="Delete" textFill="WHITE">
+         <font>
+            <Font size="11.0" />
+         </font>
+      </Button>
+      <Button fx:id="info_button" layoutX="854.0" layoutY="15.0" mnemonicParsing="false" prefHeight="1.0" prefWidth="70.0" style="-fx-background-color: #333333;" text="Info" textFill="WHITE">
+         <font>
+            <Font size="11.0" />
+         </font>
+      </Button>
+      <Circle fx:id="header_picture" fill="#aaaaaa" layoutX="28.0" layoutY="27.0" radius="15.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" />
+      <Label fx:id="header_label" layoutX="53.0" layoutY="18.0" prefHeight="17.0" prefWidth="800.0" text="Conversation Name">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Label>
    </children>
 </Pane>

@@ -8,6 +8,7 @@ public class Action {
     public static final String ADD_FAVOURITE = "ADD_FAVOURITE";
     public static final String ADD_GROUP = "ADD_GROUP";
     public static final String ADD_GROUP_NEW_MEMBER = "ADD_GROUP_NEW_MEMBER";
+    public static final String SEND_BROADCAST_MESSAGE = "SEND_BROADCAST_MESSAGE";
 
     // GET REQUESTS
     public static final String GET_GROUP_LIST = "GET_GROUP_LIST";
@@ -31,5 +32,7 @@ public class Action {
     public static final String ON_INITIAL_MESSAGES_RECEIVED = "ON_INITIAL_MESSAGES_RECEIVED";
     public static final String ON_FAVORITE_TOGGLED = "ON_FAVORITE_TOGGLED";
     public static final String ON_NEW_GROUP_CREATION = "ON_NEW_GROUP_CREATION";
+    public static final String ON_BROADCAST_MESSAGE_RECEIVED ="ON_BROADCAST_MESSAGE_RECEIVED";
+
 
 }

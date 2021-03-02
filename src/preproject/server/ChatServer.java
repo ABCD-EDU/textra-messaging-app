@@ -1,8 +1,5 @@
 package preproject.server;
 
-import preproject.server.handlers.RegisterHandler;
-
-import javax.xml.transform.Result;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -124,16 +121,37 @@ public class ChatServer {
 
     /**
      * Send a Map of <String, Object> to everyone in a given list of users.
-     * @param dataMap
-     * @param userIds
-     * @param senderId
+     * If userIds.length = 0 then send to all online users
      */
-    protected  void sendMapToListOfUsers(Map<String, Object> dataMap, ArrayList<String> userIds, String senderId) {
-        for (UserThread userThread : onlineUsers)  // for each online user
-            if (userIds.contains(String.valueOf(userThread.getUser().getUserId())) &&
-                    !senderId.equals(String.valueOf(userThread.getUser().getUserId()))) { // if user is part of list of users and is not sender
-                userThread.sendMap(dataMap);
+    protected void sendMapToListOfUsers(Map<String, Object> dataMap, ArrayList<String> userIds, String senderId) {
+        if (userIds.size() == 0){ // send to all online user except sender
+            for (UserThread userThread : onlineUsers)
+                if (!senderId.equals(String.valueOf(userThread.getUser().getUserId())))
+                    userThread.sendMap(dataMap);
+        } else { // send to all users in the userIds ArrayList
+            for (UserThread userThread : onlineUsers)  // for each online user
+                if (userIds.contains(String.valueOf(userThread.getUser().getUserId())) &&
+                        !senderId.equals(String.valueOf(userThread.getUser().getUserId()))) { // if user is part of list of users and is not sender
+                    userThread.sendMap(dataMap);
+                }
+        }
+    }
+
+    protected void broadcastMessageToAllOnlineUsers(List<Map<String, String>> messagesList, String senderId) {
+        System.out.println(messagesList);
+        System.out.println(senderId);
+        for (Map<String, String> messageMap : messagesList) {
+            for (UserThread userThread : onlineUsers) {
+                if (!senderId.equals(String.valueOf(userThread.getUser().getUserId()))) {
+                    userThread.sendMessage(
+                            messageMap.get("userId"),
+                            "-1",
+                            messageMap.get("messageSent"),
+                            new Timestamp(new Date().getTime()));
+                }
             }
+        }
+
     }
 
     /**
@@ -141,7 +159,7 @@ public class ChatServer {
      * This method broadcasts the message to all of the users in a certain group. For example, the user = 2203683,
      * message = "Foo Bar" and the recipient = group_1111, all of the users inside group_1111 will receive the message
      *
-     * @param user sender - user ID3
+     * @param user sender - user ID
      * @param message message - literal String message
      * @param address receiver - group ID
      */

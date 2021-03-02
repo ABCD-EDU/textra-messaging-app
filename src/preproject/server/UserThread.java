@@ -104,6 +104,11 @@ public class UserThread extends Thread {
             case Action.GET_GROUP_MESSAGES:
                 this.getGroupMessages((String) readData.get("groupId"));
                 break;
+            case Action.SEND_BROADCAST_MESSAGE:
+                System.out.println(readData.keySet());
+                SERVER.broadcastMessageToAllOnlineUsers((List<Map<String, String>>)readData.get("messagesList"),
+                        (String)readData.get("senderId"));
+                break;
         }
     }
 
@@ -432,11 +437,6 @@ public class UserThread extends Thread {
                 String recipient = (String)messageRepo.get("groupId");
                 String message = (String)messageRepo.get("messageSent");
                 Timestamp timeSent = Timestamp.valueOf((String)messageRepo.get("timeSent"));
-
-                System.out.println(sender);
-                System.out.println(recipient);
-                System.out.println(message);
-                System.out.println(timeSent);
 
                 messageInput.setString(1, sender);
                 messageInput.setString(2, recipient);

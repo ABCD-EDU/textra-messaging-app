@@ -5,8 +5,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -33,6 +31,9 @@ public class ChatController implements Initializable {
     private String email;
     private List<Map<String, String>> groupsList;
     private String currentlySelectedGroupID;
+
+    private int unreadBroadcastMessages;
+    private ArrayList<Message> broadCastMessages;
 
     @FXML
     private Pane header_pane;
@@ -121,6 +122,7 @@ public class ChatController implements Initializable {
                         System.out.println("FAVORITE TOGGLED");
                         handleFavoriteToggle((String)readData.get("groupId"), (String)readData.get("isFav"));
                         break;
+
                 }
             }
         }
@@ -176,8 +178,10 @@ public class ChatController implements Initializable {
 
     private void handleMessageSend(String message) throws IOException {
         Message[] messages = processMessage(message);
-        sendMessage(messages);
+        if (currentlySelectedGroupID.equals("-1"))
+            broadCastMessages.addAll(Arrays.asList(messages));
         previewMessage(messages);
+        sendMessage(messages);
     }
 
     private Message[] processMessage(String message) {
@@ -189,7 +193,7 @@ public class ChatController implements Initializable {
 
         for (int i = 0; i < msgData.length; i++) {
             Timestamp time = new Timestamp(new Date().getTime());
-            messages[i] = new Message(this.ID,time,this.fName + " " + this.lName,msgData[i]);
+            messages[i] = new Message(this.ID,time,this.fName + " " + this.lName, msgData[i]);
         }
 
         return messages;
@@ -200,7 +204,10 @@ public class ChatController implements Initializable {
      */
     private void sendMessage(Message[] msgData) throws IOException {
         Map<String, Object> request = new HashMap<>();
-        request.put("action", Action.SEND_MESSAGE);
+        if (currentlySelectedGroupID.equals("-1")) // send to all online users
+            request.put("action", Action.SEND_BROADCAST_MESSAGE);
+        else
+            request.put("action", Action.SEND_MESSAGE);
         List<Map<String, String>> messagesList = new ArrayList<>();
         for (Message msg : msgData) {
             Map<String, String> msgMap = new HashMap<>();
@@ -211,6 +218,7 @@ public class ChatController implements Initializable {
             messagesList.add(msgMap);
         }
         request.put("messagesList", messagesList);
+        request.put("senderId", msgData[0].getSenderID());
         ClientExecutable.serverConnector.getObjOut().writeObject(request);
     }
 
@@ -288,7 +296,19 @@ public class ChatController implements Initializable {
 
     // TODO: Get sender name as well - fix in backend
     private void handleMessagesReceived(Map<String, String> message) {
-//        System.out.println("======== message received ========== address:" + message.get("address"));
+        System.out.println("======== message received ========== address:" + message.get("address"));
+        Message[] msgData = {new Message(
+                message.get("sender"),
+                Timestamp.valueOf(message.get("timeSent")),
+                message.get("sender"),
+                message.get("message")
+        )};
+        if (message.get("address").equals("-1")) { // if message is from broadcast to all
+            broadCastMessages.addAll(Arrays.asList(msgData));
+            if (currentlySelectedGroupID.equals("-1"))
+                previewMessage(msgData);
+            return;
+        }
         if (!message.get("address").equals(this.currentlySelectedGroupID)) {
             for (Map<String, String> groupMap : groupsList) {
                 if (groupMap.get("groupId").equals(message.get("address"))){
@@ -300,14 +320,8 @@ public class ChatController implements Initializable {
             renderGroupsList(sortGroupList(groupsList, message.get("address")));
             return;
         }
-        Message[] msgData = {new Message(
-                message.get("sender"),
-                Timestamp.valueOf(message.get("timeSent")),
-                message.get("sender"),
-                message.get("message")
-        )};
+        // if message received is from group currently being viewed
         previewMessage(msgData);
-
     }
 
     private void renderGroupsList(List<Map<String, String>> groupsList) {
@@ -505,6 +519,26 @@ public class ChatController implements Initializable {
         header_pane.getChildren().add(node);
     }
 
+    private void initializeBroadcastButton() {
+        broadCastMessages = new ArrayList<>();
+        broadcast_button.setOnMouseClicked((e) -> {
+            Platform.runLater(() -> messages_vBox.getChildren().clear());
+            // TODO: clear notifs for broadcast as well
+            unreadBroadcastMessages = 0;
+            setConversationHeader("Broadcast To All", false);
+            currentlySelectedGroupID = "-1";
+            try {
+                System.out.println(broadCastMessages.size());
+                Message[] toPreview = new Message[broadCastMessages.size()];
+                for (int i = 0; i < broadCastMessages.size(); i++)
+                    toPreview[i] = broadCastMessages.get(i);
+                previewMessage(toPreview);
+            } catch (NullPointerException err) {
+                err.printStackTrace();
+            }
+        });
+    }
+
     /**
      *  Set values of header, text placeholder, listOfPeople, messages
      *  TODO: Clean this code
@@ -513,7 +547,7 @@ public class ChatController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle){
         clientThread = new ClientThread();
         clientThread.start();
-        currentlySelectedGroupID = null;
+        currentlySelectedGroupID = "null";
         messages = new ArrayList<>();
         groupsList = new ArrayList<>();
 
@@ -530,7 +564,6 @@ public class ChatController implements Initializable {
             e.printStackTrace();
         }
 
-
         // TODO: Clean up code by turning this block into a function that takes in varargs as argument
         HashMap<String, Object> request1 = new HashMap<>();
         request1.put("action", Action.GET_GROUP_LIST);
@@ -541,6 +574,7 @@ public class ChatController implements Initializable {
             e.printStackTrace();
         }
 
+        initializeBroadcastButton();
     }
 
 }

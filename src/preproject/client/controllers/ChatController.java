@@ -223,8 +223,6 @@ public class ChatController implements Initializable {
         for (int i = 0; i < msgData.length; i++) {
             Node node = null;
             // last sender == incoming sender?
-            System.out.println("== previewing message: ");
-            System.out.println(msgData[i]);
             boolean primary = true;
             if (messages.size() != 0)
                 primary = !messages.get(messages.size()-1).getSenderID().equals(msgData[i].getSenderID());
@@ -476,28 +474,6 @@ public class ChatController implements Initializable {
         } catch(Exception e) {
             e.printStackTrace();
         }
-        //        header_pane.getChildren().clear();
-//        TextField aliasField = new TextField();
-//        aliasField.setPromptText("conference name");
-//        header_pane.getChildren().add(aliasField);
-//        TextField membersField = new TextField();
-//        membersField.setPromptText("members");
-//        header_pane.getChildren().add(membersField);
-//        Button newConvoButton = new Button("add");
-//        header_pane.getChildren().add(newConvoButton);
-//        newConvoButton.setLayoutX(100);
-//        aliasField.setLayoutX(300);
-//        newConvoButton.setOnAction(keyEvent -> {
-//            System.out.println("new conversation button pressed");
-//            System.out.println(aliasField.getText().trim());
-//            System.out.println(membersField.getText().trim());
-//            try {
-//                createNewConversation(aliasField.getText().trim(),
-//                        membersField.getText().trim());
-//            } catch (IOException | ClassNotFoundException e) {
-//                e.printStackTrace();
-//            }
-//        });
     }
 
     private void setConversationHeader(String alias, Boolean isAdmin) {

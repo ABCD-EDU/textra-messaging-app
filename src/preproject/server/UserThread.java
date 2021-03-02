@@ -316,7 +316,6 @@ public class UserThread extends Thread {
         System.out.println("IDs " + userIdList);
         System.out.println("properties succesfully initialized");
         Map<String, String> responseMap = new HashMap<>();
-        responseMap.put("action", Action.ON_GROUP_CREATION);
 
         if (doesGroupExists(groupAlias, Integer.toString(getUserId(creator)))) {
             objOut.writeObject(false);
@@ -343,14 +342,22 @@ public class UserThread extends Thread {
 
             this.importGroupMembers(userIdList, groupAlias, creator);
 
+            ArrayList<String> stringIdList = new ArrayList<>(userIdList.stream().map(String::valueOf).collect(Collectors.toList()));
             // Update groupList in server
             SERVER.updateGroupList(
                     String.valueOf(getGroupId(groupAlias, userIdList.get(0))),
-                    userIdList.stream().map(String::valueOf).collect(Collectors.toList())
+                    stringIdList
             );
 
+            // send back to client that the creation is successful
+            responseMap.put("action", Action.ON_GROUP_CREATION);
             responseMap.put("status", "true");
             objOut.writeObject(responseMap);
+            // send to other clients that are part of the group about new group
+            Map<String, Object> notificationMap = new HashMap<>();
+            notificationMap.put("action", Action.ON_GROUP_CREATION);
+            notificationMap.put("status", "true");
+            SERVER.sendMapToListOfUsers(notificationMap, stringIdList, String.valueOf(userIdList.get(0)));
             System.out.println("successful group creation");
         } catch (SQLException e) {
             responseMap.put("status", "false");
@@ -702,6 +709,14 @@ public class UserThread extends Thread {
             messageRepo.put("timeSent", timeSent.toString());
             response.put("messages",messageRepo);
             objOut.writeObject(response); // send message to the server
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    protected void sendMap(Map<String, Object> dataMap) {
+        try {
+            objOut.writeObject(dataMap);
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -32,10 +32,6 @@ public class ChatServer {
         groupList = new HashMap<>();
         initializeGroupList();
         // TODO: need to get group list as users add members and create new groups
-//        RegisterHandler registerHandler = new RegisterHandler();
-//        for (int i = 0; i < 100; i++) {
-//            registerHandler.registerUser(new PasswordAuthentication("test" + i + "@gmail.com", "password".toCharArray()), "test", String.valueOf(i));
-//        }
      }
 
     /**
@@ -86,7 +82,7 @@ public class ChatServer {
      * Will be used by UserThread to update server's groupList
      * everytime a new group is created
      */
-    public void updateGroupList(String groupId, List<String> memberIds) {
+    protected void updateGroupList(String groupId, List<String> memberIds) {
         groupList.put(groupId, memberIds);
     }
 
@@ -94,13 +90,13 @@ public class ChatServer {
      * Will be used by UserThread to update server's groupList
      * everytime a new members is added to a group
      */
-    public void updateGroupList(String groupId, String newUserId) {
+    protected void updateGroupList(String groupId, String newUserId) {
         List<String> members = groupList.get(groupId);
         members.add(newUserId);
         groupList.replace(groupId, members);
     }
 
-    public void init() {
+    protected void init() {
         try (ServerSocket serverSocket = new ServerSocket(this.PORT)){
             System.out.println("Server listening on PORT: " + this.PORT);
             while (true) {
@@ -114,6 +110,30 @@ public class ChatServer {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Send a Map of <String, Object> to everyone in a given group.
+     */
+    protected void sendMapToGroup(Map<String, Object> dataMap, String groupId, String senderId) {
+        for (UserThread userThread : onlineUsers)  // for each online user
+            if (groupList.get(groupId).contains(String.valueOf(userThread.getUser().getUserId())))  // if user is part of given group
+                if (senderId.equals(String.valueOf(userThread.getUser().getUserId())))   // check if user is sender
+                    userThread.sendMap(dataMap);
+    }
+
+    /**
+     * Send a Map of <String, Object> to everyone in a given list of users.
+     * @param dataMap
+     * @param userIds
+     * @param senderId
+     */
+    protected  void sendMapToListOfUsers(Map<String, Object> dataMap, ArrayList<String> userIds, String senderId) {
+        for (UserThread userThread : onlineUsers)  // for each online user
+            if (userIds.contains(String.valueOf(userThread.getUser().getUserId())) &&
+                    !senderId.equals(String.valueOf(userThread.getUser().getUserId()))) { // if user is part of list of users and is not sender
+                userThread.sendMap(dataMap);
+            }
     }
 
     /**

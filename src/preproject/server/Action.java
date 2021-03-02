@@ -30,5 +30,6 @@ public class Action {
     public static final String ON_GROUP_CREATION = "ON_GROUP_CREATION";
     public static final String ON_INITIAL_MESSAGES_RECEIVED = "ON_INITIAL_MESSAGES_RECEIVED";
     public static final String ON_FAVORITE_TOGGLED = "ON_FAVORITE_TOGGLED";
+    public static final String ON_NEW_GROUP_CREATION = "ON_NEW_GROUP_CREATION";
 
 }

@@ -72,11 +72,12 @@ public class AdminController implements Initializable {
 
     @FXML
     void initializeComponents() {
-        initializeAcceptDeclineAllButton();
+        initializeButtons();
         importRegisteredUsers();
         loadUnRegisteredUsersToScrollPane();
         loadRegisteredUsersToTable();
     }
+
     /**
      * Add all the unregistered users to the scroll pane
      */
@@ -230,11 +231,6 @@ public class AdminController implements Initializable {
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
-    }
-
-    @FXML
-    void logout(ActionEvent action) {
-        //add method here
     }
 
     @SuppressWarnings("unchecked")

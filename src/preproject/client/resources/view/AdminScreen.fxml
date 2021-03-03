@@ -100,7 +100,7 @@
                         </DropShadow>
                      </effect>
                   </AnchorPane>
-                  <Button fx:id="logoutButton" mnemonicParsing="false" onAction="#logout" prefHeight="24.0" prefWidth="75.0" style="-fx-background-color: #DB5461;-fx-text-fill: WHITE;" text="Logout" textAlignment="CENTER" GridPane.rowIndex="4">
+                  <Button fx:id="logoutButton" mnemonicParsing="false" prefHeight="24.0" prefWidth="75.0" style="-fx-background-color: #DB5461;-fx-text-fill: WHITE;" text="Logout" textAlignment="CENTER" GridPane.rowIndex="4">
                      <font>
                         <Font name="System Bold" size="10.0" />
                      </font>

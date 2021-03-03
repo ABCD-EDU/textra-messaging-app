@@ -18,6 +18,7 @@ public class Action {
     public static final String GET_USER_INFORMATION = "GET_USER_INFORMATION";
     public static final String GET_GROUP_MEMBERS = "GET_GROUP_MEMBERS";
     public static final String GET_GROUP_MESSAGES = "GET_GROUP_MESSAGES";
+    public static final String GET_SEARCHED_USERS = "GET_SEARCHED_USERS";
     public static final String GET_UNREAD_MESSAGES = "GET_UNREAD_MESSAGES";
     public static final String GET_MESSAGE_LIST = "GET_MESSAGE_LIST";
 
@@ -25,6 +26,7 @@ public class Action {
     public static final String POST_VERIFIED_USERS = "POST_VERIFIED_USERS";
     public static final String ACCEPT_ALL_USERS = "ACCEPT_ALL_USERS";
     public static final String DECLINE_ALL_USERS = "DECLINE_ALL_USERS";
+    public static final String REMOVE_A_MEMBER = "REMOVE_A_MEMBER";
 
     // ON SERVER SEND
     public static final String ON_GROUP_LIST_SEND = "ON_GROUP_LIST_SEND";
@@ -35,4 +37,7 @@ public class Action {
     public static final String ON_FAVORITE_TOGGLED = "ON_FAVORITE_TOGGLED";
     public static final String ON_NEW_GROUP_CREATION = "ON_NEW_GROUP_CREATION";
     public static final String ON_BROADCAST_MESSAGE_RECEIVED ="ON_BROADCAST_MESSAGE_RECEIVED";
+    public static final String ON_GROUP_MEMBERS_SEND = "ON_GROUP_MEMBERS_SEND";
+    public static final String ON_REMOVE_A_MEMBER = "ON_REMOVE_A_MEMBER";
+    public static final String ON_SEARCHED_USERS_SEND ="ON_SEARCHED_USERS_SEND";
 }

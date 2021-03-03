@@ -77,7 +77,6 @@ public class AdminController implements Initializable {
         loadUnRegisteredUsersToScrollPane();
         loadRegisteredUsersToTable();
     }
-
     /**
      * Add all the unregistered users to the scroll pane
      */

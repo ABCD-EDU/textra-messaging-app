@@ -106,11 +106,17 @@ public class UserThread extends Thread {
                 this.writeUserInformation(this.user.getEmail());
                 break;
             case Action.GET_GROUP_MEMBERS:
+                System.out.println("GETTING GROUP MEMBERS");
                 this.getGroupMembersList((String) readData.get("groupId"));
                 break;
             case Action.GET_GROUP_MESSAGES:
                 this.getGroupMessages((String) readData.get("groupId"));
                 break;
+            case Action.REMOVE_A_MEMBER:
+                this.removeUser((String)readData.get("email"), (String) readData.get("groupId"));
+                break;
+            case Action.GET_SEARCHED_USERS:
+
             case Action.SEND_BROADCAST_MESSAGE:
                 System.out.println(readData.keySet());
                 SERVER.broadcastMessageToAllOnlineUsers((List<Map<String, String>>) readData.get("messagesList"),
@@ -404,6 +410,29 @@ public class UserThread extends Thread {
         }
     }
 
+    private void removeUser(String email, String groupId){
+        try {
+            HashMap<String,Object> response = new HashMap<>();
+            PreparedStatement preparedStatement = Connector.connect.prepareStatement(
+              "DELETE FROM group_msg WHERE group_id=? AND user_id=?"
+            );
+
+            System.out.println(groupId);
+            System.out.println(getUserId(email));
+            preparedStatement.setInt(1,Integer.parseInt(groupId));
+            preparedStatement.setInt(2, getUserId(email));
+
+            preparedStatement.executeUpdate();
+
+            response.put("action", Action.ON_REMOVE_A_MEMBER);
+            response.put("emailRemoved", email);
+
+            objOut.writeObject(response);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
     /**
      * @param groupAlias group name
      * @param groupCreator group creator ID
@@ -636,6 +665,7 @@ public class UserThread extends Thread {
     }
 
     private void getGroupMembersList(String groupId) {
+        HashMap<String,Object> response = new HashMap<>();
         List<Map<String, String>> memberRepo = new ArrayList<>();
         try {
             PreparedStatement preparedStatement = Connector.connect.prepareStatement(
@@ -653,16 +683,26 @@ public class UserThread extends Thread {
                 if (resultSetOptional.isPresent()) {
                     ResultSet userResult = resultSetOptional.get();
                     Map<String, String> userMap = new HashMap<>();
-                    userMap.put("userId", userId);
-                    userMap.put("email", userResult.getString("email"));
-                    userMap.put("firstName", userResult.getString("user_fname"));
-                    userMap.put("lastName", userResult.getString("user_lname"));
-
+                    if ( userResult.next()) {
+                        userMap.put("userId", userId);
+                        userMap.put("email", userResult.getString("email"));
+                        userMap.put("firstName", userResult.getString("user_fname"));
+                        userMap.put("lastName", userResult.getString("user_lname"));
+                    }
                     memberRepo.add(userMap);
                 }
             }
-            objOut.writeObject(memberRepo);
+            response.put("action", Action.ON_GROUP_MEMBERS_SEND);
+            response.put("members", memberRepo);
+            objOut.writeObject(response);
         } catch (SQLException | IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void getSearchedUsers(String searchQuery){
+        try {
+        }catch (Exception e){
             e.printStackTrace();
         }
     }
@@ -745,6 +785,7 @@ public class UserThread extends Thread {
             preparedStatement.setInt(1, sender);
 
             ResultSet resultSet = preparedStatement.executeQuery();
+            resultSet.next();
 
             Map<String, Object> response = new HashMap<>();
             response.put("action", Action.ON_MESSAGE_RECEIVE);

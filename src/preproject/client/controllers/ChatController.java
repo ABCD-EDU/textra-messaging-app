@@ -5,10 +5,14 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.*;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import preproject.client.Action;
@@ -32,6 +36,8 @@ public class ChatController implements Initializable {
     private String email;
     private List<Map<String, String>> groupsList;
     private String currentlySelectedGroupID;
+
+    ConvoInfoController convoController;
 
     private int unreadBroadcastMessages;
     private ArrayList<Message> broadCastMessages;
@@ -84,6 +90,7 @@ public class ChatController implements Initializable {
     @FXML
     private Label lInitial_label;
 
+
     private class ClientThread extends Thread {
 
         @SuppressWarnings("unchecked")
@@ -125,6 +132,16 @@ public class ChatController implements Initializable {
                     case Action.ON_FAVORITE_TOGGLED:
                         System.out.println("FAVORITE TOGGLED");
                         handleFavoriteToggle((String) readData.get("groupId"), (String) readData.get("isFav"));
+                        break;
+                    case Action.ON_GROUP_MEMBERS_SEND:
+                        System.out.println("GROUP MEMBERS REQUESTED");
+                        handleGroupMembers((List<HashMap<String,String>>)readData.get("members"));
+                        break;
+                    case Action.ON_REMOVE_A_MEMBER:
+                        System.out.println("A MEMBER IS REMOVED");
+                        handleMemberRemoval((String) readData.get("emailRemoved"));
+                        break;
+                    case Action.ON_SEARCHED_USERS_SEND:
                         break;
 
                 }
@@ -289,9 +306,7 @@ public class ChatController implements Initializable {
             Node finalNode = node;
             Platform.runLater(() -> messages_vBox.getChildren().add(finalNode));
         }
-
     }
-
 
     private void handleInitialMessagesReceived(List<Map<String, String>> initialMessages) {
         Platform.runLater(() -> messages_vBox.getChildren().clear());
@@ -505,6 +520,7 @@ public class ChatController implements Initializable {
 
     private void setConversationHeader(String alias, Boolean isAdmin) {
         header_pane.getChildren().clear();
+
         FXMLLoader loader = new FXMLLoader(getClass().getResource("../resources/view/ConversationHeader.fxml"));
         Node node = null;
         try {
@@ -517,20 +533,50 @@ public class ChatController implements Initializable {
         for (Node component : ((Pane)node).getChildren()){
             if (component.getId().equals("header_label"))
                 ((Label) component).setText(alias);
-            if (component.getId().equals("header_button"))
-                /*
-                    TODO: Add functionality to this button.
-                     Its functionality should be different if user is admin of said group opened.
-                     If user is NOT admin: show list of users and allow adding of other members
-                     If user is admin: show list of users and allow removal and addition of other members
-                     Suggestion:
-                     Open a new window where the user can perform these actions upon press of button
-                 */
-                if (!isAdmin)
-                    component.setVisible(false); // for debug purposes only
+            if (component.getId().equals("info_button")) {
+                setAddingMembersControl((Button) component, isAdmin);
+            }
         }
         header_pane.getChildren().add(node);
     }
+
+    private void setAddingMembersControl(Button component, Boolean isAdmin){
+        component.setOnAction(event -> {
+            try {
+                FXMLLoader loader= new FXMLLoader(getClass().getResource("../resources/view/ConvoInfoScreen.fxml"));
+                Stage tempStage =(Stage) loader.load();
+                tempStage.initStyle(StageStyle.UNDECORATED);
+                convoController = loader.getController();
+                convoController.setCurrentlySelectedGroupID(currentlySelectedGroupID);
+                convoController.setUserIsAdmin(isAdmin);
+                convoController.setCurrentUserEmail(email);
+                convoController.setGroupAlias(getCurrentGroupAlias());
+                convoController.requestMembers();
+                System.out.println(convoController.getGroupAlias());
+                tempStage.show();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    private void handleGroupMembers(List<HashMap<String, String>> groupMembers){
+        convoController.setGroupMembers(groupMembers);
+    }
+
+    private void handleMemberRemoval(String emailRemoved){
+        convoController.removeMemberFromList(emailRemoved);
+    }
+
+    private String getCurrentGroupAlias(){
+        for (Map<String, String> groups: groupsList){
+            if (groups.get("groupId").equals(currentlySelectedGroupID)){
+                return groups.get("alias");
+            }
+        }
+        return null;
+    }
+
 
     private void initializeBroadcastButton() {
         broadCastMessages = new ArrayList<>();

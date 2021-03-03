@@ -4,8 +4,9 @@
 <?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<VBox fx:id="vBox" alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" spacing="5.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="preproject.client.controllers.RegisterScreenController">
+<VBox fx:id="vBox" alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" spacing="10.0" style="-fx-background-color: FAFAFA;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="preproject.client.controllers.RegisterScreenController">
    <children>
       <HBox alignment="CENTER">
          <children>
@@ -22,42 +23,60 @@
             <Label fx:id="password_warning" text="Password does not match" textFill="RED" visible="false" />
          </children>
       </HBox>
-      <Label text="Email">
+      <Label style="-fx-background-radius: 2;" text="Email">
          <padding>
             <Insets left="5.0" />
          </padding>
+         <font>
+            <Font size="13.0" />
+         </font>
       </Label>
-      <TextField fx:id="email_field" onAction="#registerButtonPressed" style="-fx-border-radius: 2; -fx-border-color: black;" />
+      <TextField fx:id="email_field" onAction="#registerButtonPressed" style="-fx-border-radius: 3; -fx-border-color: #AAAAAA;" />
       <Label text="First Name">
          <padding>
             <Insets left="5.0" />
          </padding>
+         <font>
+            <Font size="13.0" />
+         </font>
       </Label>
-      <TextField fx:id="fName_field" onAction="#registerButtonPressed" style="-fx-border-radius: 2; -fx-border-color: black;" />
+      <TextField fx:id="fName_field" onAction="#registerButtonPressed" style="-fx-border-radius: 3; -fx-border-color: #AAAAAA;" />
       <Label text="Last Name">
          <padding>
             <Insets left="5.0" />
          </padding>
+         <font>
+            <Font size="13.0" />
+         </font>
       </Label>
-      <TextField fx:id="lName_field" onAction="#registerButtonPressed" style="-fx-border-radius: 2; -fx-border-color: black;" />
+      <TextField fx:id="lName_field" onAction="#registerButtonPressed" style="-fx-border-radius: 3; -fx-border-color: #AAAAAA;" />
       <Label text="Password">
          <padding>
             <Insets left="5.0" />
          </padding>
+         <font>
+            <Font size="13.0" />
+         </font>
       </Label>
-      <PasswordField fx:id="pass_field" onAction="#registerButtonPressed" style="-fx-border-radius: 2; -fx-border-color: black;" />
+      <PasswordField fx:id="pass_field" onAction="#registerButtonPressed" style="-fx-border-radius: 3; -fx-border-color: #AAAAAA;" />
       <Label text="Confirm Password">
          <padding>
             <Insets left="5.0" />
          </padding>
+         <font>
+            <Font size="13.0" />
+         </font>
       </Label>
-      <PasswordField fx:id="cPass_field" onAction="#registerButtonPressed" style="-fx-border-radius: 2; -fx-border-color: black;" />
+      <PasswordField fx:id="cPass_field" onAction="#registerButtonPressed" style="-fx-border-radius: 3; -fx-border-color: #AAAAAA;" />
       <HBox alignment="CENTER">
          <children>
-            <Button fx:id="register_button" alignment="CENTER" mnemonicParsing="false" onAction="#registerButtonPressed" prefHeight="26.0" prefWidth="91.0" style="-fx-background-color: black;" text="Register" textFill="WHITE">
+            <Button fx:id="register_button" alignment="CENTER" mnemonicParsing="false" onAction="#registerButtonPressed" prefHeight="26.0" prefWidth="91.0" style="-fx-background-color: #333333;" text="Register" textFill="WHITE">
                <HBox.margin>
                   <Insets top="10.0" />
                </HBox.margin>
+               <font>
+                  <Font size="13.0" />
+               </font>
             </Button>
          </children>
       </HBox>

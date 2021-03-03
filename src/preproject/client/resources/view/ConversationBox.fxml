@@ -6,7 +6,7 @@
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.text.Font?>
 
-<Pane fx:id="chatBoxPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseEntered="#mouseEnterChatBox" onMouseExited="#mouseExitChatBox" prefHeight="53.0" prefWidth="223.0" style="-fx-background-color: #EEEEEE;" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="preproject.client.controllers.ConversationBoxController">
+<Pane fx:id="chatBoxPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseEntered="#mouseEnterChatBox" onMouseExited="#mouseExitChatBox" prefHeight="53.0" prefWidth="223.0" style="-fx-background-color: #EEEEEE;" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="preproject.client.controllers.ConversationBoxController">
    <children>
       <Circle fx:id="group_picture" fill="#aaaaaa" layoutX="27.0" layoutY="27.0" radius="17.0" stroke="#23b5d3" strokeType="INSIDE" strokeWidth="0.0" />
       <Label fx:id="groupAlias_label" layoutX="55.0" layoutY="10.0" prefHeight="17.0" prefWidth="135.0" text="Conversation Name">

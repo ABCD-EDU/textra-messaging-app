@@ -5,7 +5,7 @@
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.text.Font?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="28.0" prefWidth="1020.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="28.0" prefWidth="1020.0" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <Label fx:id="message_label" layoutX="51.0" layoutY="12.0" prefHeight="17.0" prefWidth="955.0" text="Label" />
       <Label fx:id="name_label" layoutX="51.0" layoutY="-1.0" prefHeight="17.0" prefWidth="866.0" text="Label">

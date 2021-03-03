@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.stage.Stage?>
 
-<Stage fx:id="newConvoStage" title="Create New Conversation" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="preproject.client.controllers.NewConversationStageController">
+<Stage fx:id="newConvoStage" title="Create New Conversation" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="preproject.client.controllers.NewConversationStageController">
     <scene>
         <Scene>
             <AnchorPane prefHeight="520.0" prefWidth="400.0">

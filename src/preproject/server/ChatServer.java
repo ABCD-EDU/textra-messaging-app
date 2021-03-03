@@ -66,12 +66,6 @@ public class ChatServer {
         }catch (SQLException e) {
             e.printStackTrace();
         }
-        System.out.println("INITIALIZED GROUPS LIST");
-        System.out.println("Groups:");
-        for (String group : groupList.keySet()) {
-            System.out.println(group);
-            System.out.println(groupList.get(group));
-        }
 
     }
 

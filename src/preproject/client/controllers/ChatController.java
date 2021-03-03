@@ -180,12 +180,14 @@ public class ChatController implements Initializable {
         Message[] messages = processMessage(message);
         if (currentlySelectedGroupID.equals("-1"))
             broadCastMessages.addAll(Arrays.asList(messages));
+        for (Message m : broadCastMessages)
+            System.out.println(m);
         previewMessage(messages);
         sendMessage(messages);
     }
 
     private Message[] processMessage(String message) {
-        System.out.println(message);
+        System.out.println("Processing Message: " + message);
         // Include additional parsing - specify the max amount of characters per line
         // so that there will be no problems with wrapping
         String[] msgData = message.split("\n");
@@ -271,7 +273,7 @@ public class ChatController implements Initializable {
                     ((Label)component).setText(msgData[i].getTimeStamp().toString());
             }
 
-            messages.addAll(Arrays.asList(msgData));
+            messages.add(msgData[i]);
             Node finalNode = node;
             Platform.runLater(() -> messages_vBox.getChildren().add(finalNode));
         }
@@ -522,6 +524,7 @@ public class ChatController implements Initializable {
     private void initializeBroadcastButton() {
         broadCastMessages = new ArrayList<>();
         broadcast_button.setOnMouseClicked((e) -> {
+            messages = new ArrayList<>();
             Platform.runLater(() -> messages_vBox.getChildren().clear());
             // TODO: clear notifs for broadcast as well
             unreadBroadcastMessages = 0;

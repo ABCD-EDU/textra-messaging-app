@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<GridPane fx:id="gird_pane" alignment="center" hgap="10" maxHeight="1080.0" maxWidth="1920.0" prefHeight="720.0" prefWidth="1280.0" stylesheets="@../css/master.css" vgap="10" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="preproject.client.controllers.SignInController">
+<GridPane fx:id="gird_pane" alignment="center" hgap="10" maxHeight="1080.0" maxWidth="1920.0" prefHeight="720.0" prefWidth="1280.0" vgap="10" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="preproject.client.controllers.SignInController">
    <columnConstraints>
       <ColumnConstraints />
    </columnConstraints>

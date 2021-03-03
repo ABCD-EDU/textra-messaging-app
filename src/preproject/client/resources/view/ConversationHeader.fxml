@@ -6,7 +6,7 @@
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.text.Font?>
 
-<Pane fx:id="header_pane" prefHeight="53.0" prefWidth="1020.0" style="-fx-background-color: FAFAFA;" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<Pane fx:id="header_pane" prefHeight="53.0" prefWidth="1020.0" style="-fx-background-color: FAFAFA;" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <Button fx:id="delete_button" layoutX="934.0" layoutY="15.0" mnemonicParsing="false" prefHeight="1.0" prefWidth="70.0" style="-fx-background-color: DB5461;" text="Delete" textFill="WHITE">
          <font>

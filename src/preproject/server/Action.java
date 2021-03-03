@@ -18,6 +18,7 @@ public class Action {
     public static final String GET_USER_INFORMATION = "GET_USER_INFORMATION";
     public static final String GET_GROUP_MEMBERS = "GET_GROUP_MEMBERS";
     public static final String GET_GROUP_MESSAGES = "GET_GROUP_MESSAGES";
+    public static final String GET_UNREAD_MESSAGES = "GET_UNREAD_MESSAGES";
 
     // POST REQUESTS
     public static final String POST_VERIFIED_USERS = "POST_VERIFIED_USERS";

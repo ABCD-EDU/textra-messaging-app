@@ -3,15 +3,13 @@ package preproject.server;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.sql.ResultSet;
+import java.sql.*;
 import java.util.*;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.util.Date;
 
 public class ChatServer {
     private final int PORT;
-    private final List<String> onlineUserNames;
+    private final List<String> onlineUserIds;
     private final List<UserThread> onlineUsers;
     private Map<String, List<String>> groupList;
 
@@ -23,24 +21,24 @@ public class ChatServer {
     public ChatServer(int port) {
         Connector.createConnection();
         this.PORT = port;
-        this.onlineUserNames = new ArrayList<>();
+        this.onlineUserIds = new ArrayList<>();
         this.onlineUsers = new ArrayList<>();
         // TODO: populate groupList
         groupList = new HashMap<>();
         initializeGroupList();
         // TODO: need to get group list as users add members and create new groups
-     }
+    }
 
     /**
      * initialize and populate groupList with all of the groups created upon creation of Server.
      * Group list will be updated
-     *
+     * <p>
      * Algorithm:
      * 1. Get list of group id's
      * 2. Get list of members per group id
      */
     private void initializeGroupList() {
-        try{
+        try {
             // Step 1 - Get list of group_ids
             List<String> groupIds = new ArrayList<>();
             PreparedStatement group_idStatement = Connector.connect.prepareStatement(
@@ -54,7 +52,7 @@ public class ChatServer {
             for (String grpId : groupIds) {
                 List<String> memberIds = new ArrayList<>();
                 PreparedStatement membersIdStatement = Connector.connect.prepareStatement(
-                  "SELECT user_id FROM group_msg WHERE group_id = ?"
+                        "SELECT user_id FROM group_msg WHERE group_id = ?"
                 );
                 membersIdStatement.setInt(1, Integer.parseInt(grpId));
                 ResultSet membersIdResultSet = membersIdStatement.executeQuery();
@@ -63,7 +61,7 @@ public class ChatServer {
                 }
                 groupList.put(grpId, memberIds);
             }
-        }catch (SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
 
@@ -88,12 +86,12 @@ public class ChatServer {
     }
 
     protected void init() {
-        try (ServerSocket serverSocket = new ServerSocket(this.PORT)){
+        try (ServerSocket serverSocket = new ServerSocket(this.PORT)) {
             System.out.println("Server listening on PORT: " + this.PORT);
             while (true) {
                 Socket socket = serverSocket.accept();
                 UserThread userThread = new UserThread(socket, this);
-//                userThread.setDaemon(true);
+                userThread.setDaemon(true);
 
                 onlineUsers.add(userThread);
                 userThread.start();
@@ -119,7 +117,7 @@ public class ChatServer {
      * If userIds.length = 0 then send to all online users
      */
     protected void sendMapToListOfUsers(Map<String, Object> dataMap, ArrayList<String> userIds, String senderId) {
-        if (userIds.size() == 0){ // send to all online user except sender
+        if (userIds.size() == 0) { // send to all online user except sender
             for (UserThread userThread : onlineUsers)
                 if (!senderId.equals(String.valueOf(userThread.getUser().getUserId())))
                     userThread.sendMap(dataMap);
@@ -139,7 +137,7 @@ public class ChatServer {
             for (UserThread userThread : onlineUsers) {
                 if (!senderId.equals(String.valueOf(userThread.getUser().getUserId()))) {
                     userThread.sendMessage(
-                            messageMap.get("userId"),
+                            Integer.parseInt(messageMap.get("userId")),
                             "-1",
                             messageMap.get("messageSent"),
                             new Timestamp(new Date().getTime()));
@@ -154,47 +152,80 @@ public class ChatServer {
      * This method broadcasts the message to all of the users in a certain group. For example, the user = 2203683,
      * message = "Foo Bar" and the recipient = group_1111, all of the users inside group_1111 will receive the message
      *
-     * @param user sender - user ID
+     * @param user    sender - user ID
      * @param message message - literal String message
      * @param address receiver - group ID
      */
-    protected void broadcast(String user, String message, String address) {
+    protected void broadcast(int user, String message, String address) {
+        writeUnreadMessage(address);
         for (UserThread userThread : onlineUsers) { // check each user logged in
-            if (groupList.get(address).contains(String.valueOf(userThread.getUser().getUserId()))) { // if user is a member of the group
-                if (!user.equals(String.valueOf(userThread.getUser().getUserId()))) { // if the current thread in loop is not the sender
-                    try {
-                        PreparedStatement preparedStatement = Connector.connect.prepareStatement(
-                                "INSERT INTO message (from_user, group_id, message, time_sent) " +
-                                        "VALUES (?, ?, ?, ?)"
-                        );
-
-                        Timestamp messageTimeSent = new Timestamp(new Date().getTime());
-
-                        preparedStatement.setString(1, user);
-                        preparedStatement.setString(2, address);
-                        preparedStatement.setString(3, message);
-                        preparedStatement.setTimestamp(4, messageTimeSent);
-
-                        userThread.sendMessage(user, address, message, messageTimeSent);
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
-                }
+            if (user != userThread.getUser().getUserId()) { // if the current thread in loop is not the sender
+                Timestamp messageTimeSent = new Timestamp(new Date().getTime());
+                userThread.sendMessage(user, address, message, messageTimeSent);
             }
         }
     }
 
-    private void importMessageToDatabase(String user, String message, String address) {
+    private void writeUnreadMessage(String address) {
+        try {
+            PreparedStatement getLastMessageId = Connector.connect.prepareStatement(
+                    "SELECT LAST_INSERT_ID() FROM message"
+            );
 
+            ResultSet idSet = getLastMessageId.executeQuery();
+            if (idSet.next()) {
+                int id = idSet.getInt(1);
+                addUnreadMessage(id, Integer.parseInt(address));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void addUnreadMessage(int msgId, int grpId) {
+        try {
+            PreparedStatement preparedStatement = Connector.connect.prepareStatement(
+                    "SELECT user_id FROM group_msg WHERE group_id = ?;"
+            );
+
+            preparedStatement.setInt(1, grpId);
+            List<Integer> offlineUsers = new ArrayList<>();
+            ResultSet userListQuery = preparedStatement.executeQuery();
+            while (userListQuery.next()) {
+                int id = userListQuery.getInt("user_id");
+                offlineUsers.add(id);
+            }
+
+            PreparedStatement writeUnreadMsg = Connector.connect.prepareStatement(
+                    "INSERT INTO unread_msg (message_id, user_id, group_id) VALUES (?, ?, ?)"
+            );
+
+            for (int user : offlineUsers) {
+                if (!onlineUserIds.contains(String.valueOf(user))) {
+                    System.out.println(user);
+                    writeUnreadMsg.setInt(1, user);
+                    writeUnreadMsg.setInt(2, msgId);
+                    writeUnreadMsg.setInt(3, grpId);
+                    int columnAffected = writeUnreadMsg.executeUpdate();
+                    System.out.println("EXECUTE QUERY INSERT COLUMN AFFECTED: " + columnAffected);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Database is empty");
+        }
     }
 
     protected void removeUser(UserThread user) {
         onlineUsers.remove(user);
         try {
             System.out.println("User with email " + user.getUser().getEmail() + " has logged out");
-        }catch (NullPointerException e) {
+        } catch (NullPointerException e) {
             System.out.println("A user who has not yet logged in has disconnected");
         }
     }
 
+    protected void addOnlineUser(String id) {
+        System.out.println("ID ADDED! " + id);
+        this.onlineUserIds.add(id);
+    }
 }

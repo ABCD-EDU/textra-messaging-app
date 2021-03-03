@@ -123,7 +123,8 @@ public class ChatServer {
         } else { // send to all users in the userIds ArrayList
             for (UserThread userThread : onlineUsers)  // for each online user
                 if (userIds.contains(String.valueOf(userThread.getUser().getUserId())) &&
-                        !senderId.equals(String.valueOf(userThread.getUser().getUserId()))) { // if user is part of list of users and is not sender
+                        !senderId.equals(String.valueOf(userThread.getUser().getUserId()))
+                        && userThread.getUser().isLoggedIn()) { // if user is part of list of users and is not sender
                     userThread.sendMap(dataMap);
                 }
         }
@@ -134,7 +135,7 @@ public class ChatServer {
         System.out.println(senderId);
         for (Map<String, String> messageMap : messagesList) {
             for (UserThread userThread : onlineUsers) {
-                if (!senderId.equals(String.valueOf(userThread.getUser().getUserId()))) {
+                if (!senderId.equals(String.valueOf(userThread.getUser().getUserId())) && userThread.getUser().isLoggedIn()) {
                     userThread.sendMessage(
                             Integer.parseInt(messageMap.get("userId")),
                             "-1",
@@ -158,7 +159,7 @@ public class ChatServer {
     protected void broadcast(int user, String message, String address) {
         writeUnreadMessage(address);
         for (UserThread userThread : onlineUsers) { // check each user logged in
-            if (user != userThread.getUser().getUserId()) { // if the current thread in loop is not the sender
+            if (user != userThread.getUser().getUserId() && userThread.getUser().isLoggedIn()) { // if the current thread in loop is not the sender
                 Timestamp messageTimeSent = new Timestamp(new Date().getTime());
                 userThread.sendMessage(user, address, message, messageTimeSent);
             }

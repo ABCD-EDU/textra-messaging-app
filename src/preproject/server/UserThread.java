@@ -11,8 +11,6 @@ import java.sql.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static preproject.server.State.SUCCESS_POST_VERIFIED_USERS;
-
 /**
  * This class runs a session for the server. Where each {@code UserThread} is considered as one session.
  * The server will continually accept the ongoing connection to the socket as much as possible which leads to
@@ -186,11 +184,11 @@ public class UserThread extends Thread {
                 preparedStatement.setInt(1, getUserId(email));
             }
             preparedStatement.executeUpdate();
-            writeObject.put(SUCCESS_POST_VERIFIED_USERS, true);
+            writeObject.put("response", true);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        writeObject.put(SUCCESS_POST_VERIFIED_USERS, true);
+        writeObject.put("response", true);
         objOut.writeObject(writeObject);
     }
 
@@ -501,33 +499,31 @@ public class UserThread extends Thread {
     }
 
     private void loginAuthentication(LoginHandler loginHandler, HashMap<String, Object> userAuth) throws IOException, SQLException {
-        System.out.println(userAuth.get("email") + " " + userAuth.get("password"));
+        System.out.println("\"" + userAuth.get("email") + "\" \"" + userAuth.get("password") + "\"");
         Optional<ResultSet> userLoginRepo = loginHandler.loginUser(new PasswordAuthentication((String) userAuth.get("email"), ((String) userAuth.get("password")).toCharArray()));
         if (userLoginRepo.isPresent()) {
             ResultSet resultSet = userLoginRepo.get();
             String email = resultSet.getString("email");
             String firstName = resultSet.getString("user_fname");
             String lastName = resultSet.getString("user_lname");
-            String isAdmin = resultSet.getString("is_admin");
-            String verified = resultSet.getString("verified");
+            boolean isAdmin = resultSet.getBoolean("is_admin");
+            boolean verified = resultSet.getBoolean("verified");
             int id = resultSet.getInt("user_id");
             System.out.println("login success id + " + id);
 
             Map<String, String> userRepo = new HashMap<>();
-//            userRepo.put("email", email);
-//            userRepo.put("firstName", firstName);
-//            userRepo.put("lastName", lastName);
-            userRepo.put("isAdmin", isAdmin);
-            userRepo.put("isVerified", verified);
-//            userRepo.put("userid", id);
+            userRepo.put("isAdmin", String.valueOf(isAdmin));
+            userRepo.put("isVerified", String.valueOf(verified));
 
             // send data back to client
             objOut.writeObject(true);
             objOut.writeObject(userRepo);
             System.out.println("USER SUCCESSFULLY LOGGED IN");
 
-            SERVER.addOnlineUser(String.valueOf(getUserId(email)));
-            this.user = new User(id, email, firstName, lastName);
+            if (verified) {
+                SERVER.addOnlineUser(String.valueOf(getUserId(email)));
+                this.user = new User(id, email, firstName, lastName);
+            }
         } else {
             objOut.writeObject(false); // if userRepo does not have any value in it, return false (login failed)
             System.out.println("userRepo no value log in UNSUCCESSFUL");

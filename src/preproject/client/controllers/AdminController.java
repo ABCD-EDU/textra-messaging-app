@@ -14,16 +14,14 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.MapValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import preproject.server.models.User;
 import preproject.client.Action;
 import preproject.client.ClientExecutable;
+import preproject.server.models.User;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static preproject.client.State.*;
 
 public class AdminController implements Initializable {
 
@@ -171,7 +169,7 @@ public class AdminController implements Initializable {
                         .forEach(e -> e.put("isVerified", "true"));
             }
 
-            if (response.containsKey(SUCCESS_POST_VERIFIED_USERS)) {
+            if (response.get("response")) {
                 List<Map<String, String>> toRemove = unverifiedList.stream()
                         .filter(e -> e.get("email").equals(email))
                         .collect(Collectors.toList());

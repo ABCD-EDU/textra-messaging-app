@@ -15,16 +15,14 @@ public class User {
     private String email;
     private String firstName;
     private String lastName;
-    private Map<String, List<Message>> messageList; // where String = id, Message = messages for that group chat's id
-    private Set<GroupChat> groups;
+    private boolean isLoggedIn;
 
     public User(int id, String email, String fN, String lN) {
         this.userId = id;
         this.email = email;
         this.firstName = fN;
         this.lastName = lN;
-        this.messageList = new HashMap<>();
-        this.groups = new HashSet<>();
+        this.isLoggedIn = true;
     }
 
     public int getUserId() {
@@ -59,11 +57,11 @@ public class User {
         this.lastName = lastName;
     }
 
-    public Map<String, List<Message>> getMessageList() {
-        return messageList;
+    public boolean isLoggedIn() {
+        return isLoggedIn;
     }
 
-    public void setMessageList(Map<String, List<Message>> messageList) {
-        this.messageList = messageList;
+    public void setLoggedIn(boolean loggedIn) {
+        isLoggedIn = loggedIn;
     }
 }

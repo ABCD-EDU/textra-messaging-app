@@ -97,10 +97,8 @@ public class SignInController implements Initializable{
             System.out.println("log in successful");
             Map<String, String> loginRepo = (Map<String, String>) ClientExecutable.serverConnector.getObjIn().readObject();
 
-            boolean isVerified = loginRepo.get("isVerified").equals("1");
-            boolean isAdmin = loginRepo.get("isAdmin").equals("1");
-//            System.out.println(loginRepo.get("isVerified"));
-//            System.out.println(loginRepo.get("isAdmin"));
+            boolean isVerified = Boolean.parseBoolean(loginRepo.get("isVerified"));
+            boolean isAdmin = Boolean.parseBoolean(loginRepo.get("isAdmin"));
             System.out.println("is verified: " + isVerified);
             System.out.println("is admin: " + isAdmin);
 

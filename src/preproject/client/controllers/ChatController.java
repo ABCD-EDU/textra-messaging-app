@@ -112,6 +112,9 @@ public class ChatController implements Initializable {
                         System.out.println("GROUP LIST RECEIVED");
                         groupsList = (List<Map<String, String>>) readData.get("data");
                         System.out.println("Received groups list size: " + groupsList.size());
+                        List<Map<String, String>> unreadMessagesList =
+                                (List<Map<String, String>>)readData.get("unreadMessages");
+                        setGroupsListNotificationAttributes(unreadMessagesList);
                         renderGroupsList(sortGroupList(groupsList, "-1"));
                         break;
                     case Action.ON_USER_INFO_SEND:
@@ -143,8 +146,17 @@ public class ChatController implements Initializable {
                         break;
                     case Action.ON_SEARCHED_USERS_SEND:
                         break;
-
                 }
+            }
+        }
+    }
+
+    private void setGroupsListNotificationAttributes(List<Map<String, String>> unreadList) {
+        for (Map<String, String> unreadMap : unreadList) {
+            String unreadGrpId = unreadMap.get("groupId");
+            for (Map<String, String> groupMap : groupsList) {
+                if (groupMap.get("groupId").equals(unreadGrpId))
+                    groupMap.replace("unreadMessages", unreadMap.get("unreadMessages"));
             }
         }
     }
@@ -194,7 +206,6 @@ public class ChatController implements Initializable {
     private void handleFavoriteToggle(String groupId, String isFav) {
         Platform.runLater(() -> people_vBox.getChildren().clear());
         for (Map<String, String> group : groupsList) {
-            System.out.println(group);
             if (group.get("groupId").equals(groupId)) {
                 group.replace("is_fav", isFav);
                 System.out.println("group id: " + groupId + " " + isFav);
@@ -362,8 +373,10 @@ public class ChatController implements Initializable {
                 String alias = groupMap.get("alias");
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("../resources/view/ConversationBox.fxml"));
                 Node node = loader.load();
-                node.setOnMouseClicked((event) -> {
+                node.setOnMouseClicked((event) -> { // on mouse click of convo box
                     messages = new ArrayList<>();
+                    message_area.setText("message '" + groupMap.get("alias") + "'");
+                    message_area.setDisable(false);
                     HashMap<String, Object> request = new HashMap<>();
                     request.put("action", Action.GET_GROUP_MESSAGES);
                     request.put("groupId", groupMap.get("groupId"));
@@ -479,6 +492,7 @@ public class ChatController implements Initializable {
     private void handleGroupCreation(String creationStatus) {
         boolean successfulCreation = creationStatus.equals("true");
 
+        // TODO: Create different action. see issue #31
         if (successfulCreation) {
             HashMap<String, Object> request1 = new HashMap<>();
             request1.put("action", Action.GET_GROUP_LIST);
@@ -587,6 +601,8 @@ public class ChatController implements Initializable {
             unreadBroadcastMessages = 0;
             setConversationHeader("Broadcast To All", false);
             currentlySelectedGroupID = "-1";
+            message_area.setText("send a message to all online users");
+            message_area.setDisable(false);
             try {
                 System.out.println(broadCastMessages.size());
                 Message[] toPreview = new Message[broadCastMessages.size()];
@@ -642,6 +658,7 @@ public class ChatController implements Initializable {
         });
 
         initializeBroadcastButton();
+        message_area.setDisable(true);
     }
 
 }

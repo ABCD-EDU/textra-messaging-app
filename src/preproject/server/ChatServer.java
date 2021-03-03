@@ -203,8 +203,8 @@ public class ChatServer {
             for (int user : offlineUsers) {
                 if (!onlineUserIds.contains(String.valueOf(user))) {
                     System.out.println(user);
-                    writeUnreadMsg.setInt(1, user);
-                    writeUnreadMsg.setInt(2, msgId);
+                    writeUnreadMsg.setInt(1, msgId);
+                    writeUnreadMsg.setInt(2, user);
                     writeUnreadMsg.setInt(3, grpId);
                     int columnAffected = writeUnreadMsg.executeUpdate();
                     System.out.println("EXECUTE QUERY INSERT COLUMN AFFECTED: " + columnAffected);

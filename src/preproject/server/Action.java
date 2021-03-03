@@ -39,6 +39,6 @@ public class Action {
     public static final String ON_NEW_GROUP_CREATION = "ON_NEW_GROUP_CREATION";
     public static final String ON_BROADCAST_MESSAGE_RECEIVED ="ON_BROADCAST_MESSAGE_RECEIVED";
     public static final String ON_SEARCHED_USERS_SEND ="ON_SEARCHED_USERS_SEND";
-
+    public static final String ON_UNREAD_MESSAGES_SENT = "ON_UNREAD_MESSAGES_SENT";
 
 }

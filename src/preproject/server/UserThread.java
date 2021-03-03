@@ -122,17 +122,15 @@ public class UserThread extends Thread {
                 SERVER.broadcastMessageToAllOnlineUsers((List<Map<String, String>>) readData.get("messagesList"),
                         (String) readData.get("senderId"));
                 break;
-            case Action.GET_UNREAD_MESSAGES:
-                this.getUnreadMessages((Integer) readData.get("userId"));
-                break;
         }
     }
 
-    private void getUnreadMessages(int id) throws IOException {
+    private List<Map<String, String>> getUnreadMessages(int id) throws IOException {
         List<Map<String, String>> unreadRepo = new ArrayList<>();
         try {
             PreparedStatement preparedStatement = Connector.connect.prepareStatement(
-                    "SELECT * FROM unread_msg WHERE user_id = ?"
+                    "SELECT group_id, COUNT(`group_id`) as unread_messages, user_id " +
+                            "FROM unread_msg GROUP BY group_id HAVING user_id = ?"
             );
 
             preparedStatement.setInt(1, id);
@@ -140,17 +138,19 @@ public class UserThread extends Thread {
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 Map<String, String> unreadMap = new HashMap<>();
-                unreadMap.put("unreadId", resultSet.getString("unread_id"));
-                unreadMap.put("messageId", resultSet.getString("message_id"));
-                unreadMap.put("userId", resultSet.getString("user_id"));
                 unreadMap.put("groupId", resultSet.getString("group_id"));
+                unreadMap.put("unreadMessages", resultSet.getString("unread_messages"));
                 unreadRepo.add(unreadMap);
             }
+            preparedStatement = Connector.connect.prepareStatement(
+              "DELETE FROM `unread_msg` WHERE user_id = ?"
+            );
+            preparedStatement.setInt(1, id);
+            preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            objOut.writeObject(unreadRepo);
         }
+        return unreadRepo;
     }
 
     private void updateALlRegistrations(boolean isVerified) throws IOException {
@@ -606,6 +606,7 @@ public class UserThread extends Thread {
             System.out.println("responseMap created");
             List<Map<String, String>> groupList = getGroupList();
             responseMap.put("data", groupList);
+            responseMap.put("unreadMessages", getUnreadMessages(this.user.getUserId()));
             System.out.println("groupList added to responseMap");
             objOut.writeObject(responseMap);
             System.out.println("group list returned");

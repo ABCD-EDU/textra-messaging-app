@@ -21,6 +21,7 @@ public class ClientExecutable extends Application {
         primaryStage.setTitle("Messaging App");
         primaryStage.setScene(scene);
         primaryStage.show();
+        primaryStage.setOnCloseRequest(e -> serverConnector.close());
     }
 
     public static void main(String[] args) {
@@ -33,7 +34,7 @@ public class ClientExecutable extends Application {
     //TODO: Implement graceful application closing
     @Override
     public void stop() {
-        System.out.println("APPLICATION CLOSING");
+        serverConnector.close();
     }
 
 }

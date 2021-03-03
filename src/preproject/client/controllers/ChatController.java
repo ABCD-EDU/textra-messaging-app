@@ -17,9 +17,12 @@ import preproject.client.Action;
 import preproject.client.ClientExecutable;
 
 import java.io.IOException;
+import java.net.SocketException;
 import java.net.URL;
 import java.sql.Timestamp;
 import java.util.*;
+
+import static preproject.client.ClientExecutable.serverConnector;
 
 public class ChatController implements Initializable {
 
@@ -85,34 +88,37 @@ public class ChatController implements Initializable {
 
     private class ClientThread extends Thread {
 
-        public void run(){
+        @SuppressWarnings("unchecked")
+        public void run() {
             System.out.println("CLIENT THREAD STARTED");
-            while (true) {
-                Map<String, Object> readData = null;
-                try{
-                    readData = (Map<String, Object>) ClientExecutable.serverConnector.getObjIn().readObject();
-                }catch (Exception e) {
-                    e.printStackTrace();
+            while (!serverConnector.getSocket().isClosed()) {
+                Map<String, Object> readData;
+                try {
+                    readData = (Map<String, Object>) serverConnector.getObjIn().readObject();
+                } catch (SocketException e) {
+                    break;
+                } catch (IOException | ClassNotFoundException exc) {
                     continue;
                 }
+
                 System.out.println("==== NEW ACTION RECEIVED ==== " + readData.get("action"));
-                switch(String.valueOf(readData.get("action"))){
+                switch (String.valueOf(readData.get("action"))) {
                     case Action.ON_GROUP_LIST_SEND:
                         System.out.println("GROUP LIST RECEIVED");
-                        groupsList = (List<Map<String, String>>)readData.get("data");
+                        groupsList = (List<Map<String, String>>) readData.get("data");
                         System.out.println("Received groups list size: " + groupsList.size());
                         renderGroupsList(sortGroupList(groupsList, "-1"));
                         break;
                     case Action.ON_USER_INFO_SEND:
                         System.out.println("USER INFO RECEIVED");
-                        handleUserInformationSend((Map<String, String>)readData.get("data"));
+                        handleUserInformationSend((Map<String, String>) readData.get("data"));
                         break;
                     case Action.ON_MESSAGE_RECEIVE:
                         System.out.println("MESSAGE RECEIVED");
                         handleMessagesReceived((Map<String, String>) readData.get("messages"));
                         break;
                     case Action.ON_GROUP_CREATION:
-                        handleGroupCreation((String)readData.get("status"));
+                        handleGroupCreation((String) readData.get("status"));
                         break;
                     case Action.ON_INITIAL_MESSAGES_RECEIVED:
                         System.out.println("INITIAL MESSAGES RECEIVED");
@@ -120,13 +126,12 @@ public class ChatController implements Initializable {
                         break;
                     case Action.ON_FAVORITE_TOGGLED:
                         System.out.println("FAVORITE TOGGLED");
-                        handleFavoriteToggle((String)readData.get("groupId"), (String)readData.get("isFav"));
+                        handleFavoriteToggle((String) readData.get("groupId"), (String) readData.get("isFav"));
                         break;
 
                 }
             }
         }
-
     }
 
     /**
@@ -221,7 +226,7 @@ public class ChatController implements Initializable {
         }
         request.put("messagesList", messagesList);
         request.put("senderId", msgData[0].getSenderID());
-        ClientExecutable.serverConnector.getObjOut().writeObject(request);
+        serverConnector.getObjOut().writeObject(request);
     }
 
     /**
@@ -341,7 +346,7 @@ public class ChatController implements Initializable {
                     request.put("action", Action.GET_GROUP_MESSAGES);
                     request.put("groupId", groupMap.get("groupId"));
                     try {
-                        ClientExecutable.serverConnector.getObjOut().writeObject(request);
+                        serverConnector.getObjOut().writeObject(request);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -393,7 +398,7 @@ public class ChatController implements Initializable {
                             else
                                 request.put("isFav", "0");
                             try {
-                                ClientExecutable.serverConnector.getObjOut().writeObject(request);
+                                serverConnector.getObjOut().writeObject(request);
                             } catch (IOException err) {
                                 err.printStackTrace();
                             }
@@ -456,7 +461,7 @@ public class ChatController implements Initializable {
             HashMap<String, Object> request1 = new HashMap<>();
             request1.put("action", Action.GET_GROUP_LIST);
             try {
-                ClientExecutable.serverConnector.getObjOut().writeObject(request1);
+                serverConnector.getObjOut().writeObject(request1);
                 System.out.println("REQUEST FOR GROUPS SENT");
             } catch (IOException e) {
                 e.printStackTrace();
@@ -561,7 +566,7 @@ public class ChatController implements Initializable {
         request.put("email", this.email);
 
         try {
-            ClientExecutable.serverConnector.getObjOut().writeObject(request);
+            serverConnector.getObjOut().writeObject(request);
             System.out.println("USER INFORMATION REQUEST SENT");
         } catch (IOException e) {
             e.printStackTrace();
@@ -571,7 +576,7 @@ public class ChatController implements Initializable {
         HashMap<String, Object> request1 = new HashMap<>();
         request1.put("action", Action.GET_GROUP_LIST);
         try {
-            ClientExecutable.serverConnector.getObjOut().writeObject(request1);
+            serverConnector.getObjOut().writeObject(request1);
             System.out.println("REQUEST FOR GROUPS SENT");
         } catch (IOException e) {
             e.printStackTrace();

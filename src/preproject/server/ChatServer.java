@@ -93,7 +93,7 @@ public class ChatServer {
             while (true) {
                 Socket socket = serverSocket.accept();
                 UserThread userThread = new UserThread(socket, this);
-                userThread.setDaemon(true);
+//                userThread.setDaemon(true);
 
                 onlineUsers.add(userThread);
                 userThread.start();

@@ -38,4 +38,22 @@ public class ServerConnector extends Thread {
         return writeThread.getObjOut();
     }
 
+    protected void close() {
+        try {
+            if (socket != null) {
+                socket.close();
+            }
+
+            if (writeThread.getObjOut() != null) {
+                writeThread.getObjOut().close();
+            }
+
+            if (readThread.getObjIn() != null) {
+                readThread.getObjIn().close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

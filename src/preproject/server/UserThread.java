@@ -33,28 +33,37 @@ public class UserThread extends Thread {
 
     @Override
     public void run() {
-        try {
-            InputStream input = SOCKET.getInputStream();
-            ObjectInputStream reader = new ObjectInputStream(input);
-
-            OutputStream output = SOCKET.getOutputStream();
+        try (
+                InputStream input = SOCKET.getInputStream();
+                OutputStream output = SOCKET.getOutputStream();
+                ObjectInputStream reader = new ObjectInputStream(input);
+        ) {
             objOut = new ObjectOutputStream(output);
 
             // constantly receive data being sent and process it
-            SOCKET.setKeepAlive(true);
-            while (SOCKET.isConnected()) {
+//            SOCKET.setKeepAlive(true);
+            while (!SOCKET.isClosed()) {
+                try {
                 processReadData(reader);
+                } catch (EOFException e) {
+                    System.out.println("There is no data to read");
+                    SOCKET.close();
+                    break;
+                }
             }
-        } catch (SocketException socketException) {
-            SERVER.removeUser(this);
+
+            if (SOCKET.isClosed()) {
+                SERVER.removeUser(this);
+                objOut.close();
+                System.out.println("SOCKET closed successfully");
+            }
         } catch (IOException | SQLException | ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
 
     @SuppressWarnings("unchecked")
-    private void processReadData(ObjectInputStream reader) throws IOException, SQLException, ClassNotFoundException, SocketException {
-
+    private void processReadData(ObjectInputStream reader) throws IOException, SQLException, ClassNotFoundException {
         HashMap<String, Object> readData = (HashMap<String, Object>) reader.readObject();
         System.out.println("============ NEW ACTION ============ USER: ");
         switch (String.valueOf(readData.get("action"))) {
@@ -86,7 +95,7 @@ public class UserThread extends Thread {
                 this.getUsersForAdmin(false);
                 break;
             case Action.POST_VERIFIED_USERS:
-                this.updateVerifiedUsers((String)readData.get("email"), (String)readData.get("isVerified"));
+                this.updateVerifiedUsers((String) readData.get("email"), (String) readData.get("isVerified"));
                 break;
             case Action.ACCEPT_ALL_USERS:
                 this.updateALlRegistrations(true);
@@ -108,8 +117,8 @@ public class UserThread extends Thread {
                 break;
             case Action.SEND_BROADCAST_MESSAGE:
                 System.out.println(readData.keySet());
-                SERVER.broadcastMessageToAllOnlineUsers((List<Map<String, String>>)readData.get("messagesList"),
-                        (String)readData.get("senderId"));
+                SERVER.broadcastMessageToAllOnlineUsers((List<Map<String, String>>) readData.get("messagesList"),
+                        (String) readData.get("senderId"));
                 break;
         }
     }
@@ -130,14 +139,14 @@ public class UserThread extends Thread {
             }
             objOut.writeObject(true);
             return;
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         objOut.writeObject(false);
     }
 
     private void updateVerifiedUsers(String email, String isVerified) throws IOException {
-        Map<String, Boolean> writeObject= new HashMap<>();
+        Map<String, Boolean> writeObject = new HashMap<>();
         try {
             if (Boolean.parseBoolean(isVerified)) {
                 PreparedStatement preparedStatement = Connector.connect.prepareStatement(
@@ -145,17 +154,17 @@ public class UserThread extends Thread {
                 preparedStatement.setBoolean(1, true);
                 preparedStatement.setInt(2, getUserId(email));
                 preparedStatement.executeUpdate();
-            }else {
+            } else {
                 PreparedStatement preparedStatement = Connector.connect.prepareStatement(
                         "DELETE FROM user_acc WHERE user_id = ?");
                 preparedStatement.setInt(1, getUserId(email));
                 preparedStatement.executeUpdate();
             }
-            writeObject.put(SUCCESS_POST_VERIFIED_USERS,true);
+            writeObject.put(SUCCESS_POST_VERIFIED_USERS, true);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        writeObject.put(SUCCESS_POST_VERIFIED_USERS,true);
+        writeObject.put(SUCCESS_POST_VERIFIED_USERS, true);
         objOut.writeObject(writeObject);
     }
 
@@ -228,10 +237,9 @@ public class UserThread extends Thread {
     }
 
     /**
-     *
      * @param userIdList list of user ID's
      * @param groupAlias
-     * @param creator creator's email
+     * @param creator    creator's email
      * @throws IOException
      */
     private void importGroupMembers(List<Integer> userIdList, String groupAlias, String creator) throws IOException {
@@ -318,14 +326,16 @@ public class UserThread extends Thread {
         List<String> userList = (List<String>) groupMap.get("members");
         userList.add(0, creator);
         List<Integer> userIdList = getUserIdList(userList);
-        System.out.println("Alias " + (String)groupMap.get("alias"));
+        System.out.println("Alias " + (String) groupMap.get("alias"));
         System.out.println("Users " + userList);
         System.out.println("IDs " + userIdList);
         System.out.println("properties succesfully initialized");
         Map<String, String> responseMap = new HashMap<>();
 
-        if (doesGroupExists(groupAlias, Integer.toString(getUserId(creator)))) {
-            objOut.writeObject(false);
+        if (doesGroupExists(groupAlias, getUserId(creator))) {
+            responseMap.put("action", Action.ON_GROUP_CREATION);
+            responseMap.put("status", "false");
+            objOut.writeObject(responseMap);
             System.out.println("Group already exists");
             return;
         }
@@ -379,32 +389,32 @@ public class UserThread extends Thread {
      * @param groupCreator group creator ID
      * @return
      */
-    private boolean doesGroupExists(String groupAlias, String groupCreator) {
+    private boolean doesGroupExists(String groupAlias, int groupCreator) {
         try {
             PreparedStatement findGroup = Connector.connect.prepareStatement(
                     "SELECT * FROM group_repo WHERE alias = ? AND uid_admin = ?"
             );
 
             findGroup.setString(1, groupAlias);
-            findGroup.setInt(2, Integer.parseInt(groupCreator));
+            findGroup.setInt(2, groupCreator);
 
-            ResultSet result = findGroup.executeQuery();
-            if (result.next())
-                return true;
+            ResultSet rowsAffected = findGroup.executeQuery();
+            if (rowsAffected.wasNull()) {
+                return false;
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return false;
+        return true;
     }
 
     private void toggleFavorite(HashMap<String, Object> faveRepo) throws IOException {
         System.out.println("FAVORITE TOGGLED");
-        String userId = (String)faveRepo.get("userId");
-        String groupId = (String)faveRepo.get("groupId");
-        String isFav = (String)faveRepo.get("isFav");
+        String userId = (String) faveRepo.get("userId");
+        String groupId = (String) faveRepo.get("groupId");
+        String isFav = (String) faveRepo.get("isFav");
 
         try {
-            // TODO: find the group id of the given data first
             PreparedStatement preparedStatement = Connector.connect.prepareStatement(
                     "UPDATE group_msg SET is_fav = ? where user_id = ? AND group_id = ?"
             );
@@ -428,17 +438,17 @@ public class UserThread extends Thread {
 
     private void broadcastMessage(HashMap<String, Object> messagesRepo) {
         System.out.println("=== BROADCAST MESSAGE");
-        List<Map<String, Object>> messageList = (List<Map<String, Object>> )messagesRepo.get("messagesList");
+        List<Map<String, Object>> messageList = (List<Map<String, Object>>) messagesRepo.get("messagesList");
         for (Map<String, Object> messageRepo : messageList) {
             try {
                 PreparedStatement messageInput = Connector.connect.prepareStatement(
                         "INSERT INTO messenger.message VALUES (?, ?, ?, ?)"
                 );
 
-                String sender = (String)messageRepo.get("userId");
-                String recipient = (String)messageRepo.get("groupId");
-                String message = (String)messageRepo.get("messageSent");
-                Timestamp timeSent = Timestamp.valueOf((String)messageRepo.get("timeSent"));
+                String sender = (String) messageRepo.get("userId");
+                String recipient = (String) messageRepo.get("groupId");
+                String message = (String) messageRepo.get("messageSent");
+                Timestamp timeSent = Timestamp.valueOf((String) messageRepo.get("timeSent"));
 
                 messageInput.setString(1, sender);
                 messageInput.setString(2, recipient);
@@ -457,8 +467,8 @@ public class UserThread extends Thread {
     // TODO: Register the student into admin braodcast group
     private void registerUser(RegisterHandler registerHandler, HashMap<String, Object> userRepo) throws IOException {
         boolean registerAttempt = registerHandler.registerUser(
-                new PasswordAuthentication((String) userRepo.get("email"), ((String)userRepo.get("password")).toCharArray()),
-                (String)userRepo.get("firstName"), (String)userRepo.get("lastName"));
+                new PasswordAuthentication((String) userRepo.get("email"), ((String) userRepo.get("password")).toCharArray()),
+                (String) userRepo.get("firstName"), (String) userRepo.get("lastName"));
 
         // send a boolean back to the client that identifies if the register attempt is a success or not
         // if not, tell the user to try again later.
@@ -563,7 +573,7 @@ public class UserThread extends Thread {
 
     /**
      * Return a list of groups the client is a member of.
-     *
+     * <p>
      * Algorithm:
      * 1. Get group_ids the client is part of in group_msg table
      * 2. Get rows corresponding to those group_id's in the group_repo table
@@ -597,7 +607,7 @@ public class UserThread extends Thread {
                 groupMap.put("groupId", groupId);
                 groupMap.put("isAdmin", isAdmin);
                 groupMap.put("alias", alias);
-                groupMap.put("uidAdmin",uidAdmin);
+                groupMap.put("uidAdmin", uidAdmin);
                 // TODO: Update this when messages table is already functional
                 groupMap.put("unreadMessages", "0");
                 groupMap.put("is_fav", String.valueOf(group_idsStatement.getInt("is_fav")));
@@ -645,6 +655,7 @@ public class UserThread extends Thread {
 
     /**
      * TODO: Only select up to 10 at a time. joke lang pala
+     *
      * @param groupId
      */
     private void getGroupMessages(String groupId) {
@@ -694,7 +705,7 @@ public class UserThread extends Thread {
     /**
      * This is used to send the message from each user to the client. This is a helper method for the {@link ChatServer}
      * class
-     *
+     * <p>
      * TODO: Send sender name as well
      *
      * @param message message to send
@@ -709,7 +720,7 @@ public class UserThread extends Thread {
             messageRepo.put("address", address);
             messageRepo.put("message", message);
             messageRepo.put("timeSent", timeSent.toString());
-            response.put("messages",messageRepo);
+            response.put("messages", messageRepo);
             objOut.writeObject(response); // send message to the server
         } catch (IOException e) {
             e.printStackTrace();

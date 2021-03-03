@@ -38,7 +38,7 @@ public class ServerConnector extends Thread {
         return writeThread.getObjOut();
     }
 
-    protected void close() {
+    public void close() {
         try {
             if (socket != null) {
                 socket.close();
@@ -56,4 +56,8 @@ public class ServerConnector extends Thread {
         }
     }
 
+    public void reset() {
+        this.close();
+        this.run();
+    }
 }

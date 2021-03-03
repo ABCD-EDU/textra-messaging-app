@@ -589,6 +589,12 @@ public class ChatController implements Initializable {
             e.printStackTrace();
         }
 
+        logout_button.setOnAction(e -> {
+            ScreenController sC = new ScreenController((Stage) logout_button.getScene().getWindow());
+            sC.activateUsingPath("../resources/view/SignInScreen.fxml");
+            serverConnector.reset();
+        });
+
         initializeBroadcastButton();
     }
 

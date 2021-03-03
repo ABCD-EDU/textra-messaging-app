@@ -14,6 +14,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.MapValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import preproject.client.Action;
 import preproject.client.ClientExecutable;
 import preproject.server.models.User;
@@ -22,6 +23,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static preproject.client.ClientExecutable.serverConnector;
 
 public class AdminController implements Initializable {
 
@@ -61,7 +64,7 @@ public class AdminController implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        initializeAcceptDeclineAllButton();
+        initializeButtons();
         importRegisteredUsers();
         loadUnRegisteredUsersToScrollPane();
         loadRegisteredUsersToTable();
@@ -114,7 +117,7 @@ public class AdminController implements Initializable {
         }
     }
 
-    public void initializeAcceptDeclineAllButton() {
+    public void initializeButtons() {
         acceptAllButton.setOnAction(e -> {
             System.out.println("clicked accept");
             try {
@@ -155,6 +158,12 @@ public class AdminController implements Initializable {
                 exception.printStackTrace();
             }
             loadRegisteredUsersToTable();
+        });
+
+        logoutButton.setOnAction(e -> {
+            ScreenController sC = new ScreenController((Stage) logoutButton.getScene().getWindow());
+            sC.activateUsingPath("../resources/view/SignInScreen.fxml");
+            serverConnector.reset();
         });
     }
 

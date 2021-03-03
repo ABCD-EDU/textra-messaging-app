@@ -548,6 +548,7 @@ public class ChatController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle){
         clientThread = new ClientThread();
+        clientThread.setDaemon(true);
         clientThread.start();
         currentlySelectedGroupID = "null";
         messages = new ArrayList<>();

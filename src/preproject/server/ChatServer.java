@@ -93,6 +93,7 @@ public class ChatServer {
             while (true) {
                 Socket socket = serverSocket.accept();
                 UserThread userThread = new UserThread(socket, this);
+                userThread.setDaemon(true);
 
                 onlineUsers.add(userThread);
                 userThread.start();
@@ -189,7 +190,11 @@ public class ChatServer {
 
     protected void removeUser(UserThread user) {
         onlineUsers.remove(user);
-        System.out.println("User with email " + user.getUser().getEmail() + " has logged out");
+        try {
+            System.out.println("User with email " + user.getUser().getEmail() + " has logged out");
+        }catch (NullPointerException e) {
+            System.out.println("A user who has not yet logged in has disconnected");
+        }
     }
 
 }

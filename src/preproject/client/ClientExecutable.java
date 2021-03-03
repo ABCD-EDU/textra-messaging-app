@@ -25,7 +25,15 @@ public class ClientExecutable extends Application {
 
     public static void main(String[] args) {
         serverConnector = new ServerConnector();
+        //TODO: Catch ConnectionException
         serverConnector.start();
         launch(args);
     }
+
+    //TODO: Implement graceful application closing
+    @Override
+    public void stop() {
+        System.out.println("APPLICATION CLOSING");
+    }
+
 }

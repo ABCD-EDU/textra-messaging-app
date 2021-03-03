@@ -6,9 +6,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.input.*;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
@@ -134,15 +132,24 @@ public class ChatController implements Initializable {
         }
     }
 
-    /**
-     * TODO: take into consideration if entered key is shift + enter
-     */
+    //TODO: TEST FIRST
     @FXML
-    void onKeyPress(KeyEvent key) throws IOException {
-        if (key.getCode().equals(KeyCode.ENTER)) {
+    void onKeyPress(KeyEvent event) throws IOException {
+        KeyCombination shiftEnter = new KeyCodeCombination(KeyCode.ENTER, KeyCodeCombination.SHIFT_ANY);
+        if (event.getCode().equals(KeyCode.ENTER)) {
             handleMessageSend(message_area.getText().trim());
             message_area.clear();
+        } else if (shiftEnter.match(event)) {
+            String previousLine = message_area.getText();
+            message_area.setText(previousLine + "\n");
+            message_area.requestFocus();
         }
+    }
+
+    @FXML
+    void onClick() throws IOException {
+        handleMessageSend(message_area.getText().trim());
+        message_area.clear();
     }
 
     /**

@@ -92,8 +92,10 @@ public class SignInController implements Initializable{
 
             ClientExecutable.serverConnector.getObjOut().writeObject(userRepo);
             boolean isSuccessful = (boolean) ClientExecutable.serverConnector.getObjIn().readObject();
-            if (!isSuccessful)
+            if (!isSuccessful) {
+                displayErrorMsg("unsuccessful");
                 return;
+            }
             System.out.println("log in successful");
             Map<String, String> loginRepo = (Map<String, String>) ClientExecutable.serverConnector.getObjIn().readObject();
 
@@ -104,7 +106,7 @@ public class SignInController implements Initializable{
 
             if (!isVerified) {
                 System.out.println("User is not verified");
-                userDoesNotExist();
+                displayErrorMsg("pending");
             }else if (isAdmin) {
                 System.out.println("User is admin");
                 sController = new ScreenController((Stage) (signIn_btn.getScene().getWindow()));
@@ -120,11 +122,18 @@ public class SignInController implements Initializable{
         }
     }
 
-    void userDoesNotExist() {
-        error_message.setText("User does not exist");
-        error_message.setVisible(true);
-        email_field.setStyle("-fx-background-color: #FAFAFA; -fx-border-radius: 3; -fx-border-width: 1; -fx-border-color: #DB5461;");
-        pass_field.setStyle("-fx-background-color: #FAFAFA; -fx-border-radius: 3; -fx-border-width: 1; -fx-border-color: #DB5461;");
+    void displayErrorMsg(String type) {
+        if (type.equalsIgnoreCase("unsuccessful")) {
+            error_message.setStyle("-fx-text-fill:  #DB5461; -fx-font-size: 12px; -fx-font-weight: bold");
+            error_message.setText("Incorrect email or password");
+            error_message.setVisible(true);
+            email_field.setStyle("-fx-background-color: #FAFAFA; -fx-border-radius: 3; -fx-border-width: 1; -fx-border-color: #DB5461;");
+            pass_field.setStyle("-fx-background-color: #FAFAFA; -fx-border-radius: 3; -fx-border-width: 1; -fx-border-color: #DB5461;");
+        } else if (type.equalsIgnoreCase("pending")) {
+            error_message.setStyle("-fx-text-fill:  #00A676; -fx-font-size: 12px; -fx-font-weight: bold");
+            error_message.setText("User is not verified");
+            error_message.setVisible(true);
+        }
     }
 
 

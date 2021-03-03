@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<VBox fx:id="vBox" alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" spacing="10.0" style="-fx-background-color: FAFAFA;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="preproject.client.controllers.RegisterScreenController">
+<VBox fx:id="vBox" alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" style="-fx-background-color: #FAFAFA;" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="preproject.client.controllers.RegisterScreenController">
    <children>
       <HBox alignment="CENTER">
          <children>
@@ -31,7 +35,10 @@
             <Font size="13.0" />
          </font>
       </Label>
-      <TextField fx:id="email_field" onAction="#registerButtonPressed" style="-fx-border-radius: 3; -fx-border-color: #AAAAAA;" />
+      <TextField fx:id="email_field" onAction="#registerButtonPressed" onKeyPressed="#keyPressed" onMouseClicked="#fieldClicked" style="-fx-background-color: #FAFAFA; -fx-border-color: #333333; -fx-border-radius: 3;">
+         <VBox.margin>
+            <Insets bottom="20.0" />
+         </VBox.margin></TextField>
       <Label text="First Name">
          <padding>
             <Insets left="5.0" />
@@ -40,7 +47,10 @@
             <Font size="13.0" />
          </font>
       </Label>
-      <TextField fx:id="fName_field" onAction="#registerButtonPressed" style="-fx-border-radius: 3; -fx-border-color: #AAAAAA;" />
+      <TextField fx:id="fName_field" onAction="#registerButtonPressed" onKeyPressed="#keyPressed" onMouseClicked="#fieldClicked" style="-fx-background-color: #FAFAFA; -fx-border-color: #AAAAAA; -fx-border-radius: 3;">
+         <VBox.margin>
+            <Insets bottom="20.0" />
+         </VBox.margin></TextField>
       <Label text="Last Name">
          <padding>
             <Insets left="5.0" />
@@ -49,7 +59,10 @@
             <Font size="13.0" />
          </font>
       </Label>
-      <TextField fx:id="lName_field" onAction="#registerButtonPressed" style="-fx-border-radius: 3; -fx-border-color: #AAAAAA;" />
+      <TextField fx:id="lName_field" onAction="#registerButtonPressed" onKeyPressed="#keyPressed" onMouseClicked="#fieldClicked" style="-fx-background-color: #FAFAFA; -fx-border-radius: 3; -fx-border-color: #AAAAAA;">
+         <VBox.margin>
+            <Insets bottom="20.0" />
+         </VBox.margin></TextField>
       <Label text="Password">
          <padding>
             <Insets left="5.0" />
@@ -58,7 +71,10 @@
             <Font size="13.0" />
          </font>
       </Label>
-      <PasswordField fx:id="pass_field" onAction="#registerButtonPressed" style="-fx-border-radius: 3; -fx-border-color: #AAAAAA;" />
+      <PasswordField fx:id="pass_field" onAction="#registerButtonPressed" onKeyPressed="#keyPressed" onMouseClicked="#fieldClicked" style="-fx-background-color: #FAFAFA; -fx-border-radius: 3; -fx-border-color: #AAAAAA;">
+         <VBox.margin>
+            <Insets bottom="20.0" />
+         </VBox.margin></PasswordField>
       <Label text="Confirm Password">
          <padding>
             <Insets left="5.0" />
@@ -67,30 +83,39 @@
             <Font size="13.0" />
          </font>
       </Label>
-      <PasswordField fx:id="cPass_field" onAction="#registerButtonPressed" style="-fx-border-radius: 3; -fx-border-color: #AAAAAA;" />
+      <PasswordField fx:id="cPass_field" onAction="#registerButtonPressed" onKeyPressed="#keyPressed" onMouseClicked="#fieldClicked" style="-fx-background-color: #FAFAFA; -fx-border-radius: 3; -fx-border-color: #AAAAAA;">
+         <VBox.margin>
+            <Insets bottom="30.0" />
+         </VBox.margin></PasswordField>
       <HBox alignment="CENTER">
          <children>
-            <Button fx:id="register_button" alignment="CENTER" mnemonicParsing="false" onAction="#registerButtonPressed" prefHeight="26.0" prefWidth="91.0" style="-fx-background-color: #333333;" text="Register" textFill="WHITE">
+            <Button fx:id="register_button" alignment="CENTER" mnemonicParsing="false" onAction="#registerButtonPressed" prefHeight="30.0" prefWidth="90.0" style="-fx-background-color: #333333;" text="Register" textFill="WHITE">
                <HBox.margin>
-                  <Insets top="10.0" />
+                  <Insets bottom="35.0" />
                </HBox.margin>
                <font>
-                  <Font size="13.0" />
+                  <Font name="System Bold" size="12.0" />
                </font>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
             </Button>
          </children>
       </HBox>
       <HBox alignment="CENTER">
          <children>
-            <Label fx:id="goBack_label" onMouseClicked="#goBackLabelPressed" text="already have an account?">
+            <Label fx:id="signIn_label" alignment="CENTER" onMouseClicked="#goBackLabelPressed" onMouseEntered="#hoverEnter" onMouseExited="#hoverExit" text="already have an account?">
                <cursor>
                   <Cursor fx:constant="HAND" />
                </cursor>
+               <HBox.margin>
+                  <Insets bottom="30.0" />
+               </HBox.margin>
             </Label>
          </children>
       </HBox>
    </children>
    <padding>
-      <Insets left="500.0" right="500.0" />
+      <Insets left="505.0" right="505.0" />
    </padding>
 </VBox>

@@ -6,6 +6,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import preproject.client.Action;
@@ -50,10 +52,70 @@ public class RegisterScreenController {
     private Button register_button;
 
     @FXML
-    private Label goBack_label;
+    private Label signIn_label;
 
     @FXML
-    void goBackLabelPressed(MouseEvent event) {
+    void fieldClicked(MouseEvent mouseEvent) {
+//        error_message.setVisible(false);
+        if (mouseEvent.getSource().equals(email_field)) {
+            resetFieldFocus();
+            email_field.setStyle("-fx-background-color: #FAFAFA; -fx-border-radius: 3; -fx-border-width: 1; -fx-border-color: #333333;");
+        } else if (mouseEvent.getSource().equals(fName_field)) {
+            resetFieldFocus();
+            fName_field.setStyle("-fx-background-color: #FAFAFA; -fx-border-radius: 3; -fx-border-width: 1; -fx-border-color: #333333;");
+        } else if (mouseEvent.getSource().equals(lName_field)) {
+            resetFieldFocus();
+            lName_field.setStyle("-fx-background-color: #FAFAFA; -fx-border-radius: 3; -fx-border-width: 1; -fx-border-color: #333333;");
+        } else if (mouseEvent.getSource().equals(pass_field)) {
+            resetFieldFocus();
+            pass_field.setStyle("-fx-background-color: #FAFAFA; -fx-border-radius: 3; -fx-border-width: 1; -fx-border-color: #333333;");
+        } else if (mouseEvent.getSource().equals(cPass_field)) {
+            resetFieldFocus();
+            cPass_field.setStyle("-fx-background-color: #FAFAFA; -fx-border-radius: 3; -fx-border-width: 1; -fx-border-color: #333333;");
+        }
+    }
+
+    @FXML
+    void keyPressed(KeyEvent keyEvent) {
+//        error_message.setVisible(false);
+        if (keyEvent.getSource().equals(email_field) && keyEvent.getCode() == KeyCode.TAB) {
+            resetFieldFocus();
+            fName_field.setStyle("-fx-background-color: #FAFAFA; -fx-border-radius: 3; -fx-border-width: 1; -fx-border-color: #333333;");
+        } else if (keyEvent.getSource().equals(fName_field) && keyEvent.getCode() == KeyCode.TAB) {
+            resetFieldFocus();
+            lName_field.setStyle("-fx-background-color: #FAFAFA; -fx-border-radius: 3; -fx-border-width: 1; -fx-border-color: #333333;");
+        } else if (keyEvent.getSource().equals(lName_field) && keyEvent.getCode() == KeyCode.TAB) {
+            resetFieldFocus();
+            pass_field.setStyle("-fx-background-color: #FAFAFA; -fx-border-radius: 3; -fx-border-width: 1; -fx-border-color: #333333;");
+        } else if (keyEvent.getSource().equals(pass_field) && keyEvent.getCode() == KeyCode.TAB) {
+            resetFieldFocus();
+            cPass_field.setStyle("-fx-background-color: #FAFAFA; -fx-border-radius: 3; -fx-border-width: 1; -fx-border-color: #333333;");
+        } else if (keyEvent.getSource().equals(cPass_field) && keyEvent.getCode() == KeyCode.TAB) {
+            resetFieldFocus();
+            email_field.setStyle("-fx-background-color: #FAFAFA; -fx-border-radius: 3; -fx-border-width: 1; -fx-border-color: #333333;");
+        }
+    }
+
+    void resetFieldFocus() {
+        email_field.setStyle("-fx-background-color: #FAFAFA; -fx-border-radius: 3; -fx-border-width: 1; -fx-border-color: #AAAAAA;");
+        fName_field.setStyle("-fx-background-color: #FAFAFA; -fx-border-radius: 3; -fx-border-width: 1; -fx-border-color: #AAAAAA;");
+        lName_field.setStyle("-fx-background-color: #FAFAFA; -fx-border-radius: 3; -fx-border-width: 1; -fx-border-color: #AAAAAA;");
+        pass_field.setStyle("-fx-background-color: #FAFAFA; -fx-border-radius: 3; -fx-border-width: 1; -fx-border-color: #AAAAAA;");
+        cPass_field.setStyle("-fx-background-color: #FAFAFA; -fx-border-radius: 3; -fx-border-width: 1; -fx-border-color: #AAAAAA;");
+    }
+
+    @FXML
+    void hoverEnter() {
+        signIn_label.setStyle("-fx-text-fill: #3498DB; -fx-font-size: 12px");
+    }
+
+    @FXML
+    void hoverExit() {
+        signIn_label.setStyle("-fx-text-fill: #000000; -fx-font-size: 12px");
+    }
+
+    @FXML
+    void goBackLabelPressed() {
         sController = new ScreenController(vBox);
         sController.activateUsingPath("../resources/view/SignInScreen.fxml");
     }
@@ -104,20 +166,15 @@ public class RegisterScreenController {
 
     private boolean hasBlankFields() {
         if (email_field.getText().trim().isBlank())
-            email_field.setStyle("-fx-border-color: red ; -fx-border-width: 2px ; -fx-border-radius: 2px");
-        else email_field.setStyle("-fx-border-width: 0px");
+            email_field.setStyle("-fx-border-color: #DB5461 ; -fx-border-width: 1px ; -fx-border-radius: 3px");
         if (fName_field.getText().trim().isBlank())
-            fName_field.setStyle("-fx-border-color: red ; -fx-border-width: 2px ; -fx-border-radius: 2px");
-        else fName_field.setStyle("-fx-border-width: 0px");
+            fName_field.setStyle("-fx-border-color: #DB5461 ; -fx-border-width: 1px ; -fx-border-radius: 3px");
         if (lName_field.getText().trim().isBlank())
-            lName_field.setStyle("-fx-border-color: red ; -fx-border-width: 2px ; -fx-border-radius: 2px");
-        else lName_field.setStyle("-fx-border-width: 0px");
+            lName_field.setStyle("-fx-border-color: #DB5461 ; -fx-border-width: 1px ; -fx-border-radius: 3px");
         if (pass_field.getText().trim().isBlank())
-            pass_field.setStyle("-fx-border-color: red ; -fx-border-width: 2px ; -fx-border-radius: 2px");
-        else pass_field.setStyle("-fx-border-width: 0px");
+            pass_field.setStyle("-fx-border-color: #DB5461 ; -fx-border-width: 1px ; -fx-border-radius: 3px");
         if (cPass_field.getText().trim().isBlank())
-            cPass_field.setStyle("-fx-border-color: red ; -fx-border-width: 2px ; -fx-border-radius: 2px");
-        else cPass_field.setStyle("-fx-border-width: 0px");
+            cPass_field.setStyle("-fx-border-color: #DB5461 ; -fx-border-width: 1px ; -fx-border-radius: 3px");
 
         return email_field.getText().trim().isBlank() || fName_field.getText().trim().isBlank() ||
                 lName_field.getText().trim().isBlank() || pass_field.getText().trim().isBlank() ||

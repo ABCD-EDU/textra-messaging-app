@@ -67,6 +67,13 @@ public class AdminController implements Initializable {
         loadRegisteredUsersToTable();
     }
 
+    @FXML
+    void initializeComponents() {
+        initializeAcceptDeclineAllButton();
+        importRegisteredUsers();
+        loadUnRegisteredUsersToScrollPane();
+        loadRegisteredUsersToTable();
+    }
     /**
      * Add all the unregistered users to the scroll pane
      */

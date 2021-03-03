@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
@@ -18,7 +19,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="preproject.client.controllers.ChatController">
+<AnchorPane prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="preproject.client.controllers.ChatController">
    <children>
       <HBox prefHeight="720.0" prefWidth="1280.0" style="-fx-background-color: red;">
          <children>
@@ -47,12 +48,15 @@
                   </Pane>
                   <Pane prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="1">
                      <children>
-                        <TextField fx:id="searchContacts_field" alignment="CENTER" layoutX="13.0" onKeyPressed="#onSearchFieldInput" prefHeight="26.0" prefWidth="234.0" promptText="Search Contacts" style="-fx-background-color: #DDDDDD; -fx-prompt-text-fill: #666666;" />
+                        <TextField fx:id="searchContacts_field" alignment="CENTER" layoutX="13.0" onKeyPressed="#onSearchFieldInput" prefHeight="26.0" prefWidth="234.0" promptText="Search Contacts" style="-fx-background-color: #DDDDDD; -fx-prompt-text-fill: #666666; -fx-border-radius: 3;" />
                      </children>
                   </Pane>
                   <Pane prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="2">
                      <children>
-                        <Button fx:id="broadcast_button" layoutX="80.0" layoutY="14.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="100.0" style="-fx-background-color: #00A676;" text="Broadcast" textFill="WHITE" />
+                        <Button fx:id="broadcast_button" layoutX="80.0" layoutY="14.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="100.0" style="-fx-background-color: #00A676;" text="Broadcast" textFill="WHITE">
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor></Button>
                      </children>
                   </Pane>
                   <Pane prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="3">
@@ -66,12 +70,15 @@
                            <children>
                               <Circle fill="#333333" layoutX="27.0" layoutY="27.0" radius="17.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" />
                               <Label fx:id="groupAlias_label" layoutX="54.0" layoutY="18.0" prefHeight="17.0" prefWidth="109.0" text="Start a Conversation" />
-                              <Text disable="true" fill="WHITE" layoutX="18.0" layoutY="34.0" strokeType="OUTSIDE" strokeWidth="0.0" text="+">
+                              <Text disable="true" fill="WHITE" layoutX="17.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" text="+">
                                  <font>
-                                    <Font name="System Bold" size="27.0" />
+                                    <Font name="System Bold" size="29.0" />
                                  </font>
                               </Text>
                            </children>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
                         </Pane>
                      </children>
                   </Pane>
@@ -90,6 +97,9 @@
                            <font>
                               <Font size="11.0" />
                            </font>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
                         </Button>
                      </children>
                   </Pane>
@@ -112,10 +122,11 @@
                   </ScrollPane>
                   <Pane prefHeight="67.0" prefWidth="1020.0" style="-fx-background-color: #FAFAFA;" GridPane.rowIndex="2">
                      <children>
-                        <TextArea fx:id="message_area" layoutX="16.0" layoutY="19.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" onKeyPressed="#onKeyPress" prefHeight="30.0" prefWidth="988.0" promptText="message 'conversation name'" style="-fx-control-inner-background: #EEEEEE; -fx-prompt-text-fill: #666666;" wrapText="true">
+                        <TextArea fx:id="message_area" layoutX="16.0" layoutY="19.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" onKeyPressed="#onKeyPress" prefHeight="30.0" prefWidth="950.0" promptText="message 'conversation name'" style="-fx-control-inner-background: #EEEEEE; -fx-prompt-text-fill: #666666; -fx-border-radius: 3;" wrapText="true">
                            <font>
                               <Font size="14.0" />
                            </font></TextArea>
+                        <Button layoutX="974.0" layoutY="20.0" mnemonicParsing="false" onMouseClicked="#onClick" prefHeight="28.0" prefWidth="28.0" style="-fx-shape: &quot;M256 8c137 0 248 111 248 248S393 504 256 504 8 393 8 256 119 8 256 8zm113.9 231L234.4 103.5c-9.4-9.4-24.6-9.4-33.9 0l-17 17c-9.4 9.4-9.4 24.6 0 33.9L285.1 256 183.5 357.6c-9.4 9.4-9.4 24.6 0 33.9l17 17c9.4 9.4 24.6 9.4 33.9 0L369.9 273c9.4-9.4 9.4-24.6 0-34z&quot;; -fx-background-color: #333333;" />
                      </children>
                   </Pane>
                   <Pane fx:id="header_pane" prefHeight="53.0" prefWidth="1020.0" style="-fx-background-color: #FAFAFA;">

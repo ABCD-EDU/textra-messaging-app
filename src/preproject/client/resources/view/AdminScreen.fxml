@@ -18,7 +18,7 @@
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="preproject.client.controllers.AdminController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="preproject.client.controllers.AdminController">
    <children>
       <HBox prefHeight="720.0" prefWidth="1280.0">
          <children>
@@ -55,7 +55,7 @@
                         <Pane layoutX="16.0" prefHeight="1.0" prefWidth="344.0" style="-fx-background-color: EEEEEE; -fx-border-color: AAAAAA; -fx-border-style: solid hidden hidden hidden;" />
                      </children>
                   </Pane>
-                  <HBox alignment="CENTER" prefHeight="77.0" prefWidth="376.0" spacing="50.0" style="-fx-background-color: EEEEEE;" GridPane.rowIndex="1">
+                  <HBox alignment="CENTER" prefHeight="77.0" prefWidth="376.0" spacing="20.0" style="-fx-background-color: EEEEEE;" GridPane.rowIndex="1">
                      <children>
                         <Button fx:id="declineAllButton" mnemonicParsing="false" prefHeight="24.0" prefWidth="85.0" style="-fx-background-color: #DB5461;-fx-text-fill: WHITE;" text="DECLINE ALL" textAlignment="CENTER">
                            <font>
@@ -64,6 +64,14 @@
                            <cursor>
                               <Cursor fx:constant="HAND" />
                            </cursor></Button>
+                        <Button fx:id="refreshButton" mnemonicParsing="false" onAction="#initializeComponents" prefHeight="24.0" prefWidth="65.0" style="-fx-background-color: #333333; -fx-text-fill: WHITE;" text="refresh" textAlignment="CENTER">
+                           <font>
+                              <Font name="System Bold" size="10.0" />
+                           </font>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </Button>
                         <Button fx:id="acceptAllButton" mnemonicParsing="false" prefHeight="24.0" prefWidth="85.0" style="-fx-background-color: #00A676; -fx-text-fill: WHITE;" text="ACCEPT ALL" textAlignment="CENTER">
                            <font>
                               <Font name="System Bold" size="10.0" />

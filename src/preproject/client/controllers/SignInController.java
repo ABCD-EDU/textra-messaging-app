@@ -6,10 +6,12 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import preproject.client.*;
 
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
@@ -32,6 +34,28 @@ public class SignInController implements Initializable{
 
     @FXML
     private Label register_label;
+
+    @FXML
+    void fieldClick(javafx.scene.input.MouseEvent mouseEvent) {
+        if (mouseEvent.getSource().equals(email_field)) {
+            email_field.setStyle("-fx-background-color: #DDDDDD; -fx-border-radius: 3; -fx-border-width: 1; -fx-border-color: #333333;");
+            pass_field.setStyle("-fx-background-color: #FAFAFA; -fx-border-radius: 3; -fx-border-width: 1; -fx-border-color: #333333;");
+        } else if (mouseEvent.getSource().equals(pass_field)) {
+            pass_field.setStyle("-fx-background-color: #DDDDDD; -fx-border-radius: 3; -fx-border-width: 1; -fx-border-color: #333333;");
+            email_field.setStyle("-fx-background-color: #FAFAFA; -fx-border-radius: 3; -fx-border-width: 1; -fx-border-color: #333333;");
+        }
+    }
+
+    @FXML
+    void tabPress(javafx.scene.input.KeyEvent keyEvent) {
+        if (keyEvent.getSource().equals(email_field)) {
+            email_field.setStyle("-fx-background-color: #FAFAFA; -fx-border-radius: 3; -fx-border-width: 1; -fx-border-color: #333333;");
+            pass_field.setStyle("-fx-background-color: #DDDDDD; -fx-border-radius: 3; -fx-border-width: 1; -fx-border-color: #333333;");
+        } else if (keyEvent.getSource().equals(pass_field)) {
+            pass_field.setStyle("-fx-background-color: #FAFAFA; -fx-border-radius: 3; -fx-border-width: 1; -fx-border-color: #333333;");
+            email_field.setStyle("-fx-background-color: #DDDDDD; -fx-border-radius: 3; -fx-border-width: 1; -fx-border-color: #333333;");
+        }
+    }
 
     @FXML
     @SuppressWarnings("unchecked")
@@ -110,5 +134,4 @@ public class SignInController implements Initializable{
 //            e.printStackTrace();
 //        }
     }
-
 }

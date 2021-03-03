@@ -2,6 +2,7 @@ package preproject.client.controllers;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -34,10 +35,7 @@ public class AdminController implements Initializable {
     private Button acceptAllButton;
 
     @FXML
-    private Button previous;
-
-    @FXML
-    private Button next;
+    private Button logoutButton;
 
     @FXML
     private VBox signUpVbox;
@@ -218,6 +216,11 @@ public class AdminController implements Initializable {
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
+    }
+
+    @FXML
+    void logout(ActionEvent action) {
+        //add method here
     }
 
     @SuppressWarnings("unchecked")

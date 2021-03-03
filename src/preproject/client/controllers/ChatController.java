@@ -331,7 +331,6 @@ public class ChatController implements Initializable {
         try {
             System.out.println("GROUP REQUEST ACCEPTED NUMBER OF GROUPS: " + groupsList.size());
             Platform.runLater(() -> people_vBox.getChildren().clear());
-//            sortGroupList();
             for (Map<String, String> groupMap : groupsList) {
                 String alias = groupMap.get("alias");
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("../resources/view/ConversationBox.fxml"));

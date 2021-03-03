@@ -7,6 +7,7 @@ import preproject.server.models.User;
 import java.io.*;
 import java.net.PasswordAuthentication;
 import java.net.Socket;
+import java.net.SocketException;
 import java.sql.*;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -44,14 +45,15 @@ public class UserThread extends Thread {
             while (SOCKET.isConnected()) {
                 processReadData(reader);
             }
-
+        } catch (SocketException socketException) {
+            SERVER.removeUser(this);
         } catch (IOException | SQLException | ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
 
     @SuppressWarnings("unchecked")
-    private void processReadData(ObjectInputStream reader) throws IOException, SQLException, ClassNotFoundException {
+    private void processReadData(ObjectInputStream reader) throws IOException, SQLException, ClassNotFoundException, SocketException {
 
         HashMap<String, Object> readData = (HashMap<String, Object>) reader.readObject();
         System.out.println("============ NEW ACTION ============ USER: ");

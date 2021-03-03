@@ -187,11 +187,9 @@ public class ChatServer {
 
     }
 
-    protected void removeUser(String email, UserThread user) {
-        boolean removed = onlineUserNames.remove(email);
-        if (removed) {
-            onlineUsers.remove(user);
-            System.out.println("User with email " + email + " has logged out");
-        }
+    protected void removeUser(UserThread user) {
+        onlineUsers.remove(user);
+        System.out.println("User with email " + user.getUser().getEmail() + " has logged out");
     }
+
 }

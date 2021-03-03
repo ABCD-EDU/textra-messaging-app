@@ -5,13 +5,15 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import preproject.client.*;
+import javafx.scene.input.KeyEvent;
 
-import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
@@ -21,45 +23,63 @@ public class SignInController implements Initializable{
     private ScreenController sController;
 
     @FXML
-    private GridPane grid_pane;
-
-    @FXML
-    private Button signIn_btn;
-
-    @FXML
-    private TextField pass_field;
+    private Label error_message;
 
     @FXML
     private TextField email_field;
 
     @FXML
+    private PasswordField pass_field;
+
+    @FXML
     private Label register_label;
 
     @FXML
-    void fieldClick(javafx.scene.input.MouseEvent mouseEvent) {
+    private Button signIn_btn;
+
+    @FXML
+    void fieldClicked(MouseEvent mouseEvent) {
+        error_message.setVisible(false);
         if (mouseEvent.getSource().equals(email_field)) {
-            email_field.setStyle("-fx-background-color: #DDDDDD; -fx-border-radius: 3; -fx-border-width: 1; -fx-border-color: #333333;");
-            pass_field.setStyle("-fx-background-color: #FAFAFA; -fx-border-radius: 3; -fx-border-width: 1; -fx-border-color: #333333;");
-        } else if (mouseEvent.getSource().equals(pass_field)) {
-            pass_field.setStyle("-fx-background-color: #DDDDDD; -fx-border-radius: 3; -fx-border-width: 1; -fx-border-color: #333333;");
             email_field.setStyle("-fx-background-color: #FAFAFA; -fx-border-radius: 3; -fx-border-width: 1; -fx-border-color: #333333;");
+            pass_field.setStyle("-fx-background-color: #FAFAFA; -fx-border-radius: 3; -fx-border-width: 1; -fx-border-color: #AAAAAA;");
+        } else if (mouseEvent.getSource().equals(pass_field)) {
+            pass_field.setStyle("-fx-background-color: #FAFAFA; -fx-border-radius: 3; -fx-border-width: 1; -fx-border-color: #333333;");
+            email_field.setStyle("-fx-background-color: #FAFAFA; -fx-border-radius: 3; -fx-border-width: 1; -fx-border-color: #AAAAAA;");
         }
     }
 
     @FXML
-    void tabPress(javafx.scene.input.KeyEvent keyEvent) {
-        if (keyEvent.getSource().equals(email_field)) {
-            email_field.setStyle("-fx-background-color: #FAFAFA; -fx-border-radius: 3; -fx-border-width: 1; -fx-border-color: #333333;");
-            pass_field.setStyle("-fx-background-color: #DDDDDD; -fx-border-radius: 3; -fx-border-width: 1; -fx-border-color: #333333;");
-        } else if (keyEvent.getSource().equals(pass_field)) {
+    void keyPressed(KeyEvent keyEvent) {
+        error_message.setVisible(false);
+        if (keyEvent.getSource().equals(email_field) && keyEvent.getCode() == KeyCode.TAB) {
+            email_field.setStyle("-fx-background-color: #FAFAFA; -fx-border-radius: 3; -fx-border-width: 1; -fx-border-color: #AAAAAA;");
             pass_field.setStyle("-fx-background-color: #FAFAFA; -fx-border-radius: 3; -fx-border-width: 1; -fx-border-color: #333333;");
-            email_field.setStyle("-fx-background-color: #DDDDDD; -fx-border-radius: 3; -fx-border-width: 1; -fx-border-color: #333333;");
+        } else if (keyEvent.getSource().equals(pass_field) && keyEvent.getCode() == KeyCode.TAB) {
+            pass_field.setStyle("-fx-background-color: #FAFAFA; -fx-border-radius: 3; -fx-border-width: 1; -fx-border-color: #AAAAAA;");
+            email_field.setStyle("-fx-background-color: #FAFAFA; -fx-border-radius: 3; -fx-border-width: 1; -fx-border-color: #333333;");
+        } else if (keyEvent.getSource().equals(pass_field) && keyEvent.getCode() == KeyCode.ENTER) {
+            handleLogin();
         }
+    }
+
+    @FXML
+    void hoverEnter() {
+        register_label.setStyle("-fx-text-fill: #3498DB; -fx-font-size: 12px");
+    }
+
+    @FXML
+    void hoverExit() {
+        register_label.setStyle("-fx-text-fill: #000000; -fx-font-size: 12px");
     }
 
     @FXML
     @SuppressWarnings("unchecked")
-    void loginPressed(ActionEvent event) {
+    void loginPressed() {
+      handleLogin();
+    }
+
+    void handleLogin() {
         try {
             String email = email_field.getText();
             String password = pass_field.getText();
@@ -86,6 +106,7 @@ public class SignInController implements Initializable{
 
             if (!isVerified) {
                 System.out.println("User is not verified");
+                userDoesNotExist();
             }else if (isAdmin) {
                 System.out.println("User is admin");
                 sController = new ScreenController((Stage) (signIn_btn.getScene().getWindow()));
@@ -100,6 +121,14 @@ public class SignInController implements Initializable{
             e.printStackTrace();
         }
     }
+
+    void userDoesNotExist() {
+        error_message.setText("User does not exist");
+        error_message.setVisible(true);
+        email_field.setStyle("-fx-background-color: #FAFAFA; -fx-border-radius: 3; -fx-border-width: 1; -fx-border-color: #DB5461;");
+        pass_field.setStyle("-fx-background-color: #FAFAFA; -fx-border-radius: 3; -fx-border-width: 1; -fx-border-color: #DB5461;");
+    }
+
 
     @FXML
     void registerLabelPressed() {

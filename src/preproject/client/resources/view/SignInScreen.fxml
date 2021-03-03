@@ -4,17 +4,19 @@
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 
-<GridPane fx:id="gird_pane" alignment="center" hgap="10" maxHeight="1080.0" maxWidth="1920.0" prefHeight="720.0" prefWidth="1280.0" vgap="10" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="preproject.client.controllers.SignInController">
+<GridPane alignment="center" maxHeight="1080.0" maxWidth="1920.0" prefHeight="720.0" prefWidth="1280.0" style="-fx-background-color: #FAFAFA;" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="preproject.client.controllers.SignInController">
    <columnConstraints>
-      <ColumnConstraints />
+      <ColumnConstraints halignment="CENTER" />
    </columnConstraints>
    <rowConstraints>
+      <RowConstraints minHeight="10.0" prefHeight="30.0" />
       <RowConstraints />
       <RowConstraints />
       <RowConstraints />
@@ -25,23 +27,55 @@
       <RowConstraints />
    </rowConstraints>
    <children>
-      <TextField fx:id="pass_field" onKeyPressed="#tabPress" onMouseClicked="#fieldClick" prefHeight="30.0" prefWidth="230.0" promptText="password" style="-fx-background-color: #FAFAFA; -fx-border-radius: 3; -fx-border-width: 1; -fx-border-color: #333333;" GridPane.rowIndex="2" />
-      <Button fx:id="signIn_btn" mnemonicParsing="false" onAction="#loginPressed" prefHeight="30.0" prefWidth="113.0" style="-fx-background-color: #333333;" text="Sign in" textAlignment="CENTER" textFill="WHITE" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="CENTER">
+      <Label fx:id="error_message" alignment="CENTER" contentDisplay="CENTER" prefWidth="220.0" text="Error Message" textAlignment="CENTER" textFill="#db5461" visible="false">
          <GridPane.margin>
+            <Insets bottom="100.0" />
+         </GridPane.margin>
+         <opaqueInsets>
             <Insets />
-         </GridPane.margin></Button>
-      <Label alignment="CENTER" prefHeight="33.0" prefWidth="220.0" text="Placeholder" textAlignment="CENTER" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+         </opaqueInsets>
          <font>
-            <Font name="Freestyle Script" size="36.0" />
+            <Font name="System Bold" size="12.0" />
          </font>
       </Label>
-      <Label fx:id="register_label" onMouseClicked="#registerLabelPressed" text="don't have an account?" GridPane.halignment="CENTER" GridPane.rowIndex="4">
+      <Label alignment="CENTER" prefHeight="33.0" prefWidth="220.0" text="Group Three" textAlignment="CENTER" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
+         <font>
+            <Font name="Consolas Bold" size="30.0" />
+         </font>
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+         <GridPane.margin>
+            <Insets bottom="25.0" />
+         </GridPane.margin>
+      </Label>
+      <TextField fx:id="email_field" onKeyPressed="#keyPressed" onMouseClicked="#fieldClicked" prefHeight="30.0" prefWidth="178.0" promptText="email" style="-fx-background-color: #FAFAFA; -fx-border-color: #AAAAAA; -fx-border-width: 1; -fx-border-radius: 3;" GridPane.rowIndex="2">
+         <GridPane.margin>
+            <Insets bottom="10.0" />
+         </GridPane.margin></TextField>
+      <PasswordField fx:id="pass_field" onKeyPressed="#keyPressed" onMouseClicked="#fieldClicked" prefHeight="30.0" promptText="password" style="-fx-background-color: #FAFAFA; -fx-border-color: #AAAAAA; -fx-border-width: 1; -fx-border-radius: 3;" GridPane.rowIndex="3">
+         <GridPane.margin>
+            <Insets bottom="20.0" />
+         </GridPane.margin></PasswordField>
+      <Button fx:id="signIn_btn" mnemonicParsing="false" onAction="#loginPressed" prefHeight="30.0" prefWidth="90.0" style="-fx-background-color: #333333;" text="Sign in" textAlignment="CENTER" textFill="WHITE" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.valignment="CENTER">
+         <GridPane.margin>
+            <Insets bottom="35.0" />
+         </GridPane.margin>
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor></Button>
+      <Label fx:id="register_label" onMouseClicked="#registerLabelPressed" onMouseEntered="#hoverEnter" onMouseExited="#hoverExit" text="don't have an account?" GridPane.halignment="CENTER" GridPane.rowIndex="5">
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor></Label>
-      <TextField fx:id="email_field" onKeyPressed="#tabPress" onMouseClicked="#fieldClick" prefHeight="30.0" prefWidth="178.0" promptText="email" style="-fx-background-color: #FAFAFA; -fx-border-radius: 3; -fx-border-width: 1; -fx-border-color: #333333;" GridPane.rowIndex="1" />
    </children>
    <cursor>
       <Cursor fx:constant="DEFAULT" />
    </cursor>
+   <padding>
+      <Insets bottom="50.0" />
+   </padding>
 </GridPane>

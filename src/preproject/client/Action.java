@@ -19,6 +19,7 @@ public class Action {
     public static final String GET_GROUP_MEMBERS = "GET_GROUP_MEMBERS";
     public static final String GET_GROUP_MESSAGES = "GET_GROUP_MESSAGES";
     public static final String GET_UNREAD_MESSAGES = "GET_UNREAD_MESSAGES";
+    public static final String GET_MESSAGE_LIST = "GET_MESSAGE_LIST";
 
     // POST REQUESTS
     public static final String POST_VERIFIED_USERS = "POST_VERIFIED_USERS";
@@ -34,6 +35,4 @@ public class Action {
     public static final String ON_FAVORITE_TOGGLED = "ON_FAVORITE_TOGGLED";
     public static final String ON_NEW_GROUP_CREATION = "ON_NEW_GROUP_CREATION";
     public static final String ON_BROADCAST_MESSAGE_RECEIVED ="ON_BROADCAST_MESSAGE_RECEIVED";
-
-
 }

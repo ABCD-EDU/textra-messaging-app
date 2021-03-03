@@ -64,7 +64,6 @@ public class ChatServer {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
     }
 
     /**

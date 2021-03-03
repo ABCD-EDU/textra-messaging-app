@@ -289,9 +289,9 @@ public class UserThread extends Thread {
                 insertGroupMembers.executeUpdate();
             }
 
-            objOut.writeObject(true);
+//            objOut.writeObject(true);
         } catch (SQLException e) {
-            objOut.writeObject(false);
+//            objOut.writeObject(false);
             e.printStackTrace();
         }
     }
@@ -360,6 +360,7 @@ public class UserThread extends Thread {
             responseMap.put("action", Action.ON_GROUP_CREATION);
             responseMap.put("status", "false");
             objOut.writeObject(responseMap);
+//            objOut.writeObject(false);
             System.out.println("Group already exists");
             return;
         }
@@ -385,10 +386,7 @@ public class UserThread extends Thread {
 
             ArrayList<String> stringIdList = userIdList.stream().map(String::valueOf).collect(Collectors.toCollection(ArrayList::new));
             // Update groupList in server
-            SERVER.updateGroupList(
-                    String.valueOf(getGroupId(groupAlias, userIdList.get(0))),
-                    stringIdList
-            );
+            SERVER.updateGroupList(String.valueOf(getGroupId(groupAlias, userIdList.get(0))), stringIdList);
 
             // send back to client that the creation is successful
             responseMap.put("action", Action.ON_GROUP_CREATION);
@@ -423,13 +421,13 @@ public class UserThread extends Thread {
             findGroup.setInt(2, groupCreator);
 
             ResultSet rowsAffected = findGroup.executeQuery();
-            if (rowsAffected.wasNull()) {
-                return false;
+            if (rowsAffected.next()) {
+                return true;
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return true;
+        return false;
     }
 
     private void toggleFavorite(HashMap<String, Object> faveRepo) throws IOException {
@@ -755,7 +753,7 @@ public class UserThread extends Thread {
             Map<String, Object> response = new HashMap<>();
             response.put("action", Action.ON_MESSAGE_RECEIVE);
             Map<String, String> messageRepo = new HashMap<>();
-            messageRepo.put("senderId", String.valueOf(sender));
+            messageRepo.put("sender", String.valueOf(sender));
             messageRepo.put("firstName", resultSet.getString("user_fname"));
             messageRepo.put("lastName", resultSet.getString("user_lname"));
             messageRepo.put("email", resultSet.getString("email"));

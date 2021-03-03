@@ -7,14 +7,16 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Optional;
+import java.util.Random;
 
-public class RegisterHandler{
-    public RegisterHandler() {}
+public class RegisterHandler {
+    public RegisterHandler() {
+    }
 
     public boolean checkIfUserExists(String email) {
         Optional<ResultSet> resultSet;
         try (PreparedStatement statement = Connector.connect
-                .prepareStatement("SELECT * FROM user_acc WHERE email=? LIMIT 1")){
+                .prepareStatement("SELECT * FROM user_acc WHERE email=? LIMIT 1")) {
 
             statement.setString(1, email);
 
@@ -44,8 +46,8 @@ public class RegisterHandler{
             System.out.println(salt);
 
             try (PreparedStatement statement = Connector.connect.prepareStatement("INSERT INTO messenger.user_acc " +
-                            "(email, pwd_hash, salt, user_fname, user_lname, verified, is_admin)" +
-                            "VALUES (?, ?, ?, ?, ?, ?, ?)")){
+                    "(email, pwd_hash, salt, user_fname, user_lname, verified, is_admin, user_color)" +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?)")) {
 
                 statement.setString(1, email);
                 statement.setString(2, hashPassword.get());
@@ -54,6 +56,7 @@ public class RegisterHandler{
                 statement.setString(5, lName);
                 statement.setBoolean(6, false);
                 statement.setBoolean(7, false);
+                statement.setString(8, getRandomUserColor());
 
                 statement.executeUpdate();
 
@@ -63,5 +66,32 @@ public class RegisterHandler{
             }
         }
         return false;
+    }
+
+    private String getRandomUserColor() {
+        Random random = new Random();
+        switch (random.nextInt(10) + 1) {
+            case 1:
+                return "#16A085";
+            case 2:
+                return "#3498DB";
+            case 3:
+                return "#9B59B6";
+            case 4:
+                return "#596275";
+            case 5:
+                return "#E74C3C";
+            case 6:
+                return "#E67E22";
+            case 7:
+                return "#F1C40F";
+            case 8:
+                return "#7F8C8D ";
+            case 9:
+                return "#2ECC71";
+            case 10:
+                return "#F17EA6";
+        }
+        return "#000000";
     }
 }

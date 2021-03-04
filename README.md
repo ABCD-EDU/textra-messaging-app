@@ -56,6 +56,15 @@ Step 3. Select your newly created database in the list on the left side of the i
 Step 4. Go to the Import tab and select browse file. Locate the SQL file included in the project and select that file.<br/>
 Step 5. Leave everything as default and click the "Go" button to import the dump.
 
+# User Accounts
+
+These are the credentials to be used for logging in.
+
+| user | password |
+| ------ | ------ |
+| test$number<span>@</span>mail.com | password |
+| admin<span>@</span>mail.com | root |
+
 ### How to use JDBC
 Resources:<br/>
 https://www.vogella.com/tutorials/MySQLJava/article.html

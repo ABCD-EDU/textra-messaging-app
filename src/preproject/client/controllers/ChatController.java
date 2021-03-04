@@ -447,7 +447,8 @@ public class ChatController implements Initializable {
                     }
                 }
             }
-            setConversationHeader(groupMap.get("alias"), String.valueOf(this.ID).equals(groupMap.get("uidAdmin")));
+//            setConversationHeader(groupMap.get("alias"), String.valueOf(this.ID).equals(groupMap.get("uidAdmin")));
+            setConversationHeader(groupMap.get("alias"), false);
             currentlySelectedGroupID = groupMap.get("groupId");
         });
     }
@@ -601,7 +602,7 @@ public class ChatController implements Initializable {
         }
     }
 
-    private void setConversationHeader(String alias, Boolean isAdmin) {
+    private void setConversationHeader(String alias, Boolean isBroadcast) {
         header_pane.getChildren().clear();
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("../resources/view/ConversationHeader.fxml"));
@@ -617,7 +618,9 @@ public class ChatController implements Initializable {
             if (component.getId().equals("header_label"))
                 ((Label) component).setText(alias);
             if (component.getId().equals("info_button")) {
-                setAddingMembersControl((Button) component, isAdmin);
+                setAddingMembersControl((Button) component, false);
+                if (isBroadcast)
+                    component.setVisible(false);
             }
         }
         header_pane.getChildren().add(node);
@@ -691,7 +694,7 @@ public class ChatController implements Initializable {
             Platform.runLater(() -> messages_vBox.getChildren().clear());
             // TODO: clear notifs for broadcast as well
             unreadBroadcastMessages = 0;
-            setConversationHeader("Broadcast To All", false);
+            setConversationHeader("Broadcast To All", true);
             currentlySelectedGroupID = "-1";
             message_area.clear();
             message_area.setPromptText("Send a message to all online users");

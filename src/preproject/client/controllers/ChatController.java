@@ -12,6 +12,8 @@ import javafx.scene.control.*;
 import javafx.scene.input.*;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -38,6 +40,7 @@ public class ChatController implements Initializable {
     private String email;
     private List<Map<String, String>> groupsList;
     private String currentlySelectedGroupID;
+    private String userColor;
 
     ConvoInfoController convoController;
 
@@ -254,7 +257,7 @@ public class ChatController implements Initializable {
 
         for (int i = 0; i < msgData.length; i++) {
             Timestamp time = new Timestamp(new Date().getTime());
-            messages[i] = new Message(this.ID,time,this.fName + " " + this.lName, msgData[i]);
+            messages[i] = new Message(this.ID,time,this.fName, this.lName, msgData[i], this.userColor);
         }
 
         return messages;
@@ -306,31 +309,9 @@ public class ChatController implements Initializable {
             catch (IOException e) { e.printStackTrace(); }
             assert node != null;
 
-            /*
-             TODO: Separate the processing for primary and secondary message boxes to improve efficiency
-                secondary message box only has message_label component
-             */
-            for (Node component : ((Pane) node).getChildren()) {
-                if (component.getId().equals("message_label"))
-                    ((Label)component).setText(msgData[i].getMessage());
-                else if (component.getId().equals("name_label"))
-                    ((Label)component).setText(msgData[i].getSenderName());
-//                String senderName = msgData[i].getSenderName().split(" ")
-                /*
-                 TODO: Parsing sender name in client side is not efficient. Make server send first name and last name
-                    instead of sending whole name.
-                 */
-                if (component.getId().equals("fInitial_label")) {
-                    if (fName.length() > 0)
-                        ((Label)component).setText(String.valueOf(msgData[i].getSenderName().charAt(0)));
-                }
-                if (component.getId().equals("lInitial_label")) {
-                    if (lName.length() > 0)
-                        ((Label)component).setText(String.valueOf(msgData[i].getSenderName().charAt(msgData[i].getSenderName().indexOf(" ")+1)));
-                }
-                if (component.getId().equals("timeStamp_label"))
-                    ((Label)component).setText(msgData[i].getTimeStamp().toString());
-            }
+            // initialize message box properties
+            for (Node component : ((Pane) node).getChildren())
+                initializeMessageBoxProperties(component, primary, msgData[i]);
 
             messages.add(msgData[i]);
             Node finalNode = node;
@@ -338,16 +319,41 @@ public class ChatController implements Initializable {
         }
     }
 
+    private void initializeMessageBoxProperties(Node component, boolean primary,Message msgData) {
+        if (component.getId().equals("message_label"))
+            ((Label)component).setText(msgData.getMessage());
+        if (primary) {
+            if (component.getId().equals("name_label"))
+                ((Label)component).setText(msgData.getFirstName() + " " + msgData.getLastName());
+            if (component.getId().equals("picture")) {
+                System.out.println("SETTING COLOR TO: " + msgData.getColor());
+                ((Circle)component).setFill(Color.web(msgData.getColor()));
+            }
+            if (component.getId().equals("fInitial_label"))
+                if (fName.length() > 0)
+                    ((Label)component).setText(String.valueOf(msgData.getFirstName().charAt(0)));
+            if (component.getId().equals("lInitial_label"))
+                if (lName.length() > 0)
+                    ((Label)component).setText(String.valueOf(msgData.getLastName().charAt(0)));
+            if (component.getId().equals("timeStamp_label"))
+                ((Label)component).setText(msgData.getTimeStamp().toString());
+        }
+    }
+
     private void handleInitialMessagesReceived(List<Map<String, String>> initialMessages) {
         Platform.runLater(() -> messages_vBox.getChildren().clear());
-        if (initialMessages.size() == 0)
+        if (initialMessages == null || initialMessages.size() == 0) {
+            System.out.println("initial message null or size 0");
             return;
+        }
         for (Map<String, String> message : initialMessages){
             Message[] msgData = {new Message(
                     message.get("senderId"),
                     Timestamp.valueOf(message.get("timeSent")),
-                    message.get("senderName"),
-                    message.get("message")
+                    message.get("firstName"),
+                    message.get("lastName"),
+                    message.get("message"),
+                    message.get("color")
             )};
             previewMessage(msgData);
         }
@@ -359,8 +365,10 @@ public class ChatController implements Initializable {
         Message[] msgData = {new Message(
                 message.get("sender"),
                 Timestamp.valueOf(message.get("timeSent")),
-                message.get("sender"),
-                message.get("message")
+                message.get("firstName"),
+                message.get("lastName"),
+                message.get("message"),
+                message.get("color")
         )};
         if (message.get("address").equals("-1")) { // if message is from broadcast to all
             broadCastMessages.addAll(Arrays.asList(msgData));
@@ -535,6 +543,7 @@ public class ChatController implements Initializable {
         this.fName = userInformation.get("firstName");
         this.lName = userInformation.get("lastName");
         this.email = userInformation.get("email");
+        this.userColor = userInformation.get("color");
         email_label.setText(this.email);
     }
 
@@ -613,8 +622,8 @@ public class ChatController implements Initializable {
         component.setOnAction(event -> {
             try {
                 FXMLLoader loader= new FXMLLoader(getClass().getResource("../resources/view/ConvoInfoScreen.fxml"));
-                Stage tempStage =(Stage) loader.load();
-                tempStage.initStyle(StageStyle.UNDECORATED);
+                Stage tempStage =(Stage)loader.load();
+                tempStage.initModality(Modality.APPLICATION_MODAL);
                 convoController = loader.getController();
                 convoController.setCurrentlySelectedGroupID(currentlySelectedGroupID);
                 convoController.setUserIsAdmin(isAdmin);
@@ -671,7 +680,7 @@ public class ChatController implements Initializable {
             unreadBroadcastMessages = 0;
             setConversationHeader("Broadcast To All", false);
             currentlySelectedGroupID = "-1";
-            message_area.setText("send a message to all online users");
+            message_area.setPromptText("send a message to all online users");
             message_area.setDisable(false);
             try {
                 System.out.println(broadCastMessages.size());

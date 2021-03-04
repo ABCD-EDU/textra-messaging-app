@@ -47,8 +47,14 @@ Step 3. Run these commands:
 $>CREATE USER 'cs222-pregrp3'@'localhost' IDENTIFIED BY 'prelimgroup3';
 $>GRANT ALL PRIVILEGES ON * . * to 'cs222-pregrp3'@'localhost';
 ```
-
 When using the database from IDEA, you can use these credentials to login.
+
+## Import SQL File
+Step 1. Go to http://localhost/phpmyadmin and login with the root account.<br/>
+Step 2. Create a new database on the left-side of the interface and name it as "messenger". (leave everything as default)<br/>
+Step 3. Select your newly created database in the list on the left side of the interface.<br/>
+Step 4. Go to the Import tab and select browse file. Locate the SQL file included in the project and select that file.<br/>
+Step 5. Leave everything as default and click the "Go" button to import the dump.
 
 ### How to use JDBC
 Resources:<br/>

@@ -78,7 +78,6 @@ public class UserThread extends Thread {
                 this.addGroup(readData);
                 break;
             case Action.ADD_GROUP_NEW_MEMBER:
-                System.out.println("ADDING MEMBERS TO BACKEND (ChatServer)");
                 this.addGroupMembers((Map<String, Object>) readData.get("membersRepo"));
                 break;
             case Action.GET_VERIFIED_USERS:
@@ -229,8 +228,11 @@ public class UserThread extends Thread {
 
     @SuppressWarnings("unchecked")
     private void addGroupMembers(Map<String, Object> groupMap) {
+        System.out.println("ADDING MEMBERS TO GROUP ===");
+        System.out.println(groupMap);
         String groupAlias = (String) groupMap.get("alias");
-        String creator = (String) groupMap.get("creator");
+        String creatorId = (String) groupMap.get("creator");
+        String creatorEmail = getEmail(creatorId);
         List<String> userList = (List<String>) groupMap.get("members");
         for (String email:(List<String>) groupMap.get("members")){
             System.out.println("Emails Added: "+email);
@@ -238,18 +240,33 @@ public class UserThread extends Thread {
         List<Integer> userIdList = getUserIdList(userList);
         userIdList.forEach((id) ->
                 SERVER.updateGroupList(
-                        String.valueOf(getGroupId(groupAlias, Integer.parseInt(creator))),
+                        String.valueOf(getGroupId(groupAlias, Integer.parseInt(creatorId))),
                         id.toString()));
         HashMap<String, Object> response = new HashMap<>();
         response.put("action", Action.ON_ADD_NEW_GROUP_MEMBER);
         response.put("areAdded", true);
         try {
-            this.importGroupMembers(userIdList, groupAlias, creator);
+            this.importGroupMembers(userIdList, groupAlias, creatorEmail);
             System.out.println("WRITING RESPONSE TO CLIENT");
             objOut.writeObject(response);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private String getEmail(String userId) {
+        try {
+            PreparedStatement getEmailStatement = Connector.connect.prepareStatement(
+              "SELECT email FROM user_acc WHERE user_id = ?"
+            );
+            getEmailStatement.setInt(1,Integer.parseInt(userId));
+            ResultSet resultSet = getEmailStatement.executeQuery();
+            resultSet.next();
+            return resultSet.getString("email");
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "email not found";
     }
 
     private List<Integer> getUserIdList(List<String> emailList) {
@@ -276,7 +293,6 @@ public class UserThread extends Thread {
             );
 
             int groupId = getGroupId(groupAlias, getUserId(creator));
-            System.out.println(groupId);
 
             for (Integer userId : userIdList) {
                 insertGroupMembers.setInt(1, groupId);

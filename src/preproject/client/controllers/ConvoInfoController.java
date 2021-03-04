@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
 
 public class ConvoInfoController {
 
-
     private String currentlySelectedGroupID;
     private List<HashMap<String,String>> groupMembers;
     private Boolean userIsAdmin;
@@ -216,6 +215,7 @@ public class ConvoInfoController {
 
     @FXML
     public void onDonePressed(){
+        System.out.println("ON DONE PRESSED");
         HashMap<String, Object> request = new HashMap<>();
         request.put("action", Action.ADD_GROUP_NEW_MEMBER);
         HashMap<String, Object> membersRepo= new HashMap<>();
@@ -224,6 +224,7 @@ public class ConvoInfoController {
         membersRepo.put("creator", groupAdmin);
         System.out.println("GROUP ADMIN: "+groupAdmin);
         List<String> members = new ArrayList<>();
+        System.out.println("Members to be added: ==");
         for (Node component: addMemberPaneVbox.getChildren()){
             Label label =(Label) ((HBox)component).getChildren().get(0);
             System.out.println(label.getText());
@@ -231,10 +232,10 @@ public class ConvoInfoController {
         }
         membersRepo.put("members", members);
         request.put("membersRepo", membersRepo);
-        addMemberPaneVbox.getChildren().clear();
-        convoInfoGridPane.toFront();
-        convoInfoGridPane.setVisible(true);
-        System.out.println("ON DONE PRESSED");
+        ((Stage)stackPane.getScene().getWindow()).close();
+//        addMemberPaneVbox.getChildren().clear();
+//        convoInfoGridPane.toFront();
+//        convoInfoGridPane.setVisible(true);
         try {
             ClientExecutable.serverConnector.getObjOut().writeObject(request);
         }catch (Exception e){

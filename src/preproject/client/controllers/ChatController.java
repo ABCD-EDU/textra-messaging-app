@@ -330,7 +330,10 @@ public class ChatController implements Initializable {
                 ((Label)component).setText(msgData.getFirstName() + " " + msgData.getLastName());
             if (component.getId().equals("picture")) {
                 System.out.println("SETTING COLOR TO: " + msgData.getColor());
-                ((Circle)component).setFill(Color.web(msgData.getColor()));
+                if (msgData.getColor() == null || msgData.equals("null")) {
+                }else {
+                    ((Circle)component).setFill(Color.web(msgData.getColor()));
+                }
             }
             if (component.getId().equals("fInitial_label"))
                 if (fName.length() > 0)
@@ -658,8 +661,6 @@ public class ChatController implements Initializable {
         }
         return null;
     }
-
-
 
     private void initializeBroadcastButton() {
         broadCastMessages = new ArrayList<>();

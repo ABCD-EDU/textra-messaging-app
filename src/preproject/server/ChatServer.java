@@ -12,7 +12,6 @@ public class ChatServer {
     private final List<String> onlineUserIds;
     private final List<UserThread> onlineUsers;
     private final Map<String, List<String>> groupList;
-    private final List<Integer> offlineUserId;
 
     public static void main(String[] args) {
         ChatServer c = new ChatServer(2000);
@@ -24,7 +23,6 @@ public class ChatServer {
         this.PORT = port;
         this.onlineUserIds = new ArrayList<>();
         this.onlineUsers = new ArrayList<>();
-        this.offlineUserId = new ArrayList<>();
         groupList = new HashMap<>();
         initializeGroupList();
     }
@@ -192,16 +190,17 @@ public class ChatServer {
 
             preparedStatement.setInt(1, grpId);
             ResultSet userListQuery = preparedStatement.executeQuery();
+            List<Integer> offlineUserIdList = new ArrayList<>();
             while (userListQuery.next()) {
                 int id = userListQuery.getInt("user_id");
-                offlineUserId.add(id);
+                offlineUserIdList.add(id);
             }
 
             PreparedStatement writeUnreadMsg = Connector.connect.prepareStatement(
                     "INSERT INTO unread_msg (message_id, user_id, group_id) VALUES (?, ?, ?)"
             );
 
-            for (int user : offlineUserId) {
+            for (int user : offlineUserIdList) {
                 if (!onlineUserIds.contains(String.valueOf(user))) {
                     writeUnreadMsg.setInt(1, msgId);
                     writeUnreadMsg.setInt(2, user);
@@ -228,7 +227,7 @@ public class ChatServer {
         this.onlineUserIds.add(id);
     }
 
-    public List<Integer> getOfflineUserId() {
-        return offlineUserId;
+    public List<String> getOnlineUserIds() {
+        return onlineUserIds;
     }
 }

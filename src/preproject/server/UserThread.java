@@ -47,7 +47,7 @@ public class UserThread extends Thread {
                     SOCKET.close();
                     objOut.close();
                     SERVER.removeUser(this);
-                    SERVER.getOfflineUserId().add(this.getUser().getUserId());
+                    SERVER.getOnlineUserIds().remove(String.valueOf(this.getUser().getUserId()));
                     break;
                 }
             }
@@ -238,9 +238,6 @@ public class UserThread extends Thread {
         String creatorEmail = getEmail(creatorId);
         String groupId = String.valueOf(getGroupId(groupAlias, Integer.parseInt(creatorId)));
         List<String> userList = (List<String>) groupMap.get("members");
-//        for (String email:(List<String>) groupMap.get("members")){
-//            System.out.println("Emails Added: "+email);
-//        }
         List<Integer> userIdList = getUserIdList(userList);
         userIdList.forEach((id) ->
                 SERVER.updateGroupList(

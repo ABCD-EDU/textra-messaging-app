@@ -47,6 +47,7 @@ public class NewConversationStageController {
     @FXML
     void onAdd(ActionEvent event) {
         TextField newMember = new TextField();
+        newMember.setStyle("-fx-background-color: #FAFAFA; -fx-border-color: #AAAAAA; -fx-border-radius: 3");
         members_vBox.getChildren().add(newMember);
     }
 

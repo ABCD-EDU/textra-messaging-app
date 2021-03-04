@@ -636,6 +636,7 @@ public class ChatController implements Initializable {
                 convoController.setGroupAlias(getCurrentGroupAlias());
                 convoController.setGroupAdmin(getCurrentGroupAdmin());
                 convoController.requestMembers();
+                convoController.setUserId(this.ID);
                 tempStage.show();
             } catch (IOException e) {
                 e.printStackTrace();

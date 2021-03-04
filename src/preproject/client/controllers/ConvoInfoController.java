@@ -32,6 +32,7 @@ public class ConvoInfoController {
     private String currentUserEmail;
     private String groupAlias;
     private String groupAdmin;
+    private String userId;
 
     //StackPane that contains the MemberInfo GridPane and Add Members GridPane
     @FXML
@@ -42,7 +43,6 @@ public class ConvoInfoController {
 
     @FXML
     public GridPane addMemberGridPane;
-
 
     //Show Group Members GridPane
     @FXML
@@ -103,6 +103,10 @@ public class ConvoInfoController {
         this.groupAdmin = groupAdmin;
     }
 
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
     public void requestMembers() {
         HashMap<String, String> request = new HashMap<>();
         request.put("action", Action.GET_GROUP_MEMBERS);
@@ -140,7 +144,7 @@ public class ConvoInfoController {
 
                 if (component.getId().equals("remove_button")){
                     //Hide remove button if the user is not the admin of the group
-                    if (currentUserEmail.equals(member.get("email"))){
+                    if (!userId.equals(groupAdmin) || currentUserEmail.equals(member.get("email"))){
                         component.setVisible(false);
                     }else {
                         ((Button) component).setOnAction(event -> {

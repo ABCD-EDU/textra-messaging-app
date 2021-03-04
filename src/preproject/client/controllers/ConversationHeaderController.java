@@ -18,7 +18,4 @@ public class ConversationHeaderController {
 
     @FXML
     private Button info_button;
-
-    @FXML
-    private Button delete_button;
 }

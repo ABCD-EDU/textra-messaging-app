@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
 <?import javafx.scene.Scene?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
@@ -9,7 +10,6 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
@@ -20,82 +20,86 @@
    <scene>
       <Scene>
          <root>
-            <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="400.0">
+            <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="450.0" prefWidth="400.0">
                <children>
-                  <StackPane fx:id="stackPane" prefHeight="400.0" prefWidth="400.0">
+                  <StackPane fx:id="stackPane" prefHeight="450.0" prefWidth="400.0">
                      <children>
-                        <GridPane fx:id="addMemberGridPane" alignment="CENTER" style="-fx-background-color: white;">
+                        <GridPane fx:id="addMemberGridPane" alignment="CENTER" prefHeight="396.0" prefWidth="400.0" style="-fx-background-color: #EEEEEE;">
                           <columnConstraints>
-                            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="-Infinity" prefWidth="100.0" />
                           </columnConstraints>
                           <rowConstraints>
-                              <RowConstraints maxHeight="129.0" minHeight="10.0" prefHeight="39.0" vgrow="SOMETIMES" />
-                            <RowConstraints maxHeight="129.0" minHeight="10.0" prefHeight="29.0" vgrow="SOMETIMES" />
-                            <RowConstraints maxHeight="257.0" minHeight="10.0" prefHeight="54.0" vgrow="NEVER" />
-                            <RowConstraints maxHeight="318.0" minHeight="10.0" prefHeight="230.0" vgrow="SOMETIMES" />
-                              <RowConstraints maxHeight="318.0" minHeight="10.0" prefHeight="51.0" vgrow="SOMETIMES" />
+                            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="40.0" vgrow="SOMETIMES" />
+                            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="27.0" vgrow="NEVER" />
+                            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="323.0" vgrow="SOMETIMES" />
+                              <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="60.0" vgrow="SOMETIMES" />
                           </rowConstraints>
                            <children>
-                              <HBox alignment="TOP_RIGHT" prefHeight="100.0" prefWidth="200.0">
-                                 <children>
-                                    <Button fx:id="addMemberPaneExitButton" mnemonicParsing="false" onAction="#onAddMemberExit" style="-fx-background-color: red;" text="X" textFill="WHITE">
-                                       <font>
-                                          <Font name="System Bold" size="14.0" />
-                                       </font>
-                                       <HBox.margin>
-                                          <Insets right="5.0" top="5.0" />
-                                       </HBox.margin>
-                                    </Button>
-                                 </children>
-                              </HBox>
-                              <Label alignment="CENTER" prefHeight="28.0" prefWidth="251.0" text="Add New Members" GridPane.rowIndex="1">
+                              <Label alignment="CENTER" prefHeight="6.0" prefWidth="251.0" text="Add New Members">
                                  <font>
-                                    <Font name="System Bold" size="24.0" />
+                                    <Font name="System Bold" size="15.0" />
                                  </font>
+                                 <GridPane.margin>
+                                    <Insets bottom="4.0" />
+                                 </GridPane.margin>
+                                 <padding>
+                                    <Insets top="17.0" />
+                                 </padding>
                               </Label>
-                              <TextField fx:id="addMemberPaneSearchTextField" maxWidth="320.0" onKeyPressed="#onEnterKeyPressed" prefHeight="25.0" prefWidth="300.0" promptText="Enter Name" GridPane.rowIndex="2" />
-                              <ScrollPane prefHeight="222.0" prefWidth="400.0" GridPane.rowIndex="3">
+                              <TextField fx:id="addMemberPaneSearchTextField" maxWidth="360.0" onKeyPressed="#onEnterKeyPressed" prefHeight="27.0" prefWidth="300.0" promptText="Enter Name" style="-fx-background-color: #FAFAFA; -fx-border-color: #AAAAAA; -fx-border-radius: 3;" GridPane.rowIndex="1" />
+                              <ScrollPane prefWidth="360.0" style="-fx-background-color: #FAFAFA; -fx-border-color: #AAAAAA; -fx-border-radius: 3;" GridPane.rowIndex="2">
                                  <content>
-                                    <VBox fx:id="addMemberPaneVbox" prefHeight="224.0" prefWidth="397.0" />
+                                    <VBox fx:id="addMemberPaneVbox" prefHeight="309.0" prefWidth="356.0" style="-fx-background-color: #FAFAFA;" />
                                  </content>
+                                 <GridPane.margin>
+                                    <Insets left="20.0" right="20.0" top="10.0" />
+                                 </GridPane.margin>
                               </ScrollPane>
-                              <Button fx:id="addMemberPaneDoneButton" mnemonicParsing="false" onAction="#onDonePressed" text="Done" GridPane.rowIndex="4" />
+                              <Button fx:id="addMemberPaneDoneButton" mnemonicParsing="false" onAction="#onDonePressed" prefHeight="25.0" prefWidth="70.0" style="-fx-background-color: #00A676;" text="Done" textFill="WHITE" GridPane.rowIndex="3">
+                                 <GridPane.margin>
+                                    <Insets bottom="10.0" />
+                                 </GridPane.margin>
+                                 <cursor>
+                                    <Cursor fx:constant="HAND" />
+                                 </cursor></Button>
                            </children>
                         </GridPane>
-                        <GridPane fx:id="convoInfoGridPane" style="-fx-background-color: White;">
+                        <GridPane fx:id="convoInfoGridPane" prefHeight="418.0" prefWidth="400.0" style="-fx-background-color: #EEEEEE;">
                           <columnConstraints>
-                            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" />
                           </columnConstraints>
                           <rowConstraints>
-                              <RowConstraints maxHeight="125.0" minHeight="10.0" prefHeight="37.0" valignment="CENTER" vgrow="SOMETIMES" />
-                            <RowConstraints maxHeight="125.0" minHeight="2.0" prefHeight="32.0" valignment="CENTER" vgrow="SOMETIMES" />
-                            <RowConstraints maxHeight="314.0" minHeight="10.0" prefHeight="288.0" vgrow="SOMETIMES" />
-                            <RowConstraints maxHeight="83.0" minHeight="10.0" prefHeight="43.0" vgrow="SOMETIMES" />
+                            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="40.0" valignment="CENTER" vgrow="SOMETIMES" />
+                            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="350.0" vgrow="SOMETIMES" />
+                            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="60.0" vgrow="SOMETIMES" />
                           </rowConstraints>
                            <children>
-                              <HBox alignment="TOP_RIGHT" prefHeight="100.0" prefWidth="200.0">
-                                 <children>
-                                    <Button fx:id="convoInfoPaneExitButton" mnemonicParsing="false" onAction="#onConvoInfoExit" style="-fx-background-color: red;" text="X" textFill="WHITE">
-                                       <font>
-                                          <Font name="System Bold" size="14.0" />
-                                       </font>
-                                       <HBox.margin>
-                                          <Insets right="5.0" top="5.0" />
-                                       </HBox.margin>
-                                    </Button>
-                                 </children>
-                              </HBox>
-                              <ScrollPane prefHeight="311.0" prefWidth="400.0" GridPane.rowIndex="2">
-                                 <content>
-                                    <VBox fx:id="convoInfoPaneVbox" alignment="TOP_CENTER" prefHeight="286.0" prefWidth="395.0" />
-                                 </content>
-                              </ScrollPane>
-                              <Button fx:id="convoInfoPaneAddMemberButton" mnemonicParsing="false" onAction="#onAddMember" prefHeight="25.0" prefWidth="136.0" text="Add Member" GridPane.rowIndex="3" />
-                              <Label fx:id="convoInfoPaneConvoAliasLabel" alignment="CENTER" prefHeight="30.0" prefWidth="330.0" text="Convo Alias" GridPane.rowIndex="1">
+                              <Label fx:id="convoInfoPaneConvoAliasLabel" alignment="CENTER" prefHeight="0.0" prefWidth="330.0" text="Group Name">
                                  <font>
-                                    <Font name="System Bold" size="21.0" />
+                                    <Font name="System Bold" size="15.0" />
                                  </font>
+                                 <GridPane.margin>
+                                    <Insets bottom="4.0" />
+                                 </GridPane.margin>
+                                 <padding>
+                                    <Insets top="17.0" />
+                                 </padding>
                               </Label>
+                              <ScrollPane prefHeight="311.0" prefWidth="400.0" style="-fx-background-color: #FAFAFA; -fx-border-color: #AAAAAA; -fx-border-radius: 3;" GridPane.rowIndex="1">
+                                 <content>
+                                    <VBox fx:id="convoInfoPaneVbox" alignment="TOP_CENTER" prefHeight="346.0" prefWidth="356.0" style="-fx-background-color: #FAFAFA;" />
+                                 </content>
+                                 <GridPane.margin>
+                                    <Insets left="20.0" right="20.0" />
+                                 </GridPane.margin>
+                              </ScrollPane>
+                              <Button fx:id="convoInfoPaneAddMemberButton" mnemonicParsing="false" onAction="#onAddMember" prefHeight="25.0" prefWidth="120.0" style="-fx-background-color: #333333;" text="Add New Member" textFill="WHITE" GridPane.rowIndex="2">
+                                 <GridPane.margin>
+                                    <Insets bottom="10.0" />
+                                 </GridPane.margin>
+                                 <cursor>
+                                    <Cursor fx:constant="HAND" />
+                                 </cursor></Button>
                            </children>
                         </GridPane>
                      </children>

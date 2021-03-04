@@ -72,7 +72,7 @@ public class ConvoInfoController {
 
     public void setGroupMembers(List<HashMap<String, String>> groupMembers) {
         this.groupMembers = groupMembers;
-        convoInfoPaneVbox.getChildren().clear();
+        Platform.runLater(() -> convoInfoPaneVbox.getChildren().clear());
         renderMembers();
     }
 

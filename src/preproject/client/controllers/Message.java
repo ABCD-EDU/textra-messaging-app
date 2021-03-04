@@ -6,14 +6,18 @@ public class Message {
 
     private String senderID;
     private Timestamp timeStamp;
-    private String senderName;
+    private String firstName;
+    private String lastName;
     private String message;
+    private String color;
 
-    public Message(String senderID, Timestamp timeStamp, String senderName, String message) {
+    public Message(String senderID, Timestamp timeStamp, String firstName, String lastName, String message, String color) {
         this.senderID = senderID;
         this.timeStamp = timeStamp;
-        this.senderName = senderName;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.message = message;
+        this.color = color;
     }
 
     public String getSenderID() {
@@ -32,12 +36,20 @@ public class Message {
         this.timeStamp = timeStamp;
     }
 
-    public String getSenderName() {
-        return senderName;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setSenderName(String senderName) {
-        this.senderName = senderName;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getMessage() {
@@ -48,13 +60,24 @@ public class Message {
         this.message = message;
     }
 
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
     @Override
     public String toString() {
         return "Message{" +
                 "senderID='" + senderID + '\'' +
-                ", timeStamp='" + timeStamp + '\'' +
-                ", senderName='" + senderName + '\'' +
+                ", timeStamp=" + timeStamp +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
                 ", message='" + message + '\'' +
+                ", color='" + color + '\'' +
                 '}';
     }
+
 }

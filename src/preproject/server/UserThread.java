@@ -683,7 +683,7 @@ public class UserThread extends Thread {
 
             while (resultSet.next()) {
                 PreparedStatement getSenderInformation = Connector.connect.prepareStatement(
-                        "SELECT user_fname, user_lname, email FROM user_acc WHERE user_id = ?"
+                        "SELECT user_fname, user_lname, email, user_color FROM user_acc WHERE user_id = ?"
                 );
 
                 getSenderInformation.setInt(1, Integer.parseInt(resultSet.getString("from_user")));
@@ -696,6 +696,7 @@ public class UserThread extends Thread {
                     msgRepo.put("lastName", userInformationSent.getString("user_lname"));
                     msgRepo.put("email", userInformationSent.getString("email"));
                     msgRepo.put("senderName", msgRepo.get("firstName") + " " + msgRepo.get("lastName"));
+                    msgRepo.put("color", userInformationSent.getString("user_color"));
                 }
                 msgRepo.put("senderId", resultSet.getString("from_user"));
                 msgRepo.put("groupId", groupId);

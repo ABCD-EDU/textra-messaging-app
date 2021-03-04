@@ -156,13 +156,15 @@ public class ChatController implements Initializable {
                         break;
                     case Action.ON_GROUP_MEMBERS_SEND:
                         System.out.println("GROUP MEMBERS REQUESTED");
-                        handleGroupMembers((List<HashMap<String,String>>)readData.get("members"));
+                        handleGroupInfo((List<HashMap<String,String>>)readData.get("members"));
                         break;
                     case Action.ON_REMOVE_A_MEMBER:
                         System.out.println("A MEMBER IS REMOVED");
                         handleMemberRemoval((String) readData.get("emailRemoved"));
                         break;
-                    case Action.ON_SEARCHED_USERS_SEND:
+                    case Action.ON_ADD_NEW_GROUP_MEMBER:
+                        System.out.println("A NEW MEMBER IS ADDED");
+                        handleMemberAddition((Boolean)readData.get("areAdded"));
                         break;
                 }
             }
@@ -618,8 +620,8 @@ public class ChatController implements Initializable {
                 convoController.setUserIsAdmin(isAdmin);
                 convoController.setCurrentUserEmail(email);
                 convoController.setGroupAlias(getCurrentGroupAlias());
+                convoController.setGroupAdmin(getCurrentGroupAdmin());
                 convoController.requestMembers();
-                System.out.println(convoController.getGroupAlias());
                 tempStage.show();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -627,13 +629,19 @@ public class ChatController implements Initializable {
         });
     }
 
-    private void handleGroupMembers(List<HashMap<String, String>> groupMembers){
+    private void handleGroupInfo(List<HashMap<String, String>> groupMembers){
         convoController.setGroupMembers(groupMembers);
     }
 
     private void handleMemberRemoval(String emailRemoved){
         convoController.removeMemberFromList(emailRemoved);
     }
+
+    private void handleMemberAddition(Boolean areAdded){
+        convoController.requestMembers();
+        System.out.println("REQUESTING FOR MEMBERS AFTER ADDING");
+    }
+
 
     private String getCurrentGroupAlias(){
         for (Map<String, String> groups: groupsList){
@@ -643,6 +651,15 @@ public class ChatController implements Initializable {
         }
         return null;
     }
+    private String getCurrentGroupAdmin(){
+        for (Map<String, String> groups: groupsList){
+            if (groups.get("groupId").equals(currentlySelectedGroupID)){
+                return groups.get("uidAdmin");
+            }
+        }
+        return null;
+    }
+
 
 
     private void initializeBroadcastButton() {

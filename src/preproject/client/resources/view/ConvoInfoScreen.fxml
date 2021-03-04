@@ -48,18 +48,18 @@
                                     </Button>
                                  </children>
                               </HBox>
-                              <Label alignment="CENTER" prefHeight="42.0" prefWidth="174.0" text="Search" GridPane.rowIndex="1">
+                              <Label alignment="CENTER" prefHeight="28.0" prefWidth="251.0" text="Add New Members" GridPane.rowIndex="1">
                                  <font>
-                                    <Font name="System Bold" size="27.0" />
+                                    <Font name="System Bold" size="24.0" />
                                  </font>
                               </Label>
-                              <TextField fx:id="addMemberPaneSearchTextField" maxWidth="320.0" onKeyPressed="#onSearchInputField" prefHeight="25.0" prefWidth="300.0" promptText="Enter Name" GridPane.rowIndex="2" />
+                              <TextField fx:id="addMemberPaneSearchTextField" maxWidth="320.0" onKeyPressed="#onEnterKeyPressed" prefHeight="25.0" prefWidth="300.0" promptText="Enter Name" GridPane.rowIndex="2" />
                               <ScrollPane prefHeight="222.0" prefWidth="400.0" GridPane.rowIndex="3">
                                  <content>
                                     <VBox fx:id="addMemberPaneVbox" prefHeight="224.0" prefWidth="397.0" />
                                  </content>
                               </ScrollPane>
-                              <Button fx:id="addMemberPaneDoneButton" mnemonicParsing="false" text="Done" GridPane.rowIndex="4" />
+                              <Button fx:id="addMemberPaneDoneButton" mnemonicParsing="false" onAction="#onDonePressed" text="Done" GridPane.rowIndex="4" />
                            </children>
                         </GridPane>
                         <GridPane fx:id="convoInfoGridPane" style="-fx-background-color: White;">

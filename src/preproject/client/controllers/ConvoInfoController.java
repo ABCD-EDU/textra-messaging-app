@@ -10,6 +10,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -29,9 +30,9 @@ public class ConvoInfoController {
     private String currentlySelectedGroupID;
     private List<HashMap<String,String>> groupMembers;
     private Boolean userIsAdmin;
-    private List<HashMap<String, String>> searchedUsers;
     private String currentUserEmail;
     private String groupAlias;
+    private String groupAdmin;
 
     //StackPane that contains the MemberInfo GridPane and Add Members GridPane
     @FXML
@@ -72,7 +73,10 @@ public class ConvoInfoController {
 
     public void setGroupMembers(List<HashMap<String, String>> groupMembers) {
         this.groupMembers = groupMembers;
-        convoInfoPaneVbox.getChildren().clear();
+        Platform.runLater(()->convoInfoPaneVbox.getChildren().clear());
+        for (HashMap<String, String> members: groupMembers){
+            System.out.println(members.get("email"));
+        }
         renderMembers();
     }
 
@@ -94,6 +98,10 @@ public class ConvoInfoController {
 
     public String getGroupAlias() {
         return groupAlias;
+    }
+
+    public void setGroupAdmin(String groupAdmin) {
+        this.groupAdmin = groupAdmin;
     }
 
     public void requestMembers() {
@@ -183,25 +191,65 @@ public class ConvoInfoController {
     }
     @FXML
     public void onAddMemberExit(){
+        addMemberPaneVbox.getChildren().clear();
         convoInfoGridPane.toFront();
         convoInfoGridPane.setVisible(true);
     }
 
     @FXML
-    public void onSearchInputField(KeyEvent event) {
-        if (addMemberPaneSearchTextField.getText().isBlank()){
-            addMemberPaneVbox.getChildren().clear();
-        }else {
-            try {
-                Map<String, Object> request = new HashMap<>();
-                request.put("action", Action.GET_SEARCHED_USERS);
-                request.put("searchQuery", addMemberPaneSearchTextField.getText());
-                ClientExecutable.serverConnector.getObjOut().writeObject(request);
-
-            }catch (Exception e){
-                e.printStackTrace();
-            }
+    public void onEnterKeyPressed(KeyEvent keyEvent) {
+        FXMLLoader loader= new FXMLLoader(getClass().getResource("../resources/view/PeopleToAddHbox.fxml"));
+        Node node = null;
+        try {
+            node = loader.load();
+        }catch (Exception e){
+        }
+        assert node != null;
+        if (keyEvent.getCode() == KeyCode.ENTER) {
+            Label label = (Label)((HBox) node).getChildren().get(0);
+            label.setText(addMemberPaneSearchTextField.getText());
+            addMemberPaneSearchTextField.clear();
+            addMemberPaneVbox.getChildren().add((node));
+            System.out.println("MEMBER ADDED TO VBOX");
         }
     }
+
+    @FXML
+    public void onDonePressed(){
+        HashMap<String, Object> request = new HashMap<>();
+        request.put("action", Action.ADD_GROUP_NEW_MEMBER);
+        HashMap<String, Object> membersRepo= new HashMap<>();
+        membersRepo.put("alias", groupAlias);
+        System.out.println("GROUP ALIAS: "+groupAlias);
+        membersRepo.put("creator", groupAdmin);
+        System.out.println("GROUP ADMIN: "+groupAdmin);
+        List<String> members = new ArrayList<>();
+        for (Node component: addMemberPaneVbox.getChildren()){
+            Label label =(Label) ((HBox)component).getChildren().get(0);
+            System.out.println(label.getText());
+            members.add(label.getText());
+        }
+        membersRepo.put("members", members);
+        request.put("membersRepo", membersRepo);
+        addMemberPaneVbox.getChildren().clear();
+        convoInfoGridPane.toFront();
+        convoInfoGridPane.setVisible(true);
+        System.out.println("ON DONE PRESSED");
+        try {
+            ClientExecutable.serverConnector.getObjOut().writeObject(request);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+
+    public List<String> getMembersEmail(){
+        List<String> emails = new ArrayList<>();
+        for (HashMap<String, String> member: groupMembers){
+            emails.add(member.get("email"));
+        }
+        return emails;
+    }
+
 
 }

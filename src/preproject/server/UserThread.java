@@ -1,6 +1,5 @@
 package preproject.server;
 
-import preproject.client.ClientExecutable;
 import preproject.server.handlers.LoginHandler;
 import preproject.server.handlers.RegisterHandler;
 import preproject.server.models.User;
@@ -8,7 +7,10 @@ import preproject.server.models.User;
 import java.io.*;
 import java.net.PasswordAuthentication;
 import java.net.Socket;
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
 

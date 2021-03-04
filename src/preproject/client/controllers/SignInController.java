@@ -74,7 +74,6 @@ public class SignInController implements Initializable{
     }
 
     @FXML
-    @SuppressWarnings("unchecked")
     void loginPressed() {
       handleLogin();
     }
@@ -143,31 +142,8 @@ public class SignInController implements Initializable{
         sController.activateUsingPath("../resources/view/RegisterScreen.fxml");
     }
 
-    /**
-     *  Populate sController with potential scenes that the user may go to.
-     *  This block executes after calling Constructor and populating @FXML components.
-     *  Implementing this will
-     *
-     *  known problem:
-     *  FXMLoader causes an infinite loop.
-     *  Reason:
-     *  The same line gets ran everytime this class is initialized
-     *
-     *  TODO: Find an alternative to this implementation. Need to find a way to run code
-     *      as soon as FXML is loaded.
-     */
     @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-//        this.signIn_btn.setOnAction(this::loginPressed);
-//        try{
-//            System.out.println("initializing");
-//            FXMLLoader loader = new FXMLLoader(getClass().getResource("../resources/view/SignInScreen.fxml"));
-//            Parent root = (Parent)loader.load();
-//            Stage stage = (Stage)(register_label.getScene().getWindow());
-//            sController = new ScreenController(stage);
-//            sController.addScreen("SignIn1", "../resources/view/RegisterScreenOne.fxml");
-//        }catch (Exception e) {
-//            e.printStackTrace();
-//        }
+    public void initialize(URL location, ResourceBundle resources) {
+
     }
 }

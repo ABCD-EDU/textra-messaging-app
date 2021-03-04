@@ -10,12 +10,15 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import preproject.client.Action;
 import preproject.client.ClientExecutable;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
+import static preproject.client.ClientExecutable.serverConnector;
 
 public class RegisterScreenController {
 
@@ -25,13 +28,7 @@ public class RegisterScreenController {
     private VBox vBox;
 
     @FXML
-    private Label emptyField_warning;
-
-    @FXML
-    private Label email_warning;
-
-    @FXML
-    private Label password_warning;
+    private Label warning_field;
 
     @FXML
     private TextField email_field;
@@ -56,7 +53,6 @@ public class RegisterScreenController {
 
     @FXML
     void fieldClicked(MouseEvent mouseEvent) {
-//        error_message.setVisible(false);
         if (mouseEvent.getSource().equals(email_field)) {
             resetFieldFocus();
             email_field.setStyle("-fx-background-color: #FAFAFA; -fx-border-radius: 3; -fx-border-width: 1; -fx-border-color: #333333;");
@@ -77,7 +73,6 @@ public class RegisterScreenController {
 
     @FXML
     void keyPressed(KeyEvent keyEvent) {
-//        error_message.setVisible(false);
         if (keyEvent.getSource().equals(email_field) && keyEvent.getCode() == KeyCode.TAB) {
             resetFieldFocus();
             fName_field.setStyle("-fx-background-color: #FAFAFA; -fx-border-radius: 3; -fx-border-width: 1; -fx-border-color: #333333;");
@@ -121,35 +116,38 @@ public class RegisterScreenController {
     }
 
     @FXML
-    void registerButtonPressed(ActionEvent event) throws IOException, ClassNotFoundException {
+    void registerButtonPressed() throws IOException, ClassNotFoundException {
 
         boolean fieldsAreValid = true;
 
         if (hasBlankFields()) {
-            emptyField_warning.setVisible(true);
+            warning_field.setText("Please fill up the fields.");
+            warning_field.setVisible(true);
             fieldsAreValid = false;
+        } else {
+            warning_field.setVisible(false);
         }
-        emptyField_warning.setVisible(false);
 
         String email = email_field.getText().trim();
         String fName = fName_field.getText().trim();
         String lName = lName_field.getText().trim();
-        String passWord = pass_field.getText().trim();
-        String cPassWord = cPass_field.getText().trim();
+        String password = pass_field.getText().trim();
+        String cPassword = cPass_field.getText().trim();
 
         // validate email, fName, lastName here
 
-        if (!passWord.equals(cPassWord)) {
-            password_warning.setVisible(true);
+        if (!password.equals(cPassword)) {
+            warning_field.setText("Password does not match.");
+            warning_field.setVisible(true);
             fieldsAreValid = false;
-        }else password_warning.setVisible(false);
+        }
 
         if (fieldsAreValid) {
             Map<String, String> userRepo = new HashMap<>();
 
             userRepo.put("action", Action.REGISTER_USER);
             userRepo.put("email", email);
-            userRepo.put("password", passWord);
+            userRepo.put("password", password);
             userRepo.put("firstName", fName);
             userRepo.put("lastName", lName);
 
@@ -158,10 +156,11 @@ public class RegisterScreenController {
             if (result) {
                 System.out.println("successful registration");
             }else {
+                warning_field.setText("Something came up, please try again.");
+                warning_field.setVisible(true);
                 System.out.println("UNSUCCESSFUL REGISTRATION");
             }
         }
-
     }
 
     private boolean hasBlankFields() {

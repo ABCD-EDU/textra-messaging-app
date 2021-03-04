@@ -14,17 +14,10 @@
    <children>
       <HBox alignment="CENTER">
          <children>
-            <Label fx:id="emptyField_warning" text="Please fill up all fields" textFill="RED" visible="false" />
-         </children>
-      </HBox>
-      <HBox alignment="CENTER">
-         <children>
-            <Label fx:id="email_warning" text="Email is already taken" textFill="RED" visible="false" />
-         </children>
-      </HBox>
-      <HBox alignment="CENTER">
-         <children>
-            <Label fx:id="password_warning" text="Password does not match" textFill="RED" visible="false" />
+            <Label fx:id="warning_field" text="Please fill up all fields" textFill="RED" visible="false">
+               <HBox.margin>
+                  <Insets bottom="20.0" />
+               </HBox.margin></Label>
          </children>
       </HBox>
       <Label style="-fx-background-radius: 2;" text="Email">

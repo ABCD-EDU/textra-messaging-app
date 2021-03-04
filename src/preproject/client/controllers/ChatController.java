@@ -182,14 +182,12 @@ public class ChatController implements Initializable {
     //TODO: TEST FIRST
     @FXML
     void onKeyPress(KeyEvent event) throws IOException {
-        KeyCombination shiftEnter = new KeyCodeCombination(KeyCode.ENTER, KeyCodeCombination.SHIFT_ANY);
-        if (event.getCode().equals(KeyCode.ENTER)) {
+        KeyCombination shiftEnter = new KeyCodeCombination(KeyCode.ENTER, KeyCodeCombination.SHIFT_DOWN);
+        if (shiftEnter.match(event)) {
+            message_area.appendText("\n");
+        } else if (event.getCode().equals(KeyCode.ENTER)) {
             handleMessageSend(message_area.getText().trim());
             message_area.clear();
-        } else if (shiftEnter.match(event)) {
-            String previousLine = message_area.getText();
-            message_area.setText(previousLine + "\n");
-            message_area.requestFocus();
         }
     }
 
@@ -235,6 +233,7 @@ public class ChatController implements Initializable {
     }
 
     private void handleMessageSend(String message) throws IOException {
+        if (message.isEmpty()) return;
         Message[] messages = processMessage(message);
         if (currentlySelectedGroupID.equals("-1"))
             broadCastMessages.addAll(Arrays.asList(messages));
@@ -403,7 +402,9 @@ public class ChatController implements Initializable {
     private void setConvoBoxOnMouseClick(Node node, Map<String, String> groupMap) {
         node.setOnMouseClicked((event) -> { // on mouse click of convo box
             messages = new ArrayList<>();
-            message_area.setText("message '" + groupMap.get("alias") + "'");
+            message_area.clear();
+            message_area.setPromptText("message " + groupMap.get("alias"));
+            message_area.requestFocus();
             message_area.setDisable(false);
             HashMap<String, Object> request = new HashMap<>();
             request.put("action", Action.GET_GROUP_MESSAGES);

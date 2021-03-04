@@ -57,6 +57,7 @@
                            <cursor>
                               <Cursor fx:constant="HAND" />
                            </cursor></Button>
+                        <Circle fx:id="broadcastNotif_circle" fill="#ff5a5a" layoutX="177.0" layoutY="15.0" radius="6.0" stroke="#ffffff00" strokeType="INSIDE" />
                      </children>
                   </Pane>
                   <Pane prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="3">

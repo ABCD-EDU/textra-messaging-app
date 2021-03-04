@@ -82,6 +82,9 @@ public class ChatController implements Initializable {
     private Button favorite_button;
     boolean favIsPressed = false;
 
+    @FXML
+    private Circle broadcastNotif_circle;
+
     //right pane comopnents
     @FXML
     private Pane header_pane;
@@ -380,6 +383,8 @@ public class ChatController implements Initializable {
             broadCastMessages.addAll(Arrays.asList(msgData));
             if (currentlySelectedGroupID.equals("-1"))
                 previewMessage(msgData);
+            else
+                broadcastNotif_circle.setVisible(true);
             return;
         }
         if (!message.get("address").equals(this.currentlySelectedGroupID)) {
@@ -432,8 +437,8 @@ public class ChatController implements Initializable {
             }
             // Remove unread messages circle
             for (Node component : ((Pane)node).getChildren()) {
-                if (component.getId().equals("notif_circle"))
-                    component.setVisible(false);
+                if (component.getId().equals("groupAlias_label"))
+                    ((Label)component).setStyle("-fx-font-weig3333333ht: regular");
                 if (component.getId().equals("unreadMsgs_label"))
                     component.setVisible(false);
                 for (Map<String, String> globalGrpMap : groupsList) {
@@ -454,7 +459,7 @@ public class ChatController implements Initializable {
                     component.setVisible(true);
                 if (component.getId().equals("unreadMsgs_label")) {
                     component.setVisible(true);
-                    ((Label)component).setText(groupMap.get("unreadMessages"));
+                    ((Label)component).setText(groupMap.get("unreadMessages") + " unread messages");
                 }
             }else {
                 if (component.getId().equals("notif_circle"))
@@ -462,8 +467,13 @@ public class ChatController implements Initializable {
                 if (component.getId().equals("unreadMsgs_label"))
                     component.setVisible(false);
             }
-            if (component.getId().equals("groupAlias_label"))
+            if (component.getId().equals("groupAlias_label")){
                 ((Label)component).setText(groupMap.get("alias"));
+                if (Integer.parseInt(groupMap.get("unreadMessages")) > 0)
+                    ((Label)component).setStyle("-fx-font-weight: bold");
+                else
+                    ((Label)component).setStyle("-fx-font-weig3333333ht: regular");
+            }
             if (component.getId().equals("favorite_button")) {
                 if (!groupMap.get("is_fav").equals("1")) {
                     ((Button)component).setStyle("-fx-shape:  \"M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z\"; -fx-background-color:  #EEEEEE; -fx-border-color: #EDB458");
@@ -542,10 +552,8 @@ public class ChatController implements Initializable {
             if (groupMap.get("groupId").equals(gpMap.get("groupId")))
                 return;
         }
-
         groupsList.add(groupMap);
         renderGroupsList(sortGroupList(groupsList, groupMap.get("groupId")));
-
     }
 
     private void handleUserInformationSend(Map<String, String> userInformation) {
@@ -677,6 +685,7 @@ public class ChatController implements Initializable {
     private void initializeBroadcastButton() {
         broadCastMessages = new ArrayList<>();
         broadcast_button.setOnMouseClicked((e) -> {
+            broadcastNotif_circle.setVisible(false);
             messages = new ArrayList<>();
             Platform.runLater(() -> messages_vBox.getChildren().clear());
             // TODO: clear notifs for broadcast as well
@@ -743,6 +752,7 @@ public class ChatController implements Initializable {
 
         initializeBroadcastButton();
         message_area.setDisable(true);
+        broadcastNotif_circle.setVisible(false);
     }
 
 }

@@ -358,18 +358,19 @@ public class UserThread extends Thread {
         System.out.println("Users " + userList);
         System.out.println("IDs " + userIdList);
         System.out.println("properties succesfully initialized");
-        Map<String, String> responseMap = new HashMap<>();
+        Map<String, Object> responseMap = new HashMap<>();
 
         if (doesGroupExists(groupAlias, getUserId(creator))) {
             responseMap.put("action", Action.ON_GROUP_CREATION);
             responseMap.put("status", "false");
+            Map<String, String> groupMapToReturn = new HashMap<>();
+            responseMap.put("groupMap", groupMapToReturn);
             objOut.writeObject(responseMap);
 //            objOut.writeObject(false);
             System.out.println("Group already exists");
             return;
         }
 
-        System.out.println("checked if groups exist");
         try {
             PreparedStatement insertGroupRepo = Connector.connect.prepareStatement(
                     "INSERT INTO group_repo (is_admin, alias, uid_admin) VALUES (?,?,?)"
@@ -395,12 +396,16 @@ public class UserThread extends Thread {
             // send back to client that the creation is successful
             responseMap.put("action", Action.ON_GROUP_CREATION);
             responseMap.put("status", "true");
+            Map<String, String> groupMapToSend = new HashMap<>();
+            groupMapToSend.put("alias", groupAlias);
+            groupMapToSend.put("uidAdmin", creator);
+            groupMapToSend.put("is_fav", "0");
+            groupMapToSend.put("groupId", String.valueOf(getGroupId(groupAlias, Integer.parseInt(stringIdList.get(0)))));
+            groupMapToSend.put("unreadMessages", "0");
+            responseMap.put("groupMap", groupMapToSend);
             objOut.writeObject(responseMap);
-            // send to other clients that are part of the group about new group
-            Map<String, Object> notificationMap = new HashMap<>();
-            notificationMap.put("action", Action.ON_GROUP_CREATION);
-            notificationMap.put("status", "true");
-            SERVER.sendMapToListOfUsers(notificationMap, stringIdList, String.valueOf(userIdList.get(0)));
+            // send to everyone in group excluding user
+            SERVER.sendMapToListOfUsers(responseMap, stringIdList, stringIdList.get(0));
             System.out.println("successful group creation");
         } catch (SQLException e) {
             responseMap.put("status", "false");

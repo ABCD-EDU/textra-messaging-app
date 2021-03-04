@@ -126,7 +126,8 @@ public class ChatController implements Initializable {
                         handleMessagesReceived((Map<String, String>) readData.get("messages"));
                         break;
                     case Action.ON_GROUP_CREATION:
-                        handleGroupCreation((String) readData.get("status"));
+                        System.out.println("GROUP CREATION");
+                        handleGroupCreation((Map<String, String>)readData.get("groupMap"), (String)readData.get("status"));
                         break;
                     case Action.ON_INITIAL_MESSAGES_RECEIVED:
                         System.out.println("INITIAL MESSAGES RECEIVED");
@@ -370,80 +371,87 @@ public class ChatController implements Initializable {
             System.out.println("GROUP REQUEST ACCEPTED NUMBER OF GROUPS: " + groupsList.size());
             Platform.runLater(() -> people_vBox.getChildren().clear());
             for (Map<String, String> groupMap : groupsList) {
-                String alias = groupMap.get("alias");
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("../resources/view/ConversationBox.fxml"));
                 Node node = loader.load();
-                node.setOnMouseClicked((event) -> { // on mouse click of convo box
-                    messages = new ArrayList<>();
-                    message_area.setText("message '" + groupMap.get("alias") + "'");
-                    message_area.setDisable(false);
-                    HashMap<String, Object> request = new HashMap<>();
-                    request.put("action", Action.GET_GROUP_MESSAGES);
-                    request.put("groupId", groupMap.get("groupId"));
-                    try {
-                        serverConnector.getObjOut().writeObject(request);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    // Remove unread messages circle
-                    for (Node component : ((Pane)node).getChildren()) {
-                        if (component.getId().equals("notif_circle"))
-                            component.setVisible(false);
-                        if (component.getId().equals("unreadMsgs_label"))
-                            component.setVisible(false);
-                        for (Map<String, String> globalGrpMap : groupsList) {
-                            if (globalGrpMap.equals(groupMap)) {
-                                globalGrpMap.replace("unreadMessages", "0");
-                            }
-                        }
-                    }
-                    setConversationHeader(groupMap.get("alias"), String.valueOf(this.ID).equals(groupMap.get("uidAdmin")));
-                    currentlySelectedGroupID = groupMap.get("groupId");
-                });
-//                System.out.println(groupMap.get());
-                for (Node component : ((Pane)node).getChildren()) {
-                    if (Integer.parseInt(groupMap.get("unreadMessages")) > 0) {
-                        if (component.getId().equals("notif_circle"))
-                            component.setVisible(true);
-                        if (component.getId().equals("unreadMsgs_label")) {
-                            component.setVisible(true);
-                            ((Label)component).setText(groupMap.get("unreadMessages"));
-                        }
-                    }else {
-                        if (component.getId().equals("notif_circle"))
-                            component.setVisible(false);
-                        if (component.getId().equals("unreadMsgs_label"))
-                            component.setVisible(false);
-                    }
-                    if (component.getId().equals("groupAlias_label"))
-                        ((Label)component).setText(alias);
-                    if (component.getId().equals("favorite_button")) {
-                        if (!groupMap.get("is_fav").equals("1")) {
-                            ((Button)component).setStyle("-fx-shape:  \"M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z\"; -fx-background-color:  #DDDDDD; -fx-border-color: #EDB458");
-                        }else {
-                            ((Button)component).setStyle("-fx-shape:  \"M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z\"; -fx-background-color:  #EDB458");
-                        }
-                        ((Button)component).setOnMouseClicked((e) -> {
-                            Map<String, String> request = new HashMap<>();
-                            request.put("action", Action.ADD_FAVOURITE);
-                            request.put("userId", this.ID);
-                            request.put("groupId", groupMap.get("groupId"));
-                            if (!groupMap.get("is_fav").equals("1"))
-                                request.put("isFav", "1");
-                            else
-                                request.put("isFav", "0");
-                            try {
-                                serverConnector.getObjOut().writeObject(request);
-                            } catch (IOException err) {
-                                err.printStackTrace();
-                            }
-                        });
-                    }
-                }
+                setConvoBoxOnMouseClick(node, groupMap);
+                setConvoBoxChildProperties(node, groupMap);
+
                 Platform.runLater(() -> people_vBox.getChildren().add(node));
             }
         }catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void setConvoBoxOnMouseClick(Node node, Map<String, String> groupMap) {
+        node.setOnMouseClicked((event) -> { // on mouse click of convo box
+            messages = new ArrayList<>();
+            message_area.setText("message '" + groupMap.get("alias") + "'");
+            message_area.setDisable(false);
+            HashMap<String, Object> request = new HashMap<>();
+            request.put("action", Action.GET_GROUP_MESSAGES);
+            request.put("groupId", groupMap.get("groupId"));
+            try {
+                serverConnector.getObjOut().writeObject(request);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            // Remove unread messages circle
+            for (Node component : ((Pane)node).getChildren()) {
+                if (component.getId().equals("notif_circle"))
+                    component.setVisible(false);
+                if (component.getId().equals("unreadMsgs_label"))
+                    component.setVisible(false);
+                for (Map<String, String> globalGrpMap : groupsList) {
+                    if (globalGrpMap.equals(groupMap)) {
+                        globalGrpMap.replace("unreadMessages", "0");
+                    }
+                }
+            }
+            setConversationHeader(groupMap.get("alias"), String.valueOf(this.ID).equals(groupMap.get("uidAdmin")));
+            currentlySelectedGroupID = groupMap.get("groupId");
+        });
+    }
+
+    private void setConvoBoxChildProperties(Node node, Map<String, String> groupMap) {
+        for (Node component : ((Pane)node).getChildren()) {
+            if (Integer.parseInt(groupMap.get("unreadMessages")) > 0) {
+                if (component.getId().equals("notif_circle"))
+                    component.setVisible(true);
+                if (component.getId().equals("unreadMsgs_label")) {
+                    component.setVisible(true);
+                    ((Label)component).setText(groupMap.get("unreadMessages"));
+                }
+            }else {
+                if (component.getId().equals("notif_circle"))
+                    component.setVisible(false);
+                if (component.getId().equals("unreadMsgs_label"))
+                    component.setVisible(false);
+            }
+            if (component.getId().equals("groupAlias_label"))
+                ((Label)component).setText(groupMap.get("alias"));
+            if (component.getId().equals("favorite_button")) {
+                if (!groupMap.get("is_fav").equals("1")) {
+                    ((Button)component).setStyle("-fx-shape:  \"M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z\"; -fx-background-color:  #DDDDDD; -fx-border-color: #EDB458");
+                }else {
+                    ((Button)component).setStyle("-fx-shape:  \"M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z\"; -fx-background-color:  #EDB458");
+                }
+                ((Button)component).setOnMouseClicked((e) -> {
+                    Map<String, String> request = new HashMap<>();
+                    request.put("action", Action.ADD_FAVOURITE);
+                    request.put("userId", this.ID);
+                    request.put("groupId", groupMap.get("groupId"));
+                    if (!groupMap.get("is_fav").equals("1"))
+                        request.put("isFav", "1");
+                    else
+                        request.put("isFav", "0");
+                    try {
+                        serverConnector.getObjOut().writeObject(request);
+                    } catch (IOException err) {
+                        err.printStackTrace();
+                    }
+                });
+            }
         }
     }
 
@@ -489,22 +497,15 @@ public class ChatController implements Initializable {
         return sortedList; // set groupList = sortedList
     }
 
-    private void handleGroupCreation(String creationStatus) {
-        boolean successfulCreation = creationStatus.equals("true");
-
-        // TODO: Create different action. see issue #31
-        if (successfulCreation) {
-            HashMap<String, Object> request1 = new HashMap<>();
-            request1.put("action", Action.GET_GROUP_LIST);
-            try {
-                serverConnector.getObjOut().writeObject(request1);
-                System.out.println("REQUEST FOR GROUPS SENT");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }else {
-            System.out.println("CREATION OF GROUP UNSUCCESSFUL");
+    private void handleGroupCreation(Map<String, String> groupMap, String status) {
+        if (!status.equals("true")) {
+            System.out.println("group creation unsuccessful");
+            return;
         }
+
+        groupsList.add(groupMap);
+        renderGroupsList(sortGroupList(groupsList, groupMap.get("groupId")));
+
     }
 
     private void handleUserInformationSend(Map<String, String> userInformation) {

@@ -143,6 +143,7 @@ public class ConvoInfoController {
                     }
                 }
             }
+
             Node finalNode = node;
             Platform.runLater(()->convoInfoPaneVbox.getChildren().add(finalNode));
         }

@@ -94,7 +94,6 @@ public class NewConversationStageController {
         userRepo.put("alias", alias);
         userRepo.put("creator", this.email); // valid
         userRepo.put("members", members);
-        System.out.println(userRepo.get("members"));
 
         System.out.println("REQUESTED NEW CONVERSATION");
         try {

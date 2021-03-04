@@ -114,6 +114,7 @@ public class ChatServer {
     /**
      * Send a Map of <String, Object> to everyone in a given list of users.
      * If userIds.length = 0 then send to all online users
+     * If senderId == "-1", send to everyone in group including sender
      */
     protected void sendMapToListOfUsers(Map<String, Object> dataMap, ArrayList<String> userIds, String senderId) {
         if (userIds.size() == 0) { // send to all online user except sender

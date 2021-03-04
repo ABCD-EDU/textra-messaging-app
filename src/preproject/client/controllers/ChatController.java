@@ -1,6 +1,7 @@
 package preproject.client.controllers;
 
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -11,6 +12,7 @@ import javafx.scene.control.*;
 import javafx.scene.input.*;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Modality;
@@ -42,12 +44,7 @@ public class ChatController implements Initializable {
     private int unreadBroadcastMessages;
     private ArrayList<Message> broadCastMessages;
 
-    @FXML
-    private Pane header_pane;
-
-    @FXML
-    private Label header_label;
-
+    //left pane lcomponents
     @FXML
     private Label email_label;
 
@@ -58,22 +55,42 @@ public class ChatController implements Initializable {
     private Pane newConversations_Pane;
 
     @FXML
-    private Label groupAlias_label;
-
-    @FXML
     private ScrollPane conversation_scrollPane;
-
-    @FXML
-    private ScrollPane messages_scrollPane;
-
-    @FXML
-    private VBox people_vBox;
 
     @FXML
     private Button broadcast_button;
 
     @FXML
     private Button logout_button;
+
+    @FXML
+    private Pane chatBoxPane;
+
+    @FXML
+    private Circle group_picture;
+
+    @FXML
+    private Label groupAlias_label;
+
+    @FXML
+    private Label unreadMsgs_label;
+
+    @FXML
+    private Button favorite_button;
+    boolean favIsPressed = false;
+
+    //right pane comopnents
+    @FXML
+    private Pane header_pane;
+
+    @FXML
+    private Label header_label;
+
+    @FXML
+    private ScrollPane messages_scrollPane;
+
+    @FXML
+    private VBox people_vBox;
 
     @FXML
     private TextArea message_area;
@@ -433,8 +450,10 @@ public class ChatController implements Initializable {
             if (component.getId().equals("favorite_button")) {
                 if (!groupMap.get("is_fav").equals("1")) {
                     ((Button)component).setStyle("-fx-shape:  \"M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z\"; -fx-background-color:  #DDDDDD; -fx-border-color: #EDB458");
-                }else {
+                    favIsPressed = false;
+                } else {
                     ((Button)component).setStyle("-fx-shape:  \"M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z\"; -fx-background-color:  #EDB458");
+                    favIsPressed = true;
                 }
                 ((Button)component).setOnMouseClicked((e) -> {
                     Map<String, String> request = new HashMap<>();
@@ -530,6 +549,38 @@ public class ChatController implements Initializable {
             stage.show();
         } catch(Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    @FXML
+    void mouseEnterFavButton() {
+        if (!favIsPressed) {
+            favorite_button.setStyle("-fx-shape:  \"M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z\"; -fx-background-color:  #DDDDDD; -fx-border-color: #EDB458");
+        }
+    }
+
+    @FXML
+    void mouseExitFavButton() {
+        if (!favIsPressed) {
+            favorite_button.setStyle("-fx-shape:  \"M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z\"; -fx-background-color:  #DDDDDD; -fx-border-color: #DDDDDD");
+        }
+    }
+
+    // for newConvoPane & chatBoxPane(with buttons)
+    @FXML
+    void mouseEnterChatBox(MouseEvent event) {
+        chatBoxPane.setStyle("-fx-background-color: #DDDDDD");
+        if (event.getSource().equals(favorite_button) && !favIsPressed) {
+            favorite_button.setStyle("-fx-shape:  \"M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z\"; -fx-background-color:  #DDDDDD");
+        }
+    }
+
+    // for newConvoPane & chatBoxPane(with buttons)
+    @FXML
+    void mouseExitChatBox(MouseEvent event) {
+        chatBoxPane.setStyle("-fx-background-color: #EEEEEE");
+        if (event.getSource().equals(favorite_button) && !favIsPressed) {
+            favorite_button.setStyle("-fx-shape:  \"M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z\"; -fx-background-color:  #EEEEEE");
         }
     }
 

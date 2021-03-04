@@ -200,6 +200,11 @@ public class AdminController implements Initializable {
     public void loadRegisteredUsersToTable() {
         studentTable.getItems().clear();
         for (Map<String, String> map : registeredUserRepo) {
+            if (map.get("isVerified").equals("true")) {
+                map.put("isVerified", "Verified");
+            } else {
+                map.put("isVerified", "Pending");
+            }
             studentTable.getItems().add(map);
         }
 

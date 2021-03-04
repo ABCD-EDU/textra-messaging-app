@@ -2,6 +2,7 @@ package preproject.client.controllers;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -67,8 +68,16 @@ public class NewConversationStageController {
     private void previewResult(boolean success) {
         Stage stage = new Stage();
         Label label = new Label();
+        label.setStyle("-fx-background-color: #EEEEEE; -fx-font-size: 14px; -fx-font-weight: BOLD");
+
         VBox layout = new VBox();
-        Button button = new Button("Okay");
+        layout.setStyle("-fx-background-color: #EEEEEE");
+        layout.setAlignment(Pos.CENTER);
+        layout.setSpacing(12);
+
+        Button button = new Button("Continue");
+        button.setStyle("-fx-background-color: #333333; -fx-text-fill: #FFFFFF; ");
+        button.setPrefSize(80, 25);
         layout.getChildren().add(label);
         layout.getChildren().add(button);
         Scene scene = new Scene(layout, 230,100);

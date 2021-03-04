@@ -43,7 +43,6 @@ public class RegisterHandler {
 
         if (hashPassword.isPresent()) {
             String salt = pwdHandler.getSalt();
-            System.out.println(salt);
 
             try (PreparedStatement statement = Connector.connect.prepareStatement("INSERT INTO messenger.user_acc " +
                     "(email, pwd_hash, salt, user_fname, user_lname, verified, is_admin, user_color)" +

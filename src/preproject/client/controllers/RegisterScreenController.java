@@ -1,8 +1,6 @@
 package preproject.client.controllers;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -10,7 +8,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 import preproject.client.Action;
 import preproject.client.ClientExecutable;
 
@@ -18,11 +15,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static preproject.client.ClientExecutable.serverConnector;
-
 public class RegisterScreenController {
-
-    private ScreenController sController;
 
     @FXML
     private VBox vBox;
@@ -44,9 +37,6 @@ public class RegisterScreenController {
 
     @FXML
     private PasswordField cPass_field;
-
-    @FXML
-    private Button register_button;
 
     @FXML
     private Label signIn_label;
@@ -111,7 +101,7 @@ public class RegisterScreenController {
 
     @FXML
     void goBackLabelPressed() {
-        sController = new ScreenController(vBox);
+        ScreenController sController = new ScreenController(vBox);
         sController.activateUsingPath("../resources/view/SignInScreen.fxml");
     }
 
@@ -135,7 +125,6 @@ public class RegisterScreenController {
         String cPassword = cPass_field.getText().trim();
 
         // validate email, fName, lastName here
-
         if (!password.equals(cPassword)) {
             warning_field.setText("Password does not match.");
             warning_field.setVisible(true);

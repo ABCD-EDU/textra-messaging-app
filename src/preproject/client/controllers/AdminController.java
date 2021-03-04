@@ -2,7 +2,6 @@ package preproject.client.controllers;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -27,8 +26,6 @@ import java.util.stream.Collectors;
 import static preproject.client.ClientExecutable.serverConnector;
 
 public class AdminController implements Initializable {
-
-
     @FXML
     private Button declineAllButton;
 
@@ -53,6 +50,7 @@ public class AdminController implements Initializable {
     @FXML
     TableColumn<String, String> lName;
 
+    private String currentEmail;
     private ObservableList<Map<String, String>> registeredUserRepo = FXCollections.observableArrayList();
     private List<Map<String, String>> unverifiedList;
 

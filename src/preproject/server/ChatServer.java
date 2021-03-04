@@ -3,9 +3,11 @@ package preproject.server;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.*;
-import java.util.Date;
 
 public class ChatServer {
     private final int PORT;
@@ -97,16 +99,6 @@ public class ChatServer {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    /**
-     * Send a Map of <String, Object> to everyone in a given group.
-     */
-    protected void sendMapToGroup(Map<String, Object> dataMap, String groupId, String senderId) {
-        for (UserThread userThread : onlineUsers)  // for each online user
-            if (groupList.get(groupId).contains(String.valueOf(userThread.getUser().getUserId())))  // if user is part of given group
-                if (senderId.equals(String.valueOf(userThread.getUser().getUserId())))   // check if user is sender
-                    userThread.sendMap(dataMap);
     }
 
     /**

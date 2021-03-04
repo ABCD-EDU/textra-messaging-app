@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.text.Font?>
 
-<javafx.scene.layout.HBox fx:id="userSigningUpHbox" alignment="CENTER" onMouseEntered="#mouseEnterBox" onMouseExited="#mouseExitBox" prefHeight="53.0" prefWidth="325.0" style="-fx-border-style: hidden hidden solid hidden;-fx-border-color: #333333;-fx-border-width: .1;" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="preproject.client.controllers.AdminSignUpsController">
+<javafx.scene.layout.HBox fx:id="userSigningUpHbox" alignment="CENTER" onMouseEntered="#mouseEnterBox" onMouseExited="#mouseExitBox" prefHeight="53.0" prefWidth="325.0" style="-fx-border-style: hidden hidden solid hidden;-fx-border-color: #333333;-fx-border-width: .1;" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="preproject.client.controllers.AdminSignUpsController">
     <Label fx:id="userName" prefHeight="24.0" prefWidth="185.0" text="user@email.com">
         <font>
             <Font size="14.0" />

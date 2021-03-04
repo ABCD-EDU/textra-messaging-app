@@ -6,11 +6,8 @@ import java.net.Socket;
 
 public class ReadThread extends Thread {
     private ObjectInputStream objIn;
-    private Socket socket;
 
     public ReadThread(Socket socket) {
-        this.socket = socket;
-
         try {
             objIn = new ObjectInputStream(socket.getInputStream());
         } catch (IOException e) {

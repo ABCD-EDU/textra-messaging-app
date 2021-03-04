@@ -18,7 +18,7 @@
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="preproject.client.controllers.AdminController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="preproject.client.controllers.AdminController">
    <children>
       <HBox prefHeight="720.0" prefWidth="1280.0">
          <children>
@@ -149,15 +149,9 @@
                   </AnchorPane>
                   <AnchorPane prefHeight="48.0" prefWidth="769.0" style="-fx-background-color: FAFAFA;">
                      <children>
-                        <!--                        currentAdmin is an updatable text component -->
-                        <Label fx:id="currentAdmin" alignment="CENTER" layoutX="334.0" layoutY="26.0" prefHeight="18.0" prefWidth="236.0" text="currentAdmin@email" textAlignment="CENTER">
+                        <Label alignment="CENTER" contentDisplay="CENTER" layoutX="406.0" layoutY="11.0" text="Admin Panel" textAlignment="CENTER">
                            <font>
-                              <Font size="14.0" />
-                           </font>
-                        </Label>
-                        <Label alignment="CENTER" contentDisplay="CENTER" layoutX="407.0" layoutY="8.0" text="Admin Panel" textAlignment="CENTER">
-                           <font>
-                              <Font name="System Bold" size="15.0" />
+                              <Font name="System Bold" size="20.0" />
                            </font>
                         </Label>
                      </children>

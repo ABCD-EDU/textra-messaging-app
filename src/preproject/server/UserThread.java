@@ -34,24 +34,18 @@ public class UserThread extends Thread {
                 OutputStream output = SOCKET.getOutputStream();
                 ObjectInputStream reader = new ObjectInputStream(input)
         ) {
+            user = new User(0,"","","");
             objOut = new ObjectOutputStream(output);
 
-            // constantly receive data being sent and process it
-//            SOCKET.setKeepAlive(true);
             while (!SOCKET.isClosed()) {
                 try {
-                processReadData(reader);
+                    processReadData(reader);
                 } catch (EOFException e) {
-                    System.out.println("There is no data to read");
                     SOCKET.close();
+                    objOut.close();
+                    SERVER.removeUser(this);
                     break;
                 }
-            }
-
-            if (SOCKET.isClosed()) {
-                SERVER.removeUser(this);
-                objOut.close();
-                System.out.println("SOCKET closed successfully");
             }
         } catch (IOException | SQLException | ClassNotFoundException e) {
             e.printStackTrace();
@@ -61,13 +55,14 @@ public class UserThread extends Thread {
     @SuppressWarnings("unchecked")
     private void processReadData(ObjectInputStream reader) throws IOException, SQLException, ClassNotFoundException {
         HashMap<String, Object> readData = (HashMap<String, Object>) reader.readObject();
-        System.out.println("============ NEW ACTION ============ USER: ");
         switch (String.valueOf(readData.get("action"))) {
             case Action.LOGIN_USER:
                 this.loginAuthentication(new LoginHandler(), readData);
                 break;
             case Action.LOGOUT_USER:
-                this.SOCKET.close(); // close the socket when user logouts
+                SOCKET.close();
+                objOut.close();
+                SERVER.removeUser(this);
                 break;
             case Action.REGISTER_USER:
                 this.registerUser(new RegisterHandler(), readData);
@@ -100,25 +95,23 @@ public class UserThread extends Thread {
                 this.updateALlRegistrations(false);
                 break;
             case Action.GET_GROUP_LIST:
-                this.writeGroupList();
+                this.getGroupList();
                 break;
             case Action.GET_USER_INFORMATION:
-                this.writeUserInformation(this.user.getEmail());
+                this.getUserInformation(this.user.getEmail());
                 break;
             case Action.GET_GROUP_MEMBERS:
-                System.out.println("GETTING GROUP MEMBERS");
                 this.getGroupMembersList((String) readData.get("groupId"));
                 break;
             case Action.GET_GROUP_MESSAGES:
                 this.getGroupMessages((String) readData.get("groupId"));
                 break;
             case Action.REMOVE_A_MEMBER:
-                this.removeUser((String)readData.get("email"), (String) readData.get("groupId"));
+                this.removeUser((String) readData.get("email"), (String) readData.get("groupId"));
                 break;
             case Action.GET_SEARCHED_USERS:
 
             case Action.SEND_BROADCAST_MESSAGE:
-                System.out.println(readData.keySet());
                 SERVER.broadcastMessageToAllOnlineUsers((List<Map<String, String>>) readData.get("messagesList"),
                         (String) readData.get("senderId"));
                 break;
@@ -129,8 +122,8 @@ public class UserThread extends Thread {
         List<Map<String, String>> unreadRepo = new ArrayList<>();
         try {
             PreparedStatement preparedStatement = Connector.connect.prepareStatement(
-                    "SELECT group_id, COUNT(`group_id`) as unread_messages, user_id " +
-                            "FROM unread_msg GROUP BY group_id HAVING user_id = ?"
+                    "SELECT group_id, COUNT(group_id) as unread_messages, user_id " +
+                            "FROM unread_msg WHERE user_id = ? GROUP BY group_id"
             );
 
             preparedStatement.setInt(1, id);
@@ -143,7 +136,7 @@ public class UserThread extends Thread {
                 unreadRepo.add(unreadMap);
             }
             preparedStatement = Connector.connect.prepareStatement(
-              "DELETE FROM `unread_msg` WHERE user_id = ?"
+                    "DELETE FROM `unread_msg` WHERE user_id = ?"
             );
             preparedStatement.setInt(1, id);
             preparedStatement.executeUpdate();
@@ -206,7 +199,6 @@ public class UserThread extends Thread {
             preparedStatement.setBoolean(1, isVerified);
 
             ResultSet resultSet = preparedStatement.executeQuery();
-//            System.out.println("test");
 
             List<Map<String, String>> userRepo = new ArrayList<>(); // list of userRepo
             while (resultSet.next()) {
@@ -225,7 +217,6 @@ public class UserThread extends Thread {
                 mapRepo.put("isAdmin", isAdmin);
 
                 userRepo.add(mapRepo);
-//                System.out.println("SIZE OF REPO " + userRepo.size());
             }
 
             objOut.writeObject(userRepo);
@@ -234,10 +225,8 @@ public class UserThread extends Thread {
         }
     }
 
-    // TODO: hook up with SERVER groupList update
     @SuppressWarnings("unchecked")
     private void addGroupMembers(Map<String, Object> groupMap) {
-        System.out.println("ADD GROUP MEMBER");
         String groupAlias = (String) groupMap.get("alias");
         String creator = (String) groupMap.get("creator");
         List<String> userList = (List<String>) groupMap.get("members");
@@ -254,10 +243,8 @@ public class UserThread extends Thread {
     }
 
     private List<Integer> getUserIdList(List<String> emailList) {
-        System.out.println("=== getUserIDList");
         List<Integer> userIdList = new ArrayList<>();
         for (String email : emailList) {
-            System.out.println("email: " + email);
             int userId = getUserId(email);
             if (userId != -1) {
                 userIdList.add(getUserId(email));
@@ -273,12 +260,6 @@ public class UserThread extends Thread {
      * @throws IOException in case read/write error occurs
      */
     private void importGroupMembers(List<Integer> userIdList, String groupAlias, String creator) throws IOException {
-        System.out.println("==== Import group members");
-        System.out.println("creator: " + creator);
-        System.out.println("UserIDLIST " + userIdList);
-        System.out.println("Alias " + groupAlias);
-        System.out.println("userid(0) " + userIdList.get(0));
-
         try {
             PreparedStatement insertGroupMembers = Connector.connect.prepareStatement(
                     "INSERT INTO group_msg (group_id, user_id, is_fav) VALUES (?,?,?)"
@@ -348,16 +329,11 @@ public class UserThread extends Thread {
      */
     @SuppressWarnings("unchecked")
     private void addGroup(HashMap<String, Object> groupMap) throws IOException {
-        System.out.println("==== add group ====");
         String groupAlias = (String) groupMap.get("alias");
         String creator = (String) groupMap.get("creator");
         List<String> userList = (List<String>) groupMap.get("members");
         userList.add(0, creator);
         List<Integer> userIdList = getUserIdList(userList);
-        System.out.println("Alias " + groupMap.get("alias"));
-        System.out.println("Users " + userList);
-        System.out.println("IDs " + userIdList);
-        System.out.println("properties succesfully initialized");
         Map<String, Object> responseMap = new HashMap<>();
 
         if (doesGroupExists(groupAlias, getUserId(creator))) {
@@ -366,8 +342,6 @@ public class UserThread extends Thread {
             Map<String, String> groupMapToReturn = new HashMap<>();
             responseMap.put("groupMap", groupMapToReturn);
             objOut.writeObject(responseMap);
-//            objOut.writeObject(false);
-            System.out.println("Group already exists");
             return;
         }
 
@@ -376,16 +350,12 @@ public class UserThread extends Thread {
                     "INSERT INTO group_repo (is_admin, alias, uid_admin) VALUES (?,?,?)"
             );
 
-            System.out.println("prepared the query statement");
 
             insertGroupRepo.setBoolean(1, false);
             insertGroupRepo.setString(2, groupAlias);
             insertGroupRepo.setInt(3, userIdList.get(0));
 
-            System.out.println("creator: " + userIdList.get(0));
-
             insertGroupRepo.executeUpdate();
-            System.out.println("query executed update");
 
             this.importGroupMembers(userIdList, groupAlias, creator);
 
@@ -406,25 +376,21 @@ public class UserThread extends Thread {
             objOut.writeObject(responseMap);
             // send to everyone in group excluding user
             SERVER.sendMapToListOfUsers(responseMap, stringIdList, stringIdList.get(0));
-            System.out.println("successful group creation");
         } catch (SQLException e) {
             responseMap.put("status", "false");
             objOut.writeObject(responseMap);
-            System.out.println("unsuccessful group creation");
             e.printStackTrace();
         }
     }
 
-    private void removeUser(String email, String groupId){
+    private void removeUser(String email, String groupId) {
         try {
-            HashMap<String,Object> response = new HashMap<>();
+            HashMap<String, Object> response = new HashMap<>();
             PreparedStatement preparedStatement = Connector.connect.prepareStatement(
-              "DELETE FROM group_msg WHERE group_id=? AND user_id=?"
+                    "DELETE FROM group_msg WHERE group_id=? AND user_id=?"
             );
 
-            System.out.println(groupId);
-            System.out.println(getUserId(email));
-            preparedStatement.setInt(1,Integer.parseInt(groupId));
+            preparedStatement.setInt(1, Integer.parseInt(groupId));
             preparedStatement.setInt(2, getUserId(email));
 
             preparedStatement.executeUpdate();
@@ -433,13 +399,13 @@ public class UserThread extends Thread {
             response.put("emailRemoved", email);
 
             objOut.writeObject(response);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     /**
-     * @param groupAlias group name
+     * @param groupAlias   group name
      * @param groupCreator group creator ID
      * @return if group exists from group_repo table
      */
@@ -463,7 +429,6 @@ public class UserThread extends Thread {
     }
 
     private void toggleFavorite(HashMap<String, Object> faveRepo) throws IOException {
-        System.out.println("FAVORITE TOGGLED");
         String userId = (String) faveRepo.get("userId");
         String groupId = (String) faveRepo.get("groupId");
         String isFav = (String) faveRepo.get("isFav");
@@ -485,14 +450,12 @@ public class UserThread extends Thread {
             response.put("isFav", isFav);
             objOut.writeObject(response);
         } catch (SQLException e) {
-            System.out.println("FAVORITE TOGGLE UNSUCCESSFUL");
             e.printStackTrace();
         }
     }
 
     @SuppressWarnings("unchecked")
     private void broadcastMessage(HashMap<String, Object> messagesRepo) {
-        System.out.println("=== BROADCAST MESSAGE");
         List<Map<String, Object>> messageList = (List<Map<String, Object>>) messagesRepo.get("messagesList");
         for (Map<String, Object> messageRepo : messageList) {
             try {
@@ -533,7 +496,6 @@ public class UserThread extends Thread {
     }
 
     private void loginAuthentication(LoginHandler loginHandler, HashMap<String, Object> userAuth) throws IOException, SQLException {
-        System.out.println("\"" + userAuth.get("email") + "\" \"" + userAuth.get("password") + "\"");
         Optional<ResultSet> userLoginRepo = loginHandler.loginUser(new PasswordAuthentication((String) userAuth.get("email"), ((String) userAuth.get("password")).toCharArray()));
         if (userLoginRepo.isPresent()) {
             ResultSet resultSet = userLoginRepo.get();
@@ -543,7 +505,6 @@ public class UserThread extends Thread {
             boolean isAdmin = resultSet.getBoolean("is_admin");
             boolean verified = resultSet.getBoolean("verified");
             int id = resultSet.getInt("user_id");
-            System.out.println("login success id + " + id);
 
             Map<String, String> userRepo = new HashMap<>();
             userRepo.put("isAdmin", String.valueOf(isAdmin));
@@ -552,27 +513,26 @@ public class UserThread extends Thread {
             // send data back to client
             objOut.writeObject(true);
             objOut.writeObject(userRepo);
-            System.out.println("USER SUCCESSFULLY LOGGED IN");
 
             if (verified) {
                 SERVER.addOnlineUser(String.valueOf(getUserId(email)));
                 this.user = new User(id, email, firstName, lastName);
             }
+            System.out.println("request from: " + this.user.getEmail() +"| LOGIN ATTEMPT SUCCESSFUL: user: " + userAuth.get("email") + " at " + new Timestamp(System.currentTimeMillis()).toString());
         } else {
+            System.out.println("request from: " + this.user.getEmail() +"| LOGIN ATTEMPT FAILED: user: " + userAuth.get("email") + " at " + new Timestamp(System.currentTimeMillis()).toString());
             objOut.writeObject(false); // if userRepo does not have any value in it, return false (login failed)
-            System.out.println("userRepo no value log in UNSUCCESSFUL");
         }
     }
 
-    private void writeUserInformation(String email) {
-        System.out.println("USER INFORMATION REQUEST");
+    private void getUserInformation(String email) throws IOException {
+        Map<String, Object> responseMap = new HashMap<>();
         try {
             PreparedStatement preparedStatement = Connector.connect.prepareStatement(
                     "SELECT * FROM user_acc WHERE email = ?"
             );
 
             preparedStatement.setString(1, email);
-            System.out.println("email: " + email);
 
             ResultSet resultSet = preparedStatement.executeQuery();
             resultSet.next();
@@ -582,6 +542,7 @@ public class UserThread extends Thread {
             String lastName = resultSet.getString("user_lname");
             String isVerified = String.valueOf(resultSet.getBoolean("verified"));
             String isAdmin = String.valueOf(resultSet.getBoolean("is_admin"));
+            String color = resultSet.getString("user_color");
 
             userRepo.put("userId", userId);
             userRepo.put("email", email);
@@ -589,34 +550,33 @@ public class UserThread extends Thread {
             userRepo.put("lastName", lastName);
             userRepo.put("isVerified", isVerified);
             userRepo.put("isAdmin", isAdmin);
+            userRepo.put("color", color);
 
-            Map<String, Object> responseMap = new HashMap<>();
             responseMap.put("action", Action.ON_USER_INFO_SEND);
             responseMap.put("data", userRepo);
 
-            objOut.writeObject(responseMap);
-        } catch (SQLException | IOException e) {
+            System.out.println("request from: " + this.user.getEmail() +"| GET USER INFORMATION SUCCESS: user: " + email + " at " + new Timestamp(System.currentTimeMillis()).toString());
+        } catch (SQLException e) {
+            System.out.println("request from: " + this.user.getEmail() +"| GET USER INFORMATION FAIL: user: " + email + " at " + new Timestamp(System.currentTimeMillis()).toString());
             e.printStackTrace();
+        } finally {
+            objOut.writeObject(responseMap);
         }
     }
 
-    /**
-     * TODO: Only return groups that the user requesting is part of
-     */
-    private void writeGroupList() {
-        System.out.println("GET GROUP LIST REQUEST");
+    private void getGroupList() {
         try {
             Map<String, Object> responseMap = new HashMap<>();
             responseMap.put("action", Action.ON_GROUP_LIST_SEND);
-            System.out.println("responseMap created");
-            List<Map<String, String>> groupList = getGroupList();
+
+            List<Map<String, String>> groupList = retrieveGroupToList();
             responseMap.put("data", groupList);
             responseMap.put("unreadMessages", getUnreadMessages(this.user.getUserId()));
-            System.out.println("groupList added to responseMap");
+
             objOut.writeObject(responseMap);
-            System.out.println("group list returned");
+            System.out.println("request from: " + this.user.getEmail() +"| GET GROUP->MEMBER LIST SUCCESS at " + new Timestamp(System.currentTimeMillis()).toString());
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("request from: " + this.user.getEmail() +"| GET GROUP->MEMBER LIST FAIL at " + new Timestamp(System.currentTimeMillis()).toString());
         }
     }
 
@@ -627,10 +587,9 @@ public class UserThread extends Thread {
      * 1. Get group_ids the client is part of in group_msg table
      * 2. Get rows corresponding to those group_id's in the group_repo table
      */
-    private List<Map<String, String>> getGroupList() {
+    private List<Map<String, String>> retrieveGroupToList() {
         List<Map<String, String>> groupList = new ArrayList<>();
         try {
-
             // get group_ids the client is part of
             PreparedStatement getGroup_idsStatement = Connector.connect.prepareStatement(
                     "SELECT group_id, is_fav FROM group_msg WHERE user_id = ?"
@@ -657,21 +616,20 @@ public class UserThread extends Thread {
                 groupMap.put("isAdmin", isAdmin);
                 groupMap.put("alias", alias);
                 groupMap.put("uidAdmin", uidAdmin);
-                // TODO: Update this when messages table is already functional
                 groupMap.put("unreadMessages", "0");
                 groupMap.put("is_fav", String.valueOf(group_idsStatement.getInt("is_fav")));
 
                 groupList.add(groupMap);
             }
-
+            System.out.println("request from: " + this.user.getEmail() +"| QUERY GROUP->MEMBER LIST SUCCESS at " + new Timestamp(System.currentTimeMillis()).toString());
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("request from: " + this.user.getEmail() +"| GET GROUP->MEMBER LIST FAIL at " + new Timestamp(System.currentTimeMillis()).toString());
         }
         return groupList;
     }
 
-    private void getGroupMembersList(String groupId) {
-        HashMap<String,Object> response = new HashMap<>();
+    private void getGroupMembersList(String groupId) throws IOException {
+        HashMap<String, Object> response = new HashMap<>();
         List<Map<String, String>> memberRepo = new ArrayList<>();
         try {
             PreparedStatement preparedStatement = Connector.connect.prepareStatement(
@@ -689,35 +647,29 @@ public class UserThread extends Thread {
                 if (resultSetOptional.isPresent()) {
                     ResultSet userResult = resultSetOptional.get();
                     Map<String, String> userMap = new HashMap<>();
-                    if ( userResult.next()) {
+                    if (userResult.next()) {
                         userMap.put("userId", userId);
                         userMap.put("email", userResult.getString("email"));
                         userMap.put("firstName", userResult.getString("user_fname"));
                         userMap.put("lastName", userResult.getString("user_lname"));
+                        userMap.put("color", userResult.getString("user_color"));
                     }
                     memberRepo.add(userMap);
                 }
             }
             response.put("action", Action.ON_GROUP_MEMBERS_SEND);
             response.put("members", memberRepo);
-            objOut.writeObject(response);
-        } catch (SQLException | IOException e) {
-            e.printStackTrace();
+            System.out.println("request from: " + this.user.getEmail() +"| GET MEMBERS LIST SUCCESS at " + new Timestamp(System.currentTimeMillis()).toString());
+        } catch (SQLException e) {
+            System.out.println("request from: " + this.user.getEmail() +"| GET GROUP->MEMBER LIST FAIL at " + new Timestamp(System.currentTimeMillis()).toString());
         }
-    }
-
-    public void getSearchedUsers(String searchQuery){
-        try {
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+        objOut.writeObject(response);
     }
 
     /**
      * @param groupId id of the specific group
      */
-    private void getGroupMessages(String groupId) {
-        System.out.println("GET INITIAL GROUP MESSAGES");
+    private void getGroupMessages(String groupId) throws IOException {
         Map<String, Object> response = new HashMap<>();
         response.put("action", Action.ON_INITIAL_MESSAGES_RECEIVED);
         List<Map<String, String>> groupMsgRepo = new ArrayList<>();
@@ -752,23 +704,25 @@ public class UserThread extends Thread {
                 groupMsgRepo.add(msgRepo);
             }
             response.put("messages", groupMsgRepo);
-            objOut.writeObject(response);
-        } catch (SQLException | IOException e) {
-            e.printStackTrace();
+            System.out.println("request from: " + this.user.getEmail() +"| GET GROUP->MEMBER LIST SUCCESS at " + new Timestamp(System.currentTimeMillis()).toString());
+        } catch (SQLException e) {
+            System.out.println("request from: " + this.user.getEmail() +"| GET GROUP->MESSAGES LIST FAIL at " + new Timestamp(System.currentTimeMillis()).toString());
         }
+        objOut.writeObject(response);
     }
 
     private Optional<ResultSet> queryUserInformation(String userId) {
         try {
             PreparedStatement preparedStatement = Connector.connect.prepareStatement(
-                    "SELECT email,user_fname,user_lname FROM user_acc WHERE user_id = ?"
+                    "SELECT email,user_fname,user_lname,user_color FROM user_acc WHERE user_id = ?"
             );
 
             preparedStatement.setInt(1, Integer.parseInt(userId));
 
+            System.out.println("request from: " + this.user.getEmail() +"| QUERY USER INFORMATION SUCCESS at " + new Timestamp(System.currentTimeMillis()).toString());
             return Optional.ofNullable(preparedStatement.executeQuery());
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("request from: " + this.user.getEmail() +"| QUERY USER INFORMATION SUCCESS at " + new Timestamp(System.currentTimeMillis()).toString());
         }
         return Optional.empty();
     }
@@ -778,14 +732,14 @@ public class UserThread extends Thread {
      * class
      * <p>
      *
-     * @param sender who sent the message
+     * @param sender  who sent the message
      * @param address who receives the message
      * @param message message to send
      */
     protected void sendMessage(int sender, String address, String message, Timestamp timeSent) {
         try {
             PreparedStatement preparedStatement = Connector.connect.prepareStatement(
-                    "SELECT user_fname, user_lname, email FROM user_acc WHERE user_id = ?"
+                    "SELECT user_fname, user_lname, email, user_color FROM user_acc WHERE user_id = ?"
             );
 
             preparedStatement.setInt(1, sender);
@@ -803,10 +757,13 @@ public class UserThread extends Thread {
             messageRepo.put("address", address);
             messageRepo.put("message", message);
             messageRepo.put("timeSent", timeSent.toString());
+            messageRepo.put("color", resultSet.getString("user_color"));
             response.put("messages", messageRepo);
             objOut.writeObject(response); // send message to the server
+
+            System.out.println("request from: " + this.user.getEmail() +"| MESSAGE SENT TO ADDRESS: " + address + "FROM user: " + sender + " SUCCESS at " + new Timestamp(System.currentTimeMillis()).toString());
         } catch (IOException | SQLException e) {
-            e.printStackTrace();
+            System.out.println("request from: " + this.user.getEmail() +"| MESSAGE SENT TO ADDRESS: " + address + "FROM user: " + sender + " FAIL at " + new Timestamp(System.currentTimeMillis()).toString());
         }
     }
 

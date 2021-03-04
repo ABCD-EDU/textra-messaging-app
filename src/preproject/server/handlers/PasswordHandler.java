@@ -34,7 +34,7 @@ public class PasswordHandler {
 
     private static String SALT;
 
-    public PasswordHandler() {};
+    public PasswordHandler() {}
 
     public String getSalt() {
         return SALT;

@@ -16,7 +16,7 @@ public class LoginHandler {
      *
      * @param emailInput email to find
      * @return row data of email found
-     * @throws SQLException
+     * @throws SQLException error with query
      */
     private Optional<ResultSet> findUserByEmail(String emailInput) throws SQLException {
         PreparedStatement statement = Connector.connect
@@ -32,7 +32,6 @@ public class LoginHandler {
      * @param pwdAuth  repo for password/username
      * @param userRepo repo for the row data
      * @return correct password authentication
-     * @throws SQLException
      */
     private boolean verifyUserAuthentication(PasswordAuthentication pwdAuth, ResultSet userRepo) {
         try {

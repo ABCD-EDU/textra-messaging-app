@@ -11,7 +11,7 @@ public class ChatServer {
     private final int PORT;
     private final List<String> onlineUserIds;
     private final List<UserThread> onlineUsers;
-    private Map<String, List<String>> groupList;
+    private final Map<String, List<String>> groupList;
 
     public static void main(String[] args) {
         ChatServer c = new ChatServer(2000);
@@ -203,12 +203,10 @@ public class ChatServer {
 
             for (int user : offlineUsers) {
                 if (!onlineUserIds.contains(String.valueOf(user))) {
-                    System.out.println(user);
                     writeUnreadMsg.setInt(1, msgId);
                     writeUnreadMsg.setInt(2, user);
                     writeUnreadMsg.setInt(3, grpId);
-                    int columnAffected = writeUnreadMsg.executeUpdate();
-                    System.out.println("EXECUTE QUERY INSERT COLUMN AFFECTED: " + columnAffected);
+                    writeUnreadMsg.executeUpdate();
                 }
             }
         } catch (SQLException e) {
@@ -219,9 +217,9 @@ public class ChatServer {
     protected void removeUser(UserThread user) {
         onlineUsers.remove(user);
         try {
-            System.out.println("User with email " + user.getUser().getEmail() + " has logged out");
+            System.out.println("SOCKET closed successfully! | user: \"" + user.getUser().getEmail() + "\" has successfully LOGGED OUT at " + new Timestamp(System.currentTimeMillis()).toString());
         } catch (NullPointerException e) {
-            System.out.println("A user who has not yet logged in has disconnected");
+            System.out.println("SOCKET closed successfully! | a user who has not yet logged in has disconnected at " + new Timestamp(System.currentTimeMillis()).toString());
         }
     }
 

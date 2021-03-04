@@ -166,11 +166,11 @@ public class ChatController implements Initializable {
                         break;
                     case Action.ON_REMOVE_A_MEMBER:
                         System.out.println("A MEMBER IS REMOVED");
-                        handleMemberRemoval((String) readData.get("emailRemoved"));
+                        handleMemberRemoval((String)readData.get("email"), (String)readData.get("groupId"));
                         break;
                     case Action.ON_ADD_NEW_GROUP_MEMBER:
                         System.out.println("A NEW MEMBER IS ADDED");
-                        handleMemberAddition((Boolean)readData.get("areAdded"));
+                        handleGroupCreation((Map<String, String>)readData.get("groupMap"), "true");
                         break;
                 }
             }
@@ -635,8 +635,16 @@ public class ChatController implements Initializable {
         convoController.setGroupMembers(groupMembers);
     }
 
-    private void handleMemberRemoval(String emailRemoved){
-        convoController.removeMemberFromList(emailRemoved);
+    private void handleMemberRemoval(String email, String groupId){
+        if (!email.equals(this.email))
+            return;
+        for (Map<String, String> groupMap : groupsList) {
+            if (groupMap.get("groupId").equals(groupId)) {
+                groupsList.remove(groupMap);
+                break;
+            }
+        }
+        renderGroupsList(sortGroupList(groupsList, "-1"));
     }
 
     private void handleMemberAddition(Boolean areAdded){

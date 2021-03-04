@@ -114,7 +114,7 @@ public class ChatServer {
     /**
      * Send a Map of <String, Object> to everyone in a given list of users.
      * If userIds.length = 0 then send to all online users
-     * If senderId == "-1", send to everyone in group including sender
+     * If senderId == "-1", send to everyone in list including sender
      */
     protected void sendMapToListOfUsers(Map<String, Object> dataMap, ArrayList<String> userIds, String senderId) {
         if (userIds.size() == 0) { // send to all online user except sender
@@ -126,6 +126,7 @@ public class ChatServer {
                 if (userIds.contains(String.valueOf(userThread.getUser().getUserId())) &&
                         !senderId.equals(String.valueOf(userThread.getUser().getUserId()))
                         && userThread.getUser().isLoggedIn()) { // if user is part of list of users and is not sender
+                    System.out.println("SENDING MAP TO: " + userThread.getUser().getEmail());
                     userThread.sendMap(dataMap);
                 }
         }

@@ -233,22 +233,35 @@ public class UserThread extends Thread {
         String groupAlias = (String) groupMap.get("alias");
         String creatorId = (String) groupMap.get("creator");
         String creatorEmail = getEmail(creatorId);
+        String groupId = String.valueOf(getGroupId(groupAlias, Integer.parseInt(creatorId)));
         List<String> userList = (List<String>) groupMap.get("members");
-        for (String email:(List<String>) groupMap.get("members")){
-            System.out.println("Emails Added: "+email);
-        }
+//        for (String email:(List<String>) groupMap.get("members")){
+//            System.out.println("Emails Added: "+email);
+//        }
         List<Integer> userIdList = getUserIdList(userList);
         userIdList.forEach((id) ->
                 SERVER.updateGroupList(
-                        String.valueOf(getGroupId(groupAlias, Integer.parseInt(creatorId))),
-                        id.toString()));
-        HashMap<String, Object> response = new HashMap<>();
-        response.put("action", Action.ON_ADD_NEW_GROUP_MEMBER);
-        response.put("areAdded", true);
+                        groupId,
+                        id.toString())
+        );
+
         try {
             this.importGroupMembers(userIdList, groupAlias, creatorEmail);
-            System.out.println("WRITING RESPONSE TO CLIENT");
-            objOut.writeObject(response);
+
+            // notify added users
+            Map<String, Object> notifMap = new HashMap<>();
+            notifMap.put("action", Action.ON_ADD_NEW_GROUP_MEMBER);
+            Map<String, String> groupMapToReturn = new HashMap<>();
+            groupMapToReturn.put("groupId", groupId);
+            groupMapToReturn.put("alias", groupAlias);
+            groupMapToReturn.put("unreadMessages", "0");
+            groupMapToReturn.put("is_fav", "0");
+            notifMap.put("groupMap", groupMapToReturn);
+            ArrayList<String> usersIdList = new ArrayList<>();
+            for (String email: (List<String>)groupMap.get("members"))
+                usersIdList.add(String.valueOf(getUserId(email)));
+            SERVER.sendMapToListOfUsers(notifMap, usersIdList, creatorId);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -425,8 +438,12 @@ public class UserThread extends Thread {
 
             preparedStatement.executeUpdate();
 
+            ArrayList<String> usersToRemove = new ArrayList<>();
+            usersToRemove.add(String.valueOf(getUserId(email)));
             response.put("action", Action.ON_REMOVE_A_MEMBER);
-            response.put("emailRemoved", email);
+            response.put("groupId", groupId);
+            response.put("email", email);
+            SERVER.sendMapToListOfUsers(response, usersToRemove, "-1");
 
             objOut.writeObject(response);
         } catch (Exception e) {

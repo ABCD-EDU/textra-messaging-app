@@ -180,7 +180,7 @@ public class ConvoInfoController {
     @FXML
     public void onConvoInfoExit(){
     Stage stage = (Stage)stackPane.getScene().getWindow();
-    Platform.runLater(()->stage.close());
+        Platform.runLater(()->stage.close());
     }
 
     @FXML

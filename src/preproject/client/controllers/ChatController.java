@@ -538,6 +538,10 @@ public class ChatController implements Initializable {
             System.out.println("group creation unsuccessful");
             return;
         }
+        for (Map<String, String> gpMap : groupsList) {
+            if (groupMap.get("groupId").equals(gpMap.get("groupId")))
+                return;
+        }
 
         groupsList.add(groupMap);
         renderGroupsList(sortGroupList(groupsList, groupMap.get("groupId")));

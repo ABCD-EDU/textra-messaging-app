@@ -47,6 +47,7 @@ public class UserThread extends Thread {
                     SOCKET.close();
                     objOut.close();
                     SERVER.removeUser(this);
+                    SERVER.getOfflineUserId().add(this.getUser().getUserId());
                     break;
                 }
             }

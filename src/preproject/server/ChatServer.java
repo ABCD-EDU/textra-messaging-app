@@ -12,6 +12,7 @@ public class ChatServer {
     private final List<String> onlineUserIds;
     private final List<UserThread> onlineUsers;
     private final Map<String, List<String>> groupList;
+    private final List<Integer> offlineUserId;
 
     public static void main(String[] args) {
         ChatServer c = new ChatServer(2000);
@@ -23,10 +24,9 @@ public class ChatServer {
         this.PORT = port;
         this.onlineUserIds = new ArrayList<>();
         this.onlineUsers = new ArrayList<>();
-        // TODO: populate groupList
+        this.offlineUserId = new ArrayList<>();
         groupList = new HashMap<>();
         initializeGroupList();
-        // TODO: need to get group list as users add members and create new groups
     }
 
     /**
@@ -191,18 +191,17 @@ public class ChatServer {
             );
 
             preparedStatement.setInt(1, grpId);
-            List<Integer> offlineUsers = new ArrayList<>();
             ResultSet userListQuery = preparedStatement.executeQuery();
             while (userListQuery.next()) {
                 int id = userListQuery.getInt("user_id");
-                offlineUsers.add(id);
+                offlineUserId.add(id);
             }
 
             PreparedStatement writeUnreadMsg = Connector.connect.prepareStatement(
                     "INSERT INTO unread_msg (message_id, user_id, group_id) VALUES (?, ?, ?)"
             );
 
-            for (int user : offlineUsers) {
+            for (int user : offlineUserId) {
                 if (!onlineUserIds.contains(String.valueOf(user))) {
                     writeUnreadMsg.setInt(1, msgId);
                     writeUnreadMsg.setInt(2, user);
@@ -227,5 +226,9 @@ public class ChatServer {
     protected void addOnlineUser(String id) {
         System.out.println("ID ADDED! " + id);
         this.onlineUserIds.add(id);
+    }
+
+    public List<Integer> getOfflineUserId() {
+        return offlineUserId;
     }
 }

@@ -110,6 +110,9 @@ public class ChatController implements Initializable {
     @FXML
     private Label lInitial_label;
 
+    @FXML
+    private Button send_button;
+
 
     private class ClientThread extends Thread {
 
@@ -460,7 +463,7 @@ public class ChatController implements Initializable {
                 ((Label)component).setText(groupMap.get("alias"));
             if (component.getId().equals("favorite_button")) {
                 if (!groupMap.get("is_fav").equals("1")) {
-                    ((Button)component).setStyle("-fx-shape:  \"M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z\"; -fx-background-color:  #DDDDDD; -fx-border-color: #EDB458");
+                    ((Button)component).setStyle("-fx-shape:  \"M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z\"; -fx-background-color:  #EEEEEE; -fx-border-color: #EDB458");
                     favIsPressed = false;
                 } else {
                     ((Button)component).setStyle("-fx-shape:  \"M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z\"; -fx-background-color:  #EDB458");
@@ -565,35 +568,22 @@ public class ChatController implements Initializable {
     }
 
     @FXML
-    void mouseEnterFavButton() {
-        if (!favIsPressed) {
-            favorite_button.setStyle("-fx-shape:  \"M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z\"; -fx-background-color:  #DDDDDD; -fx-border-color: #EDB458");
+    void mouseEnter(MouseEvent event) {
+        if (event.getSource().equals(send_button)) {
+            send_button.setStyle("-fx-shape:  \"M256 8c137 0 248 111 248 248S393 504 256 504 8 393 8 256 119 8 256 8zm113.9 231L234.4 103.5c-9.4-9.4-24.6-9.4-33.9 0l-17 17c-9.4 9.4-9.4 24.6 0 33.9L285.1 256 183.5 357.6c-9.4 9.4-9.4 24.6 0 33.9l17 17c9.4 9.4 24.6 9.4 33.9 0L369.9 273c9.4-9.4 9.4-24.6 0-34z\"; -fx-background-color: #333333");
+        } else if (event.getSource().equals(newConversations_Pane)) {
+            newConversations_Pane.setStyle("-fx-background-color: #DDDDDD; -fx-background-radius: 5");
         }
     }
 
     @FXML
-    void mouseExitFavButton() {
-        if (!favIsPressed) {
-            favorite_button.setStyle("-fx-shape:  \"M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z\"; -fx-background-color:  #DDDDDD; -fx-border-color: #DDDDDD");
+    void mouseExit(MouseEvent event) {
+        if (event.getSource().equals(send_button)) {
+            send_button.setStyle("-fx-shape:  \"M256 8c137 0 248 111 248 248S393 504 256 504 8 393 8 256 119 8 256 8zm113.9 231L234.4 103.5c-9.4-9.4-24.6-9.4-33.9 0l-17 17c-9.4 9.4-9.4 24.6 0 33.9L285.1 256 183.5 357.6c-9.4 9.4-9.4 24.6 0 33.9l17 17c9.4 9.4 24.6 9.4 33.9 0L369.9 273c9.4-9.4 9.4-24.6 0-34z\"; -fx-background-color: #999999");
+        } else if (event.getSource().equals(newConversations_Pane)) {
+            newConversations_Pane.setStyle("-fx-background-color: #EEEEEE");
+
         }
-    }
-
-    // for newConvoPane & chatBoxPane(with buttons)
-    @FXML
-    void mouseEnterChatBox(MouseEvent event) {
-//        chatBoxPane.setStyle("-fx-background-color: #DDDDDD");
-//        if (event.getSource().equals(favorite_button) && !favIsPressed) {
-//            favorite_button.setStyle("-fx-shape:  \"M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z\"; -fx-background-color:  #DDDDDD");
-//        }
-    }
-
-    // for newConvoPane & chatBoxPane(with buttons)
-    @FXML
-    void mouseExitChatBox(MouseEvent event) {
-//        chatBoxPane.setStyle("-fx-background-color: #EEEEEE");
-//        if (event.getSource().equals(favorite_button) && !favIsPressed) {
-//            favorite_button.setStyle("-fx-shape:  \"M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z\"; -fx-background-color:  #EEEEEE");
-//        }
     }
 
     private void setConversationHeader(String alias, Boolean isAdmin) {
@@ -680,7 +670,9 @@ public class ChatController implements Initializable {
             unreadBroadcastMessages = 0;
             setConversationHeader("Broadcast To All", false);
             currentlySelectedGroupID = "-1";
-            message_area.setPromptText("send a message to all online users");
+            message_area.clear();
+            message_area.setPromptText("Send a message to all online users");
+            message_area.requestFocus();
             message_area.setDisable(false);
             try {
                 System.out.println(broadCastMessages.size());

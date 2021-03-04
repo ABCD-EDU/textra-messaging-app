@@ -1,24 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.shape.Circle?>
 <?import javafx.scene.text.Font?>
 
-<javafx.scene.layout.HBox fx:id="userSigningUpHbox" alignment="CENTER_LEFT" onMouseEntered="#mouseEnterBox" onMouseExited="#mouseExitBox" prefHeight="53.0" prefWidth="340.0" style="-fx-border-style: hidden hidden solid hidden;-fx-border-color: #333333;-fx-border-width: .1;" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="preproject.client.controllers.AdminSignUpsController">
-   <Circle fill="#aaaaaa" radius="17.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0">
-      <HBox.margin>
-         <Insets left="5.0" />
-      </HBox.margin>
-   </Circle>
-    <Label fx:id="userName" prefHeight="24.0" prefWidth="176.0" text="user@email.com">
+<javafx.scene.layout.HBox fx:id="userSigningUpHbox" alignment="CENTER" onMouseEntered="#mouseEnterBox" onMouseExited="#mouseExitBox" prefHeight="53.0" prefWidth="325.0" style="-fx-border-style: hidden hidden solid hidden;-fx-border-color: #333333;-fx-border-width: .1;" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="preproject.client.controllers.AdminSignUpsController">
+    <Label fx:id="userName" prefHeight="24.0" prefWidth="185.0" text="user@email.com">
         <font>
             <Font size="14.0" />
         </font>
       <HBox.margin>
-         <Insets left="10.0" />
+         <Insets />
       </HBox.margin>
     </Label>
     <Button fx:id="declineButton" mnemonicParsing="false" prefHeight="20.0" prefWidth="50.0" style="-fx-background-color: #DB5461;-fx-text-fill: WHITE;" text="decline">
@@ -27,12 +22,18 @@
       </HBox.margin>
       <font>
          <Font name="System Bold" size="10.0" />
-      </font></Button>
+      </font>
+      <cursor>
+         <Cursor fx:constant="HAND" />
+      </cursor></Button>
     <Button fx:id="acceptButton" mnemonicParsing="false" prefHeight="20.0" prefWidth="50.0" style="-fx-background-color: #00A676;-fx-text-fill: WHITE;" text="accept">
       <HBox.margin>
-         <Insets right="5.0" />
+         <Insets />
       </HBox.margin>
       <font>
          <Font name="System Bold" size="10.0" />
-      </font></Button>
+      </font>
+      <cursor>
+         <Cursor fx:constant="HAND" />
+      </cursor></Button>
 </javafx.scene.layout.HBox>

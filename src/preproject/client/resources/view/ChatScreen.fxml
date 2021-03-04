@@ -19,7 +19,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="preproject.client.controllers.ChatController">
+<AnchorPane prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="preproject.client.controllers.ChatController">
    <children>
       <HBox prefHeight="720.0" prefWidth="1280.0" style="-fx-background-color: red;">
          <children>
@@ -66,7 +66,7 @@
                   </Pane>
                   <Pane prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="4">
                      <children>
-                        <Pane fx:id="newConversations_Pane" layoutX="13.0" onMouseClicked="#onNewConversationClick" onMouseEntered="#mouseEnterChatBox" onMouseExited="#mouseExitChatBox" prefHeight="53.0" prefWidth="234.0">
+                        <Pane fx:id="newConversations_Pane" layoutX="13.0" onMouseClicked="#onNewConversationClick" onMouseEntered="#mouseEnter" onMouseExited="#mouseExit" prefHeight="53.0" prefWidth="234.0">
                            <children>
                               <Circle fill="#333333" layoutX="27.0" layoutY="27.0" radius="17.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" />
                               <Label fx:id="groupAlias_label" layoutX="54.0" layoutY="18.0" prefHeight="17.0" prefWidth="109.0" text="Start a Conversation" />
@@ -122,11 +122,14 @@
                   </ScrollPane>
                   <Pane prefHeight="67.0" prefWidth="1020.0" style="-fx-background-color: #FAFAFA;" GridPane.rowIndex="2">
                      <children>
-                        <TextArea fx:id="message_area" layoutX="16.0" layoutY="19.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" onKeyPressed="#onKeyPress" prefHeight="30.0" prefWidth="950.0" promptText="message 'conversation name'" style="-fx-control-inner-background: #EEEEEE; -fx-prompt-text-fill: #666666; -fx-border-radius: 3;" wrapText="true">
+                        <TextArea fx:id="message_area" layoutX="16.0" layoutY="19.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" onKeyPressed="#onKeyPress" prefHeight="30.0" prefWidth="950.0" promptText="message 'conversation name'" style="-fx-control-inner-background: #EEEEEE; -fx-prompt-text-fill: #666666;" wrapText="true">
                            <font>
                               <Font size="14.0" />
                            </font></TextArea>
-                        <Button layoutX="974.0" layoutY="20.0" mnemonicParsing="false" onMouseClicked="#onClick" prefHeight="28.0" prefWidth="28.0" style="-fx-shape: &quot;M256 8c137 0 248 111 248 248S393 504 256 504 8 393 8 256 119 8 256 8zm113.9 231L234.4 103.5c-9.4-9.4-24.6-9.4-33.9 0l-17 17c-9.4 9.4-9.4 24.6 0 33.9L285.1 256 183.5 357.6c-9.4 9.4-9.4 24.6 0 33.9l17 17c9.4 9.4 24.6 9.4 33.9 0L369.9 273c9.4-9.4 9.4-24.6 0-34z&quot;; -fx-background-color: #333333;" />
+                        <Button fx:id="send_button" layoutX="974.0" layoutY="20.0" mnemonicParsing="false" onMouseClicked="#onClick" onMouseEntered="#mouseEnter" onMouseExited="#mouseExit" prefHeight="28.0" prefWidth="28.0" style="-fx-shape: &quot;M256 8c137 0 248 111 248 248S393 504 256 504 8 393 8 256 119 8 256 8zm113.9 231L234.4 103.5c-9.4-9.4-24.6-9.4-33.9 0l-17 17c-9.4 9.4-9.4 24.6 0 33.9L285.1 256 183.5 357.6c-9.4 9.4-9.4 24.6 0 33.9l17 17c9.4 9.4 24.6 9.4 33.9 0L369.9 273c9.4-9.4 9.4-24.6 0-34z&quot;; -fx-background-color: #999999;">
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor></Button>
                      </children>
                   </Pane>
                   <Pane fx:id="header_pane" prefHeight="53.0" prefWidth="1020.0" style="-fx-background-color: #FAFAFA;">

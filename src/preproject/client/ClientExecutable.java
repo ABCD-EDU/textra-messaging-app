@@ -13,7 +13,7 @@ public class ClientExecutable extends Application {
     public void start(Stage primaryStage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("resources/view/SignInScreen.fxml"));
         Scene scene = new Scene(root);
-        primaryStage.setTitle("Messaging App");
+        primaryStage.setTitle("Textra");
         primaryStage.setScene(scene);
         primaryStage.show();
         primaryStage.setOnCloseRequest(e -> serverConnector.close());

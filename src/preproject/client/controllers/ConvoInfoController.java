@@ -144,7 +144,14 @@ public class ConvoInfoController {
 
                 if (component.getId().equals("remove_button")){
                     //Hide remove button if the user is not the admin of the group
-                    if (!userId.equals(groupAdmin) || currentUserEmail.equals(member.get("email"))){
+                    boolean currentUserIsSameWithGroupAdmin = groupAdmin.equals(currentUserEmail);
+                    boolean isAdmin = userId.equals(groupAdmin);
+                    boolean sameUser = currentUserEmail.equals(member.get("email"));
+                    if (isAdmin || currentUserIsSameWithGroupAdmin)
+                        component.setVisible(true);
+                    else
+                        component.setVisible(false);
+                    if (sameUser){
                         component.setVisible(false);
                     }else {
                         ((Button) component).setOnAction(event -> {

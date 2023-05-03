@@ -1,5 +1,11 @@
 # 9322-preGrp3
 
+## Project Preview:
+![vlcsnap-00045](https://user-images.githubusercontent.com/90618180/235820362-275e422b-4ac7-4df3-b143-1fcfb324bf74.png)
+![vlcsnap-00044](https://user-images.githubusercontent.com/90618180/235820366-75ac0dd6-d444-4713-b40b-0aba91912221.png)
+
+
+
 ## Starting Information
 **First, make sure to set the project's SDK and Language level to both java version "11.0.9" and 11 - Local variable syntax for lambda parameters**
 
